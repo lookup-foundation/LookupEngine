@@ -36,7 +36,7 @@ internal sealed class TimeDiagnoser : IEngineDiagnoser
 
     public TimeSpan GetElapsed()
     {
-#if NETCOREAPP
+#if NET
         var elapsed = Stopwatch.GetElapsedTime(_startTimeStamp, _endTimeStamp);
 #else
         var tickFrequency = (double) TimeSpan.TicksPerSecond / Stopwatch.Frequency;

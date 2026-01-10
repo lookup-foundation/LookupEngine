@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using JetBrains.Annotations;
 using LookupEngine.Abstractions.Decomposition;
-#if NETCOREAPP
+#if NET
 using System.Text.Json.Serialization;
 #endif
 
@@ -18,7 +18,7 @@ public sealed class DecomposedValue
     /// <summary>
     ///     The raw, non-evaluated value
     /// </summary>
-#if NETCOREAPP
+#if NET
     [JsonIgnore]
 #endif
     public required object? RawValue { get; init; }
@@ -46,7 +46,7 @@ public sealed class DecomposedValue
     /// <summary>
     ///     Descriptor for value description
     /// </summary>
-#if NETCOREAPP
+#if NET
     [JsonIgnore]
 #endif
     public Descriptor? Descriptor { get; init; }
