@@ -29,16 +29,21 @@ public partial class LookupComposer
         var enumerator = enumerable.GetEnumerator();
 
         var index = 0;
-        while (enumerator.MoveNext())
+        try
         {
-            WriteEnumerableMember(enumerator.Current, index);
-            index++;
-            _depth--;
+            while (enumerator.MoveNext())
+            {
+                WriteEnumerableMember(enumerator.Current, index);
+                index++;
+                _depth--;
+            }
         }
-
-        if (enumerator is IDisposable disposable)
+        finally
         {
-            disposable.Dispose();
+            if (enumerator is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
         }
     }
 }
