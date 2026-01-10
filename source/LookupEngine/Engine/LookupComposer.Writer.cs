@@ -102,7 +102,9 @@ public partial class LookupComposer
             Name = name,
             Value = CreateValue(name, value),
             DeclaringTypeName = formatTypeName,
-            DeclaringTypeFullName = $"{MemberDeclaringType.Namespace}.{formatTypeName}",
+            DeclaringTypeFullName = MemberDeclaringType.Namespace != null
+                ? $"{MemberDeclaringType.Namespace}.{formatTypeName}"
+                : formatTypeName,
             MemberAttributes = MemberAttributes.Extension,
             ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds,
             AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes()
@@ -121,7 +123,9 @@ public partial class LookupComposer
             Value = CreateValue(memberInfo.Name, value),
             Name = memberInfo.Name,
             DeclaringTypeName = formatTypeName,
-            DeclaringTypeFullName = $"{MemberDeclaringType.Namespace}.{formatTypeName}",
+            DeclaringTypeFullName = MemberDeclaringType.Namespace != null
+                ? $"{MemberDeclaringType.Namespace}.{formatTypeName}"
+                : formatTypeName,
             MemberAttributes = ModifiersFormater.FormatAttributes(memberInfo),
             ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds,
             AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes()
@@ -140,7 +144,9 @@ public partial class LookupComposer
             Value = CreateValue(memberInfo.Name, value),
             Name = ReflexionFormater.FormatMemberName(memberInfo, parameters),
             DeclaringTypeName = formatTypeName,
-            DeclaringTypeFullName = $"{MemberDeclaringType.Namespace}.{formatTypeName}",
+            DeclaringTypeFullName = MemberDeclaringType.Namespace != null
+                ? $"{MemberDeclaringType.Namespace}.{formatTypeName}"
+                : formatTypeName,
             MemberAttributes = ModifiersFormater.FormatAttributes(memberInfo),
             ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds,
             AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes()
