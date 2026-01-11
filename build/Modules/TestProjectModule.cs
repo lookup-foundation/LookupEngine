@@ -19,7 +19,7 @@ public sealed class TestProjectModule : Module<CommandResult>
         {
             Configuration = Configuration.Release,
             Verbosity = Verbosity.Minimal,
-            Arguments = ["--project"]
+            Arguments = ["--project", Projects.LookupEngine_Tests_Unit.FullName]
         }, cancellationToken);
     }
 }
