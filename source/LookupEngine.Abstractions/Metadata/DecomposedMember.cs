@@ -9,7 +9,7 @@ namespace LookupEngine.Abstractions;
 ///     Represents a decomposed object member
 /// </summary>
 [PublicAPI]
-[DebuggerDisplay("Name = {Name} Value = {Value.Name}")]
+[DebuggerDisplay("Name = {Name}, Value = {Value.Name}")]
 public sealed class DecomposedMember
 {
     /// <summary>

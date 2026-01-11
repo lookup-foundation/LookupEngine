@@ -1,9 +1,7 @@
 ﻿using System.Diagnostics;
 using JetBrains.Annotations;
 using LookupEngine.Abstractions.Decomposition;
-#if NET
 using System.Text.Json.Serialization;
-#endif
 
 // ReSharper disable once CheckNamespace
 namespace LookupEngine.Abstractions;
@@ -12,16 +10,13 @@ namespace LookupEngine.Abstractions;
 ///     Represents a decomposed member value
 /// </summary>
 [PublicAPI]
-[DebuggerDisplay("Name = {Name} Value = {RawValue}")]
+[DebuggerDisplay("Name = {Name}, Value = {RawValue}")]
 public sealed class DecomposedValue
 {
     /// <summary>
     ///     The raw, non-evaluated value
     /// </summary>
-#if NET
-    [JsonIgnore]
-#endif
-    public required object? RawValue { get; init; }
+    [JsonIgnore] public object? RawValue { get; init; }
 
     /// <summary>
     ///     The value name
@@ -46,8 +41,5 @@ public sealed class DecomposedValue
     /// <summary>
     ///     Descriptor for value description
     /// </summary>
-#if NET
-    [JsonIgnore]
-#endif
-    public Descriptor? Descriptor { get; init; }
+    [JsonIgnore] public Descriptor? Descriptor { get; init; }
 }
