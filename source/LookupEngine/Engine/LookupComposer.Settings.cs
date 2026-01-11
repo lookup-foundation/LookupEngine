@@ -31,7 +31,6 @@ public partial class LookupComposer
     private int _depth;
     private object _input;
     private DecomposedObject? _decomposedObject;
-    private List<DecomposedMember>? _decomposedMembers;
 
     /// <summary>
     ///     Initialize a new composer instance
@@ -41,6 +40,9 @@ public partial class LookupComposer
         _input = value;
         _options = options;
     }
+#if NETFRAMEWORK
+#pragma warning disable CS8603 // Possible null reference return.
+#endif
 
     /// <summary>
     ///     Decomposed members of the input object
@@ -49,14 +51,14 @@ public partial class LookupComposer
     {
         get
         {
-            if (_decomposedMembers is null)
+            if (field is null)
             {
                 EngineException.ThrowIfEngineNotInitialized(nameof(DecomposedMembers));
             }
 
-            return _decomposedMembers;
+            return field;
         }
-        set => _decomposedMembers = value;
+        set;
     }
 
     /// <summary>
@@ -92,4 +94,7 @@ public partial class LookupComposer
         }
         set;
     }
+#if NETFRAMEWORK
+#pragma warning restore CS8603 // Possible null reference return.
+#endif
 }

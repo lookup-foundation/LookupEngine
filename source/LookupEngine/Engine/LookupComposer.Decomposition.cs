@@ -85,7 +85,7 @@ public partial class LookupComposer
     [Pure]
     private List<DecomposedMember> DecomposeInstanceMembers(Type objectType)
     {
-        _decomposedMembers = new List<DecomposedMember>(32);
+        DecomposedMembers = new List<DecomposedMember>(32);
 
         var objectTypeHierarchy = GetTypeHierarchy(objectType);
         for (var i = objectTypeHierarchy.Count - 1; i >= 0; i--)
@@ -109,7 +109,7 @@ public partial class LookupComposer
         MemberDeclaringType = objectType;
         AddEnumerableItems();
 
-        return _decomposedMembers;
+        return DecomposedMembers;
     }
 
     /// <summary>
@@ -118,7 +118,7 @@ public partial class LookupComposer
     [Pure]
     private List<DecomposedMember> DecomposeStaticMembers(Type objectType)
     {
-        _decomposedMembers = new List<DecomposedMember>(32);
+        DecomposedMembers = new List<DecomposedMember>(32);
 
         var flags = BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly;
         if (_options.IncludePrivateMembers) flags |= BindingFlags.NonPublic;
@@ -136,7 +136,7 @@ public partial class LookupComposer
             _depth--;
         }
 
-        return _decomposedMembers;
+        return DecomposedMembers;
     }
 
     /// <summary>
