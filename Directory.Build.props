@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>true</ImplicitUsings>
+        <PlatformTarget>AnyCPU</PlatformTarget>
     </PropertyGroup>
 
 </Project>
