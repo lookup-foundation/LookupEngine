@@ -1,0 +1,37 @@
+mode: ContinuousDelivery
+strategies:
+  - Mainline
+  - ConfiguredNextVersion
+branches:
+  main:
+    regex: ^main$
+    mode: ContinuousDelivery
+    label: ''
+    increment: Patch
+    track-merge-target: false
+    is-release-branch: true
+    is-main-branch: true
+    prevent-increment:
+      of-merged-branch: true
+  develop:
+    regex: ^dev(elop)?(ment)?$
+    mode: ContinuousDeployment
+    label: beta
+    increment: Minor
+    is-release-branch: false
+    is-main-branch: false
+    track-merge-target: true
+    prevent-increment:
+      when-current-commit-tagged: false
+    source-branches:
+      - main
+  feature:
+    regex: ^features?[/-](?<BranchName>.+)
+    mode: ContinuousDeployment
+    label: alpha
+    increment: Inherit
+    is-main-branch: false
+    prevent-increment:
+      when-current-commit-tagged: false
+    source-branches:
+      - develop

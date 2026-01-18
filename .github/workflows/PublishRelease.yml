@@ -1,9 +1,10 @@
-﻿name: Publish Release
+﻿name: Publish release
 
 on:
   push:
     tags:
       - '*'
+  workflow_dispatch:
 
 jobs:
   windows:
@@ -16,7 +17,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache NuGet
+      - name: Cache packages
         uses: actions/cache@v5
         with:
           path: ~/.nuget/packages
@@ -29,4 +30,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOTNET_ENVIRONMENT: ${{ (github.ref_name == 'main' || github.ref_type == 'tag') && 'Production' || 'Development' }}
-          Publish__Version: ${{ github.ref_name }}
+          Publish__Version: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
