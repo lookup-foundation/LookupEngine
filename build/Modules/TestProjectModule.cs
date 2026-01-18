@@ -12,6 +12,7 @@ namespace Build.Modules;
 ///     Test the project.
 /// </summary>
 [ModuleCategory("test")]
+[DependsOn<CompileProjectModule>(Optional = true)]
 public sealed class TestProjectModule : Module<CommandResult>
 {
     protected override async Task<CommandResult?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)

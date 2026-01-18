@@ -12,7 +12,7 @@ namespace Build.Modules;
 ///     Compile the project.
 /// </summary>
 [ModuleCategory("compile")]
-[DependsOn<CleanProjectModule>]
+[DependsOn<CleanProjectModule>(Optional = true)]
 public sealed class CompileProjectModule : Module<CommandResult>
 {
     protected override async Task<CommandResult?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)
