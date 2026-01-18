@@ -1,8 +1,8 @@
 name: 🐛 Bug report
 description: Report errors or unexpected behavior
+type: Bug 🐛
 labels:
-  - bug 🐛
-  - unverified ⌛
+  - needs triage 🔍
 body:
   - type: markdown
     attributes:
@@ -17,7 +17,11 @@ body:
   - type: textarea
     attributes:
       label: Steps to reproduce
-      placeholder: Having detailed steps helps us reproduce the bug
+      description: We highly suggest including screenshots
+      placeholder: |
+        1. Configure LookupComposer with custom settings
+        2. Call the Decompose() method with parameters X, Y
+        3. Check the returned results
     validations:
       required: true
 

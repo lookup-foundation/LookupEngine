@@ -1,9 +1,8 @@
 name: 💡 Feature or enhancement request
 description: Propose something new
+type: Feature 📬
 labels:
-  - feature request 📬
-  - improvements ✨
-  - unverified ⌛
+  - needs triage 🔍
 body:
   - type: textarea
     attributes:
@@ -14,9 +13,23 @@ body:
   - type: textarea
     attributes:
       label: Scenario when this would be used?
-      placeholder: What is the scenario this would be used? Why is this important to your workflow as a power user?
+      placeholder: |
+        Describe a specific use case:
+        - What problem does this solve?
+        - Why is this important to your workflow?
     validations:
       required: true
+  - type: dropdown
+    attributes:
+      label: Priority
+      description: How important is this feature for you?
+      options:
+        - Critical (blocking work)
+        - High (significant impact)
+        - Medium (nice to have)
+        - Low (future consideration)
+    validations:
+      required: false
   - type: markdown
     attributes:
       value: Please limit one request per issue.
