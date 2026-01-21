@@ -5,7 +5,6 @@ using ModularPipelines.Attributes;
 using ModularPipelines.Context;
 using ModularPipelines.Git.Extensions;
 using ModularPipelines.Modules;
-using Shouldly;
 using File = ModularPipelines.FileSystem.File;
 
 namespace Build.Modules;
@@ -13,7 +12,6 @@ namespace Build.Modules;
 /// <summary>
 ///     Generate the changelog for publishing the templates.
 /// </summary>
-[ModuleCategory("publish")]
 [DependsOn<ResolveBuildVersionModule>]
 public sealed class GenerateChangelogModule(IOptions<PublishOptions> publishOptions) : Module<string>
 {
@@ -23,11 +21,9 @@ public sealed class GenerateChangelogModule(IOptions<PublishOptions> publishOpti
         var versioning = versioningResult.ValueOrDefault!;
 
         var changelogFile = context.Git().RootDirectory.GetFile(publishOptions.Value.ChangelogFile);
-
         var changelog = await ParseChangelog(changelogFile, versioning.Version);
-        changelog.Length.ShouldBePositive($"No version entry exists in the changelog: {versioning.Version}");
 
-        return changelog.ToString();
+        return changelog.Length > 0 ? changelog.ToString() : string.Empty;
     }
 
     /// <summary>

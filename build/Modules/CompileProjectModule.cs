@@ -11,7 +11,6 @@ namespace Build.Modules;
 /// <summary>
 ///     Compile the project.
 /// </summary>
-[ModuleCategory("compile")]
 [DependsOn<CleanProjectModule>(Optional = true)]
 public sealed class CompileProjectModule : Module<CommandResult>
 {

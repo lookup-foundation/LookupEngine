@@ -11,7 +11,6 @@ namespace Build.Modules;
 ///     Clean projects and artifact directories.
 /// </summary>
 [SkipIf<IsCI>]
-[ModuleCategory("compile")]
 public sealed class CleanProjectModule : SyncModule
 {
     protected override void ExecuteModule(IModuleContext context, CancellationToken cancellationToken)

@@ -1,5 +1,4 @@
 using Build.Options;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using ModularPipelines.Attributes;
 using ModularPipelines.Context;
@@ -7,31 +6,29 @@ using ModularPipelines.Git.Extensions;
 using ModularPipelines.Git.Options;
 using ModularPipelines.Modules;
 using ModularPipelines.Options;
-using Shouldly;
 
 namespace Build.Modules;
 
 /// <summary>
 ///     Resolve semantic versions for compiling and publishing the templates.
 /// </summary>
-[ModuleCategory("publish")]
-public sealed class ResolveBuildVersionModule(IOptions<PublishOptions> publishOptions, IHostEnvironment environment) : Module<ResolveVersioningResult>
+public sealed class ResolveBuildVersionModule(IOptions<PublishOptions> publishOptions) : Module<ResolveVersioningResult>
 {
     protected override async Task<ResolveVersioningResult?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)
     {
         var version = publishOptions.Value.Version;
-        if (environment.IsProduction())
+        if (!string.IsNullOrEmpty(version))
         {
-            version.ShouldNotBeNullOrWhiteSpace();
+            return await CreateFromVersionStringAsync(context, version);
         }
 
-        return await CreateFromVersionStringAsync(context, version!);
+        return await CreateFromGitVersioningAsync(context);
     }
 
     /// <summary>
     ///     Resolve versions using the specified version string.
     /// </summary>
-    private static async Task<ResolveVersioningResult> CreateFromVersionStringAsync(IPipelineContext context, string version)
+    private static async Task<ResolveVersioningResult> CreateFromVersionStringAsync(IModuleContext context, string version)
     {
         var versionParts = version.Split('-');
 
@@ -46,16 +43,33 @@ public sealed class ResolveBuildVersionModule(IOptions<PublishOptions> publishOp
     }
 
     /// <summary>
+    ///     Resolve versions using the GitVersion Tool.
+    /// </summary>
+    private static async Task<ResolveVersioningResult> CreateFromGitVersioningAsync(IModuleContext context)
+    {
+        var gitVersioning = await context.Git().Versioning.GetGitVersioningInformation();
+
+        return new ResolveVersioningResult
+        {
+            Version = gitVersioning.SemVer!,
+            VersionPrefix = gitVersioning.MajorMinorPatch!,
+            VersionSuffix = gitVersioning.PreReleaseTag,
+            IsPrerelease = gitVersioning.PreReleaseNumber > 0,
+            PreviousVersion = await FetchPreviousVersionAsync(context)
+        };
+    }
+
+    /// <summary>
     ///     Retrieves the previous version from the git history.
     /// </summary>
-    private static async Task<string> FetchPreviousVersionAsync(IPipelineContext context)
+    private static async Task<string> FetchPreviousVersionAsync(IModuleContext context)
     {
         var describeResult = await context.Git().Commands.Describe(
             new GitDescribeOptions
             {
                 Tags = true,
                 Abbrev = "0",
-                Arguments = ["HEAD^"],
+                Arguments = ["HEAD^"]
             },
             new CommandExecutionOptions
             {
@@ -73,7 +87,7 @@ public sealed class ResolveBuildVersionModule(IOptions<PublishOptions> publishOp
                 MaxCount = "1",
                 Pretty = "format:%H",
                 Arguments = ["HEAD"],
-                NoCommitHeader = true,
+                NoCommitHeader = true
             },
             new CommandExecutionOptions
             {

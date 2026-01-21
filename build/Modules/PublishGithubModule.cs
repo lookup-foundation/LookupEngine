@@ -13,7 +13,7 @@ namespace Build.Modules;
 ///     Publish the templates to GitHub.
 /// </summary>
 [SkipIfNoGitHubToken]
-[ModuleCategory("publish")]
+[DependsOn<CompileProjectModule>]
 [DependsOn<ResolveBuildVersionModule>]
 [DependsOn<GenerateGitHubChangelogModule>]
 public sealed class PublishGithubModule : Module<Release?>
@@ -32,7 +32,8 @@ public sealed class PublishGithubModule : Module<Release?>
             Name = versioning.Version,
             Body = changelog,
             TargetCommitish = context.Git().Information.LastCommitSha,
-            Prerelease = versioning.IsPrerelease
+            Prerelease = versioning.IsPrerelease,
+            GenerateReleaseNotes = changelog.Length == 0
         };
 
         return await context.GitHub().Client.Repository.Release.Create(repositoryInfo.Owner, repositoryInfo.RepositoryName, newRelease);

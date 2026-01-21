@@ -1,10 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Build.Options;
+﻿namespace Build.Options;
 
 [Serializable]
 public sealed record PublishOptions
 {
     public string? Version { get; init; }
-    [Required] public string ChangelogFile { get; init; } = null!;
+    public string ChangelogFile { get; init; } = "Changelog.md";
 }

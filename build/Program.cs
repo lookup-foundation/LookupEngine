@@ -1,4 +1,5 @@
-﻿using Build.Options;
+﻿using Build.Modules;
+using Build.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModularPipelines;
@@ -10,9 +11,18 @@ builder.Configuration.AddJsonFile("appsettings.json");
 builder.Configuration.AddUserSecrets<Program>();
 builder.Configuration.AddEnvironmentVariables();
 
-builder.Services.AddOptions<PublishOptions>().Bind(builder.Configuration.GetSection("Publish")).ValidateDataAnnotations();
-builder.Services.AddModulesFromAssemblyContainingType<Program>();
+builder.Services.AddOptions<PublishOptions>().Bind(builder.Configuration.GetSection("Publish"));
 
-builder.Options.RunOnlyCategories = args.Length == 0 ? ["compile"] : args;
+builder.Services.AddModule<CompileProjectModule>();
+
+if (args.Contains("test"))
+{
+    builder.Services.AddModule<TestProjectModule>();
+}
+
+if (args.Contains("publish"))
+{
+    builder.Services.AddModule<PublishGithubModule>();
+}
 
 await builder.Build().RunAsync();

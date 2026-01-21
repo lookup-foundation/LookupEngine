@@ -11,7 +11,6 @@ namespace Build.Modules;
 /// <summary>
 ///     Test the project.
 /// </summary>
-[ModuleCategory("test")]
 [DependsOn<CompileProjectModule>(Optional = true)]
 public sealed class TestProjectModule : Module<CommandResult>
 {

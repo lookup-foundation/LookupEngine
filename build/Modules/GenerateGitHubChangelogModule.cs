@@ -8,7 +8,6 @@ namespace Build.Modules;
 /// <summary>
 ///     Generate and format the changelog for publishing on the GitHub.
 /// </summary>
-[ModuleCategory("publish")]
 [DependsOn<GenerateChangelogModule>]
 [DependsOn<ResolveBuildVersionModule>]
 public sealed class GenerateGitHubChangelogModule : Module<string>
@@ -19,6 +18,7 @@ public sealed class GenerateGitHubChangelogModule : Module<string>
         var changelogResult = await context.GetModule<GenerateChangelogModule>();
         var versioning = versioningResult.ValueOrDefault!;
         var changelog = changelogResult.ValueOrDefault!;
+        if (changelog.Length == 0) return changelog;
 
         return AppendGitHubCompareUrl(context, changelog, versioning);
     }
