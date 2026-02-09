@@ -51,4 +51,12 @@ public static class Variants
     {
         return new Variant(new InvalidOperationException("Member execution disabled"));
     }
+
+    /// <summary>
+    ///     Creates a variant representing an unsupported method overload
+    /// </summary>
+    public static IVariant NotSupported()
+    {
+        return new Variant(new NotSupportedException("Unsupported method overload"));
+    }
 }
