@@ -13,6 +13,7 @@
 // UNINTERRUPTED OR ERROR FREE.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using LookupEngine.Abstractions.Configuration;
 using LookupEngine.Abstractions.Decomposition;
 
@@ -22,17 +23,18 @@ namespace LookupEngine;
 [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
 public partial class LookupComposer : IExtensionManager
 {
+    private static readonly Dictionary<(Type Descriptor, Type Interface), bool> ExtensionOwnerCache = [];
+
     /// <summary>
     ///     Add extension members to the decomposition
     /// </summary>
     private protected virtual void ExecuteExtensions()
     {
         if (!_options.EnableExtensions) return;
+        if (MemberDeclaringDescriptor is not IDescriptorExtension extension) return;
+        if (!DeclaresOwnExtensions(extension, typeof(IDescriptorExtension))) return;
 
-        if (MemberDeclaringDescriptor is IDescriptorExtension extension)
-        {
-            extension.RegisterExtensions(this);
-        }
+        extension.RegisterExtensions(this);
     }
 
     /// <summary>
@@ -49,5 +51,36 @@ public partial class LookupComposer : IExtensionManager
         {
             WriteExtensionMember(exception, methodName);
         }
+    }
+
+    /// <summary>
+    ///     Checks whether the descriptor type declares its own RegisterExtensions implementation for the given interface
+    /// </summary>
+    private protected static bool DeclaresOwnExtensions(IDescriptorCollector descriptor, Type interfaceType)
+    {
+        var type = descriptor.GetType();
+        var key = (type, interfaceType);
+
+#if NET8_0_OR_GREATER
+        ref var owns = ref CollectionsMarshal.GetValueRefOrAddDefault(ExtensionOwnerCache, key, out var exists);
+        if (!exists)
+        {
+            var map = type.GetInterfaceMap(interfaceType);
+            owns = map.TargetMethods[0].DeclaringType == type;
+        }
+
+        return owns;
+#else
+        if (ExtensionOwnerCache.TryGetValue(key, out var owns))
+        {
+            return owns;
+        }
+
+        var map = type.GetInterfaceMap(interfaceType);
+        owns = map.TargetMethods[0].DeclaringType == type;
+        ExtensionOwnerCache[key] = owns;
+
+        return owns;
+#endif
     }
 }

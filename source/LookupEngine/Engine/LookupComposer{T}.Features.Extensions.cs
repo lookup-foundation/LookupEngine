@@ -27,12 +27,12 @@ public partial class LookupComposer<TContext> : IExtensionManager<TContext>
     {
         if (!_options.EnableExtensions) return;
 
-        if (MemberDeclaringDescriptor is IDescriptorExtension extension)
+        if (MemberDeclaringDescriptor is IDescriptorExtension extension && DeclaresOwnExtensions(extension, typeof(IDescriptorExtension)))
         {
             extension.RegisterExtensions(this);
         }
 
-        if (MemberDeclaringDescriptor is IDescriptorExtension<TContext> contextExtension)
+        if (MemberDeclaringDescriptor is IDescriptorExtension<TContext> contextExtension && DeclaresOwnExtensions(contextExtension, typeof(IDescriptorExtension<TContext>)))
         {
             contextExtension.RegisterExtensions(this);
         }
