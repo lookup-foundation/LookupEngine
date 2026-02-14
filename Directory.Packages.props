@@ -16,7 +16,7 @@
         <PackageVersion Include="ModularPipelines.DotNet" Version="3.1.90"/>
 
         <!-- Testing -->
-        <PackageVersion Include="TUnit" Version="1.13.11"/>
+        <PackageVersion Include="TUnit" Version="1.13.60"/>
         <PackageVersion Include="Shouldly" Version="4.3.0"/>
         <PackageVersion Include="BenchmarkDotNet" Version="0.15.8"/>
 
