@@ -24,7 +24,7 @@
         <PackageVersion Include="JetBrains.Annotations" Version="2025.2.4"/>
 
         <!-- System References -->
-        <PackageVersion Include="System.Text.Json" Version="10.0.2"/>
+        <PackageVersion Include="System.Text.Json" Version="10.0.3"/>
     </ItemGroup>
 
     <!-- Development References -->
