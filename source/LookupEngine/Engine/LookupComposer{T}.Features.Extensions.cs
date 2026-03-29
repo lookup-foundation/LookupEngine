@@ -46,6 +46,8 @@ public partial class LookupComposer<TContext> : IExtensionManager<TContext>
         try
         {
             var result = EvaluateValue(extension);
+            if (result.Value is NotSupportedException && !_options.IncludeUnsupported) return;
+            
             WriteExtensionMember(result, name);
         }
         catch (Exception exception)
