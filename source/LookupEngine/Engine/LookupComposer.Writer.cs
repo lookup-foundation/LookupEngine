@@ -92,7 +92,7 @@ public partial class LookupComposer
         DecomposedMembers.Add(member);
     }
 
-    private protected void WriteExtensionMember(object? value, string name)
+    private protected void WriteExtensionMember(object? value, string name, MemberAttributes attributes)
     {
         var formatTypeName = ReflexionFormater.FormatTypeName(MemberDeclaringType);
 
@@ -105,7 +105,7 @@ public partial class LookupComposer
             DeclaringTypeFullName = MemberDeclaringType.Namespace != null
                 ? $"{MemberDeclaringType.Namespace}.{formatTypeName}"
                 : formatTypeName,
-            MemberAttributes = MemberAttributes.Extension,
+            MemberAttributes = attributes,
             ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds,
             AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes()
         };

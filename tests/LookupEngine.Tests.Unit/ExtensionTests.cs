@@ -105,29 +105,12 @@ file sealed class ExtensionDescriptor : Descriptor, IDescriptorExtension, IDescr
 {
     public void RegisterExtensions(IExtensionManager manager)
     {
-        manager.Register("Extension", Extension);
-        return;
-
-        IVariant Extension()
-        {
-            return Variants.Value("Extended");
-        }
+        manager.Define("Extension").Register(() => Variants.Value("Extended"));
     }
 
     public void RegisterExtensions(IExtensionManager<EngineTestContext> manager)
     {
-        manager.Register("VersionExtension", VersionExtension);
-        manager.Register("MetadataExtension", MetadataExtension);
-        return;
-
-        IVariant VersionExtension(EngineTestContext context)
-        {
-            return Variants.Value(context.Version);
-        }
-
-        IVariant MetadataExtension(EngineTestContext context)
-        {
-            return Variants.Value(context.Metadata);
-        }
+        manager.Define("VersionExtension").Register(context => Variants.Value(context.Version));
+        manager.Define("MetadataExtension").Register(context => Variants.Value(context.Metadata));
     }
 }
