@@ -162,7 +162,7 @@ file sealed class ExtensionDescriptor : Descriptor, IDescriptorExtension
 {
     public void RegisterExtensions(IExtensionManager manager)
     {
-        manager.Register("Extension", Extension);
+        manager.Define("Extension").Register(Extension);
         return;
 
         IVariant Extension()

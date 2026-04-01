@@ -14,6 +14,7 @@
 
 using LookupEngine.Abstractions.Configuration;
 using LookupEngine.Abstractions.Decomposition;
+using LookupEngine.Abstractions.Enums;
 
 //ReSharper disable once CheckNamespace
 namespace LookupEngine;
@@ -39,20 +40,56 @@ public partial class LookupComposer<TContext> : IExtensionManager<TContext>
     }
 
     /// <summary>
-    ///     Callback of the extension registration
+    ///     Defines a context-aware extension with the specified name and returns a builder for configuration
     /// </summary>
-    public void Register(string name, Func<TContext, IVariant> extension)
+    public new ExtensionBuilder Define(string name)
     {
+        return new ExtensionBuilder(name, RegisterExtension, RegisterExtensionResult, TryRegisterExtension);
+    }
+
+    /// <summary>
+    ///     Defines a context-aware extension with the specified name and returns a builder for configuration
+    /// </summary>
+    ExtensionBuilder<TContext> IExtensionManager<TContext>.Define(string name)
+    {
+        return new ExtensionBuilder<TContext>(name, RegisterContextExtension, RegisterExtensionResult, TryRegisterContextExtension);
+    }
+
+    /// <summary>
+    ///     Registers the context-aware extension with evaluation
+    /// </summary>
+    private void RegisterContextExtension(string name, MemberAttributes attributes, Func<TContext, IVariant> handler)
+    {
+        if ((attributes & MemberAttributes.Static) != 0 && !_options.IncludeStaticMembers) return;
+
         try
         {
-            var result = EvaluateValue(extension);
-            if (result.Value is NotSupportedException && !_options.IncludeUnsupported) return;
-            
-            WriteExtensionMember(result, name);
+            var result = EvaluateValue(handler);
+            WriteExtensionMember(result, name, attributes);
         }
         catch (Exception exception)
         {
-            WriteExtensionMember(exception, name);
+            WriteExtensionMember(exception, name, attributes);
+        }
+    }
+
+    /// <summary>
+    ///     Registers the context-aware extension and returns whether the evaluated result is truthy
+    /// </summary>
+    private bool TryRegisterContextExtension(string name, MemberAttributes attributes, Func<TContext, IVariant> handler)
+    {
+        if ((attributes & MemberAttributes.Static) != 0 && !_options.IncludeStaticMembers) return false;
+
+        try
+        {
+            var result = EvaluateValue(handler);
+            WriteExtensionMember(result, name, attributes);
+            return result.Value is true;
+        }
+        catch (Exception exception)
+        {
+            WriteExtensionMember(exception, name, attributes);
+            return false;
         }
     }
 }

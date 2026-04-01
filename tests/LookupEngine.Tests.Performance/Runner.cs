@@ -16,4 +16,5 @@ var configuration = ManualConfig.Create(DefaultConfig.Instance)
 
 // BenchmarkRunner.Run<ResolveTypeBenchmark>(configuration);
 // BenchmarkRunner.Run<SortBenchmark>(configuration);
-BenchmarkRunner.Run<TypeEqualBenchmark>(configuration);
+// BenchmarkRunner.Run<TypeEqualBenchmark>(configuration);
+BenchmarkRunner.Run<ExtensionRegistrationBenchmark>(configuration);

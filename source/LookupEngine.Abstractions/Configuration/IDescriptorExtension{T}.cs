@@ -18,7 +18,7 @@ namespace LookupEngine.Abstractions.Configuration;
 ///     Indicates that the descriptor can add a new methods to the object
 /// </summary>
 /// <typeparam name="TContext">The type of execution context</typeparam>
-public interface IDescriptorExtension<in TContext> : IDescriptorCollector
+public interface IDescriptorExtension<TContext> : IDescriptorCollector
 {
     /// <summary>
     ///     Registers the extensions for the object

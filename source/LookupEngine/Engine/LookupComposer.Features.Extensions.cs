@@ -16,6 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using LookupEngine.Abstractions.Configuration;
 using LookupEngine.Abstractions.Decomposition;
+using LookupEngine.Abstractions.Enums;
 
 //ReSharper disable once CheckNamespace
 namespace LookupEngine;
@@ -38,20 +39,63 @@ public partial class LookupComposer : IExtensionManager
     }
 
     /// <summary>
-    ///     Callback of the extension registration
+    ///     Defines an extension with the specified name and returns a builder for configuration
     /// </summary>
-    public void Register(string methodName, Func<IVariant> handler)
+    public ExtensionBuilder Define(string name)
     {
+        return new ExtensionBuilder(name, RegisterExtension, RegisterExtensionResult, TryRegisterExtension);
+    }
+
+    /// <summary>
+    ///     Registers the extension with evaluation
+    /// </summary>
+    private protected void RegisterExtension(string name, MemberAttributes attributes, Func<IVariant> handler)
+    {
+        if ((attributes & MemberAttributes.Static) != 0 && !_options.IncludeStaticMembers) return;
+
         try
         {
             var result = EvaluateValue(handler);
-            if (result.Value is NotSupportedException && !_options.IncludeUnsupported) return;
-
-            WriteExtensionMember(result, methodName);
+            WriteExtensionMember(result, name, attributes);
         }
         catch (Exception exception)
         {
-            WriteExtensionMember(exception, methodName);
+            WriteExtensionMember(exception, name, attributes);
+        }
+    }
+
+    /// <summary>
+    ///     Registers the extension without implementation
+    /// </summary>
+    private protected void RegisterExtensionResult(string name, MemberAttributes attributes, bool isDisabled)
+    {
+        if (!_options.IncludeUnsupported) return;
+        if ((attributes & MemberAttributes.Static) != 0 && !_options.IncludeStaticMembers) return;
+
+        Exception exception = isDisabled
+            ? new InvalidOperationException("Member execution disabled")
+            : new NotSupportedException("Unsupported method overload");
+
+        WriteExtensionMember(exception, name, attributes);
+    }
+
+    /// <summary>
+    ///     Registers the extension and returns whether the evaluated result is truthy
+    /// </summary>
+    private protected bool TryRegisterExtension(string name, MemberAttributes attributes, Func<IVariant> handler)
+    {
+        if ((attributes & MemberAttributes.Static) != 0 && !_options.IncludeStaticMembers) return false;
+
+        try
+        {
+            var result = EvaluateValue(handler);
+            WriteExtensionMember(result, name, attributes);
+            return result.Value is true;
+        }
+        catch (Exception exception)
+        {
+            WriteExtensionMember(exception, name, attributes);
+            return false;
         }
     }
 

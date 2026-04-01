@@ -12,20 +12,17 @@
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 
-using LookupEngine.Abstractions.Decomposition;
-
 namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
 ///     The manager to register extensions for object descriptors
 /// </summary>
 /// <typeparam name="TContext">The type of execution context</typeparam>
-public interface IExtensionManager<out TContext>
+public interface IExtensionManager<TContext>
 {
     /// <summary>
-    ///     Registers the extension for the object
+    ///     Defines a context-aware extension with the specified name and returns a builder for configuration
     /// </summary>
     /// <param name="name">The extension name</param>
-    /// <param name="extension">The function for lazy extension creation</param>
-    void Register(string name, Func<TContext, IVariant> extension);
+    ExtensionBuilder<TContext> Define(string name);
 }

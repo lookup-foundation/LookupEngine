@@ -12,8 +12,6 @@
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 
-using LookupEngine.Abstractions.Decomposition;
-
 namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
@@ -22,9 +20,8 @@ namespace LookupEngine.Abstractions.Configuration;
 public interface IExtensionManager
 {
     /// <summary>
-    ///     Registers the extension for the object
+    ///     Defines an extension with the specified name and returns a builder for configuration
     /// </summary>
     /// <param name="name">The extension name</param>
-    /// <param name="extension">The function for lazy extension creation</param>
-    void Register(string name, Func<IVariant> extension);
+    ExtensionBuilder Define(string name);
 }
