@@ -16,26 +16,16 @@ using BenchmarkDotNet.Attributes;
 
 namespace LookupEngine.Tests.Performance.Benchmarks;
 
-/// <summary>
-///     Benchmarks comparing extension registration approaches:
-///     <list type="bullet">
-///         <item>Composer: direct Register(name, handler) with NotSupportedException check after evaluation</item>
-///         <item>Struct: Define(name) returns a struct builder (zero-alloc)</item>
-///         <item>Class: Define(name) returns a class builder (heap allocation per call)</item>
-///         <item>StructCachedDelegate: struct builder with a cached Action delegate (one allocation per manager lifetime)</item>
-///         <item>StructInterface: struct builder returned via interface (boxing per call)</item>
-///     </list>
-/// </summary>
 public class ExtensionRegistrationBenchmark
 {
     [Params(1, 100, 500)]
     public int Count { get; set; }
 
-    private ComposerManager _composerManager = new ComposerManager();
-    private StructManager _structManager = new StructManager();
-    private ClassManager _classManager = new ClassManager();
-    private StructCachedDelegateManager _structCachedDelegateManager = new StructCachedDelegateManager();
-    private StructInterfaceManager _structInterfaceManager = new StructInterfaceManager();
+    private readonly ComposerManager _composerManager = new();
+    private readonly StructManager _structManager = new();
+    private readonly ClassManager _classManager = new();
+    private readonly StructCachedDelegateManager _structCachedDelegateManager = new();
+    private readonly StructInterfaceManager _structInterfaceManager = new();
 
     [Benchmark(Baseline = true)]
     public int Composer_DirectRegister()
@@ -190,7 +180,7 @@ public class ExtensionRegistrationBenchmark
 /// <summary>
 ///     Immutable result container used by all benchmark managers
 /// </summary>
-sealed class Variant(object? value)
+public sealed class Variant(object? value)
 {
     public object? Value { get; } = value;
 }
@@ -198,7 +188,7 @@ sealed class Variant(object? value)
 /// <summary>
 ///     Original LookupComposer approach: direct Register(name, handler) with NotSupportedException type check after evaluation
 /// </summary>
-sealed class ComposerManager
+public sealed class ComposerManager
 {
     private readonly List<object> _members = new(64);
 
@@ -225,7 +215,7 @@ sealed class ComposerManager
 /// <summary>
 ///     Struct builder approach: Define(name) returns a stack-allocated struct with direct manager reference (zero-alloc)
 /// </summary>
-sealed class StructManager
+public sealed class StructManager
 {
     private readonly List<object> _members = new(64);
 
@@ -235,7 +225,7 @@ sealed class StructManager
 
     public StructBuilder Define(string name) => new(this, name);
 
-    internal void RegisterExtension(string name, Func<Variant> handler)
+    public void RegisterExtension(string name, Func<Variant> handler)
     {
         try
         {
@@ -248,7 +238,7 @@ sealed class StructManager
         }
     }
 
-    internal bool TryRegisterExtension(string name, Func<Variant> handler)
+    public bool TryRegisterExtension(string name, Func<Variant> handler)
     {
         try
         {
@@ -263,11 +253,11 @@ sealed class StructManager
         }
     }
 
-    internal void RegisterNotSupported(string name)
+    public void RegisterNotSupported(string name)
     {
     }
 
-    internal void RegisterDisabled(string name)
+    public void RegisterDisabled(string name)
     {
     }
 }
@@ -275,17 +265,9 @@ sealed class StructManager
 /// <summary>
 ///     Struct builder returned by <see cref="StructManager" />
 /// </summary>
-struct StructBuilder
+public struct StructBuilder(StructManager manager, string name)
 {
-    private readonly StructManager _manager;
-    private readonly string _name;
     private string? _apiName;
-
-    public StructBuilder(StructManager manager, string name)
-    {
-        _manager = manager;
-        _name = name;
-    }
 
     public StructBuilder Map(string apiName)
     {
@@ -298,19 +280,19 @@ struct StructBuilder
         return this;
     }
 
-    public void Register(Func<Variant> handler) => _manager.RegisterExtension(_name, handler);
+    public void Register(Func<Variant> handler) => manager.RegisterExtension(name, handler);
 
-    public bool TryRegister(Func<Variant> handler) => _manager.TryRegisterExtension(_name, handler);
+    public bool TryRegister(Func<Variant> handler) => manager.TryRegisterExtension(name, handler);
 
-    public void AsNotSupported() => _manager.RegisterNotSupported(_name);
+    public void AsNotSupported() => manager.RegisterNotSupported(name);
 
-    public void AsDisabled() => _manager.RegisterDisabled(_name);
+    public void AsDisabled() => manager.RegisterDisabled(name);
 }
 
 /// <summary>
 ///     Class builder approach: Define(name) returns a heap-allocated class builder (one allocation per Define call)
 /// </summary>
-sealed class ClassManager
+public sealed class ClassManager
 {
     private readonly List<object> _members = new(64);
 
@@ -320,7 +302,7 @@ sealed class ClassManager
 
     public ClassBuilder Define(string name) => new(this, name);
 
-    internal void RegisterExtension(string name, Func<Variant> handler)
+    public void RegisterExtension(string name, Func<Variant> handler)
     {
         try
         {
@@ -337,17 +319,9 @@ sealed class ClassManager
 /// <summary>
 ///     Class builder returned by <see cref="ClassManager" />
 /// </summary>
-sealed class ClassBuilder
+public sealed class ClassBuilder(ClassManager manager, string name)
 {
-    private readonly ClassManager _manager;
-    private readonly string _name;
     private string? _apiName;
-
-    public ClassBuilder(ClassManager manager, string name)
-    {
-        _manager = manager;
-        _name = name;
-    }
 
     public ClassBuilder Map(string apiName)
     {
@@ -360,14 +334,14 @@ sealed class ClassBuilder
         return this;
     }
 
-    public void Register(Func<Variant> handler) => _manager.RegisterExtension(_name, handler);
+    public void Register(Func<Variant> handler) => manager.RegisterExtension(name, handler);
 }
 
 /// <summary>
 ///     Struct builder with cached delegate approach: struct builder uses a cached Action delegate instead of direct manager reference
 ///     (one delegate allocation per manager lifetime)
 /// </summary>
-sealed class StructCachedDelegateManager
+public sealed class StructCachedDelegateManager
 {
     private readonly List<object> _members = new(64);
     private readonly Action<string, Func<Variant>> _registerCallback;
@@ -400,17 +374,9 @@ sealed class StructCachedDelegateManager
 /// <summary>
 ///     Struct builder returned by <see cref="StructCachedDelegateManager" />
 /// </summary>
-struct CachedDelegateBuilder
+public struct CachedDelegateBuilder(string name, Action<string, Func<Variant>> callback)
 {
-    private readonly string _name;
-    private readonly Action<string, Func<Variant>> _callback;
     private string? _apiName;
-
-    public CachedDelegateBuilder(string name, Action<string, Func<Variant>> callback)
-    {
-        _name = name;
-        _callback = callback;
-    }
 
     public CachedDelegateBuilder Map(string apiName)
     {
@@ -423,13 +389,13 @@ struct CachedDelegateBuilder
         return this;
     }
 
-    public void Register(Func<Variant> handler) => _callback(_name, handler);
+    public void Register(Func<Variant> handler) => callback(name, handler);
 }
 
 /// <summary>
 ///     Struct builder returned via interface approach: Define(name) returns IBuilder causing boxing of the struct (one boxing per Define call)
 /// </summary>
-sealed class StructInterfaceManager
+public sealed class StructInterfaceManager
 {
     private readonly List<object> _members = new(64);
 
@@ -439,7 +405,7 @@ sealed class StructInterfaceManager
 
     public IExtensionBuilder Define(string name) => new InterfaceStructBuilder(this, name);
 
-    internal void RegisterExtension(string name, Func<Variant> handler)
+    public void RegisterExtension(string name, Func<Variant> handler)
     {
         try
         {
@@ -456,7 +422,7 @@ sealed class StructInterfaceManager
 /// <summary>
 ///     Builder interface for the boxing benchmark scenario
 /// </summary>
-interface IExtensionBuilder
+public interface IExtensionBuilder
 {
     IExtensionBuilder Map(string apiName);
     IExtensionBuilder AsStatic();
@@ -466,17 +432,9 @@ interface IExtensionBuilder
 /// <summary>
 ///     Struct builder implementing <see cref="IExtensionBuilder" /> — boxed when returned from <see cref="StructInterfaceManager.Define" />
 /// </summary>
-struct InterfaceStructBuilder : IExtensionBuilder
+file struct InterfaceStructBuilder(StructInterfaceManager manager, string name) : IExtensionBuilder
 {
-    private readonly StructInterfaceManager _manager;
-    private readonly string _name;
     private string? _apiName;
-
-    public InterfaceStructBuilder(StructInterfaceManager manager, string name)
-    {
-        _manager = manager;
-        _name = name;
-    }
 
     public IExtensionBuilder Map(string apiName)
     {
@@ -489,5 +447,5 @@ struct InterfaceStructBuilder : IExtensionBuilder
         return this;
     }
 
-    public void Register(Func<Variant> handler) => _manager.RegisterExtension(_name, handler);
+    public void Register(Func<Variant> handler) => manager.RegisterExtension(name, handler);
 }
