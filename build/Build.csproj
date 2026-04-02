@@ -12,7 +12,6 @@
         <PackageReference Include="ModularPipelines.Git"/>
         <PackageReference Include="ModularPipelines.GitHub"/>
         <PackageReference Include="ModularPipelines.DotNet"/>
-        <PackageReference Include="JetBrains.Annotations"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -7,7 +7,6 @@
 
     <ItemGroup>
         <PackageReference Include="BenchmarkDotNet"/>
-        <PackageReference Include="JetBrains.Annotations"/>
     </ItemGroup>
 
 </Project>

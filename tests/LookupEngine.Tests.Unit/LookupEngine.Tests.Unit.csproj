@@ -14,8 +14,4 @@
         <ProjectReference Include="..\..\source\LookupEngine\LookupEngine.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations" PrivateAssets="all"/>
-    </ItemGroup>
-
 </Project>
