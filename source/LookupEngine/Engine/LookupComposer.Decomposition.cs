@@ -12,7 +12,6 @@
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 
-using System.Diagnostics.Contracts;
 using System.Reflection;
 using LookupEngine.Abstractions;
 

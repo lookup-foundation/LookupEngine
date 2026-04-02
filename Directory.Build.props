@@ -8,4 +8,9 @@
         <PlatformTarget>AnyCPU</PlatformTarget>
     </PropertyGroup>
 
+    <!-- Global usings -->
+    <ItemGroup>
+        <Using Include="JetBrains.Annotations"/>
+    </ItemGroup>
+
 </Project>
