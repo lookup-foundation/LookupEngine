@@ -21,7 +21,7 @@
         <PackageVersion Include="BenchmarkDotNet" Version="0.15.8"/>
 
         <!-- System Dependencies -->
-        <PackageVersion Include="System.Text.Json" Version="10.0.5"/>
+        <PackageVersion Include="System.Text.Json" Version="10.0.7"/>
     </ItemGroup>
 
     <!-- Development Dependencies -->
