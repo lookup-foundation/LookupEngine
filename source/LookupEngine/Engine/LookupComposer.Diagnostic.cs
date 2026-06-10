@@ -29,15 +29,18 @@ public partial class LookupComposer
     /// </summary>
     private object? EvaluateValue(FieldInfo member)
     {
-        TimeDiagnoser.StartMonitoring();
-        MemoryDiagnoser.StartMonitoring();
+        try
+        {
+            TimeDiagnoser.StartMonitoring();
+            MemoryDiagnoser.StartMonitoring();
 
-        var value = member.GetValue(_input);
-
-        MemoryDiagnoser.StopMonitoring();
-        TimeDiagnoser.StopMonitoring();
-
-        return value;
+            return member.GetValue(_input);
+        }
+        finally
+        {
+            MemoryDiagnoser.StopMonitoring();
+            TimeDiagnoser.StopMonitoring();
+        }
     }
 
     /// <summary>

@@ -85,6 +85,78 @@ public sealed class ResolverTests
             await Assert.That(comparableContextResult.Members.Count).IsGreaterThan(comparableResult.Members.Count);
         }
     }
+    [Test]
+    public async Task Decompose_SharedValueDescriptor_DescriptionDoesNotLeakBetweenMembers()
+    {
+        //Arrange
+        var data = new DescribedContainerObject();
+        var sharedDescriptor = new SharedValueDescriptor();
+        var options = new DecomposeOptions
+        {
+            TypeResolver = (obj, _) =>
+            {
+                return obj switch
+                {
+                    DescribedContainerObject => new DescribingResolverDescriptor(),
+                    DescribedValueObject => sharedDescriptor,
+                    _ => new ObjectDescriptor(obj)
+                };
+            }
+        };
+
+        //Act
+        var result = LookupComposer.Decompose(data, options);
+
+        //Assert
+        var describedMember = result.Members.First(member => member.Name.StartsWith(nameof(DescribedContainerObject.DescribedMethod)));
+        var plainMember = result.Members.First(member => member.Name.StartsWith(nameof(DescribedContainerObject.PlainMethod)));
+        using (Assert.Multiple())
+        {
+            await Assert.That(describedMember.Value.Description).IsEqualTo("Variant description");
+            await Assert.That(plainMember.Value.Description).IsNull();
+            await Assert.That(sharedDescriptor.Description).IsNull();
+        }
+    }
+}
+
+file sealed class DescribedContainerObject
+{
+    public DescribedValueObject DescribedMethod(int parameter)
+    {
+        return new DescribedValueObject();
+    }
+
+    public DescribedValueObject PlainMethod(int parameter)
+    {
+        return new DescribedValueObject();
+    }
+}
+
+file sealed class DescribedValueObject;
+
+file sealed class SharedValueDescriptor : Descriptor;
+
+file sealed class DescribingResolverDescriptor : Descriptor, IDescriptorResolver
+{
+    public Func<IVariant>? Resolve(string target, ParameterInfo[] parameters)
+    {
+        return target switch
+        {
+            nameof(DescribedContainerObject.DescribedMethod) => ResolveDescribedMethod,
+            nameof(DescribedContainerObject.PlainMethod) => ResolvePlainMethod,
+            _ => null
+        };
+
+        IVariant ResolveDescribedMethod()
+        {
+            return Variants.Value(new DescribedValueObject(), "Variant description");
+        }
+
+        IVariant ResolvePlainMethod()
+        {
+            return Variants.Value(new DescribedValueObject());
+        }
+    }
 }
 
 file sealed class ResolvableObject

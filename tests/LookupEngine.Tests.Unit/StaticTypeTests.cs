@@ -30,16 +30,20 @@ public sealed class StaticTypeTests
     }
 
     [Test]
-    public async Task Decompose_StaticTypeWithoutOption_ReturnsNoStaticMembers()
+    public async Task Decompose_StaticTypeWithoutOption_StillIncludesStaticMembers()
     {
         // Arrange
-        var type = typeof(string);
+        var type = typeof(DateOnly);
 
         // Act
         var result = LookupComposer.Decompose(type);
 
-        // Assert
-        await Assert.That(result.Members).IsEmpty();
+        // Assert - decomposing a Type always includes static members, they are the content of the type itself
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.Members).IsNotEmpty();
+            await Assert.That(result.Members.Any(member => member.Name == nameof(DateOnly.MaxValue))).IsTrue();
+        }
     }
 
     [Test]

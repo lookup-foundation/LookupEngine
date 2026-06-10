@@ -40,6 +40,10 @@ public class DecomposeOptions
     /// <summary>
     ///     Decompose static members
     /// </summary>
+    /// <remarks>
+    ///     Applies to instance decomposition and extensions.
+    ///     Decomposing a <see cref="Type"/> always includes static members, they are the content of the type itself
+    /// </remarks>
     public bool IncludeStaticMembers { get; set; }
 
     /// <summary>

@@ -40,10 +40,10 @@ public partial class LookupComposer
     [Pure]
     private DecomposedObject DecomposeInstanceObject()
     {
-        _input = RedirectValue(_input, out var instanceDescriptor);
+        _input = RedirectValue(_input, out var instanceDescriptor, out var instanceDescription);
 
         var objectType = _input.GetType();
-        return CreateInstanceDecomposition(_input, objectType, instanceDescriptor);
+        return CreateInstanceDecomposition(_input, objectType, instanceDescriptor, instanceDescription);
     }
 
     /// <summary>

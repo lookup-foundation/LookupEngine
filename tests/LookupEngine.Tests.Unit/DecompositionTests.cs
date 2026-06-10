@@ -211,4 +211,26 @@ public sealed class DecompositionTests
             await Assert.That(messageMember.DeclaringTypeFullName).Contains(nameof(System));
         }
     }
+
+    [Test]
+    public async Task Decompose_NullNamespaceType_TypeFullNameHasNoLeadingDot()
+    {
+        // Arrange - Anonymous types have null namespace
+        var anonymous = new {Value = 42};
+
+        // Act
+        var result = LookupComposer.Decompose(anonymous);
+
+        // Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.TypeFullName).IsEqualTo(result.TypeName);
+            await Assert.That(result.TypeFullName.StartsWith('.')).IsFalse();
+            foreach (var member in result.Members)
+            {
+                await Assert.That(member.DeclaringTypeFullName.StartsWith('.')).IsFalse();
+                await Assert.That(member.Value.TypeFullName.StartsWith('.')).IsFalse();
+            }
+        }
+    }
 }

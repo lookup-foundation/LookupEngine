@@ -29,5 +29,6 @@ public interface IDescriptorEnumerator : IDescriptorCollector
     /// <summary>
     ///     The enumerator of the current described collection
     /// </summary>
+    /// <remarks>Each access returns a fresh, non-advanced enumerator</remarks>
     public IEnumerator Enumerator { get; }
 }

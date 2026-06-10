@@ -154,6 +154,40 @@ public sealed class DiagnosticsTests
             await Assert.That(membersWithAllocation).IsGreaterThan(0);
         }
     }
+
+    [Test]
+    public async Task Decompose_ThrowingFieldInitializer_MetricsAreNotNegative()
+    {
+        // Arrange
+        var options = new DecomposeOptions
+        {
+            IncludeFields = true,
+            IncludeStaticMembers = true
+        };
+
+        // Act
+        var result = LookupComposer.Decompose(typeof(ThrowingFieldObject), options);
+
+        // Assert
+        var fieldMember = result.Members.First(member => member.Name == nameof(ThrowingFieldObject.FaultedField));
+        using (Assert.Multiple())
+        {
+            await Assert.That(fieldMember.Value.RawValue).IsNotNull();
+            await Assert.That(fieldMember.Value.RawValue!.GetType()).IsEqualTo(typeof(TypeInitializationException));
+            await Assert.That(fieldMember.ComputationTime).IsGreaterThanOrEqualTo(0);
+            await Assert.That(fieldMember.AllocatedBytes).IsGreaterThanOrEqualTo(0);
+        }
+    }
+}
+
+file sealed class ThrowingFieldObject
+{
+    public static readonly int FaultedField = ThrowNow();
+
+    private static int ThrowNow()
+    {
+        throw new InvalidOperationException("Static initializer failed");
+    }
 }
 
 file sealed class ExtensibleObject;

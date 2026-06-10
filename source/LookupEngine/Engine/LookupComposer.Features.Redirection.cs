@@ -24,15 +24,22 @@ namespace LookupEngine;
 public partial class LookupComposer
 {
     /// <summary>
+    ///     The redirection limit to protect against cyclic redirects
+    /// </summary>
+    private protected const int MaxRedirections = 32;
+
+    /// <summary>
     ///     Redirect the member value to another object
     /// </summary>
     private protected virtual object RedirectValue(object value)
     {
         if (!_options.EnableRedirection) return value;
 
+        var redirections = 0;
         var valueDescriptor = _options.TypeResolver.Invoke(value, null);
         while (valueDescriptor is IDescriptorRedirector redirector)
         {
+            if (redirections++ == MaxRedirections) break;
             if (!redirector.TryRedirect(string.Empty, out value)) break;
             valueDescriptor = _options.TypeResolver.Invoke(value, null);
         }
@@ -43,15 +50,15 @@ public partial class LookupComposer
     /// <summary>
     ///     Redirect the input value to another object
     /// </summary>
-    private object RedirectValue(object value, out Descriptor valueDescriptor)
+    private object RedirectValue(object value, out Descriptor valueDescriptor, out string? description)
     {
-        return RedirectValue(value, string.Empty, out valueDescriptor);
+        return RedirectValue(value, string.Empty, out valueDescriptor, out description);
     }
 
     /// <summary>
     ///     Redirect the decomposed value to another object
     /// </summary>
-    private protected virtual object RedirectValue(object value, string target, out Descriptor valueDescriptor)
+    private protected virtual object RedirectValue(object value, string target, out Descriptor valueDescriptor, out string? description)
     {
         var variant = value as IVariant;
         if (variant is not null)
@@ -61,7 +68,7 @@ public partial class LookupComposer
 
         valueDescriptor = _options.TypeResolver.Invoke(value, null);
 
-        var description = valueDescriptor.Description;
+        description = valueDescriptor.Description;
         if (variant is not null && description is null)
         {
             description = variant.Description;
@@ -69,8 +76,10 @@ public partial class LookupComposer
 
         if (_options.EnableRedirection)
         {
+            var redirections = 0;
             while (valueDescriptor is IDescriptorRedirector redirector)
             {
+                if (redirections++ == MaxRedirections) break;
                 if (!redirector.TryRedirect(target, out value)) break;
                 valueDescriptor = _options.TypeResolver.Invoke(value, null);
 
@@ -81,7 +90,6 @@ public partial class LookupComposer
             }
         }
 
-        valueDescriptor.Description = description;
         return value;
     }
 }

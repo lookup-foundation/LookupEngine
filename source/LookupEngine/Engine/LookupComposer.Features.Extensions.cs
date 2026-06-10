@@ -12,8 +12,8 @@
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using LookupEngine.Abstractions.Configuration;
 using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Abstractions.Enums;
@@ -24,7 +24,7 @@ namespace LookupEngine;
 [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
 public partial class LookupComposer : IExtensionManager
 {
-    private static readonly Dictionary<(Type Descriptor, Type Interface), bool> ExtensionOwnerCache = [];
+    private static readonly ConcurrentDictionary<(Type Descriptor, Type Interface), bool> ExtensionOwnerCache = new();
 
     /// <summary>
     ///     Add extension members to the decomposition
@@ -107,16 +107,6 @@ public partial class LookupComposer : IExtensionManager
         var type = descriptor.GetType();
         var key = (type, interfaceType);
 
-#if NET8_0_OR_GREATER
-        ref var owns = ref CollectionsMarshal.GetValueRefOrAddDefault(ExtensionOwnerCache, key, out var exists);
-        if (!exists)
-        {
-            var map = type.GetInterfaceMap(interfaceType);
-            owns = map.TargetMethods[0].DeclaringType == type;
-        }
-
-        return owns;
-#else
         if (ExtensionOwnerCache.TryGetValue(key, out var owns))
         {
             return owns;
@@ -127,6 +117,5 @@ public partial class LookupComposer : IExtensionManager
         ExtensionOwnerCache[key] = owns;
 
         return owns;
-#endif
     }
 }

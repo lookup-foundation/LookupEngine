@@ -30,6 +30,14 @@ internal static class ReflexionFormater
     }
 
     /// <summary>
+    ///     Format the full type name, omitting the namespace separator for types without a namespace
+    /// </summary>
+    internal static string FormatTypeFullName(Type type, string typeName)
+    {
+        return type.Namespace is null ? typeName : $"{type.Namespace}.{typeName}";
+    }
+
+    /// <summary>
     ///     Format the name of a parametric member
     /// </summary>
     internal static string FormatMemberName(MemberInfo member, ParameterInfo[] parameters)

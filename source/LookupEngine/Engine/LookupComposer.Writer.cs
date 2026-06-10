@@ -41,7 +41,7 @@ public partial class LookupComposer
     /// <summary>
     ///     Write an object metadata to the decomposition result
     /// </summary>
-    private static DecomposedObject CreateInstanceDecomposition(object instance, Type type, Descriptor descriptor)
+    private static DecomposedObject CreateInstanceDecomposition(object instance, Type type, Descriptor descriptor, string? description)
     {
         var formatTypeName = ReflexionFormater.FormatTypeName(type);
         var hasUnknownName = descriptor.Name is null ||
@@ -51,10 +51,10 @@ public partial class LookupComposer
         return new DecomposedObject
         {
             Name = hasUnknownName ? formatTypeName : descriptor.Name!,
-            Description = descriptor.Description,
+            Description = description,
             RawValue = instance,
             TypeName = formatTypeName,
-            TypeFullName = $"{type.Namespace}.{formatTypeName}",
+            TypeFullName = ReflexionFormater.FormatTypeFullName(type, formatTypeName),
             Descriptor = descriptor
         };
     }
@@ -72,7 +72,7 @@ public partial class LookupComposer
             Description = descriptor.Description,
             RawValue = type,
             TypeName = formatTypeName,
-            TypeFullName = $"{type.Namespace}.{formatTypeName}",
+            TypeFullName = ReflexionFormater.FormatTypeFullName(type, formatTypeName),
             Descriptor = descriptor
         };
     }
@@ -102,9 +102,7 @@ public partial class LookupComposer
             Name = name,
             Value = CreateValue(name, value),
             DeclaringTypeName = formatTypeName,
-            DeclaringTypeFullName = MemberDeclaringType.Namespace != null
-                ? $"{MemberDeclaringType.Namespace}.{formatTypeName}"
-                : formatTypeName,
+            DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
             MemberAttributes = attributes,
             ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds,
             AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes()
@@ -123,9 +121,7 @@ public partial class LookupComposer
             Value = CreateValue(memberInfo.Name, value),
             Name = memberInfo.Name,
             DeclaringTypeName = formatTypeName,
-            DeclaringTypeFullName = MemberDeclaringType.Namespace != null
-                ? $"{MemberDeclaringType.Namespace}.{formatTypeName}"
-                : formatTypeName,
+            DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
             MemberAttributes = ModifiersFormater.FormatAttributes(memberInfo),
             ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds,
             AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes()
@@ -144,9 +140,7 @@ public partial class LookupComposer
             Value = CreateValue(memberInfo.Name, value),
             Name = ReflexionFormater.FormatMemberName(memberInfo, parameters),
             DeclaringTypeName = formatTypeName,
-            DeclaringTypeFullName = MemberDeclaringType.Namespace != null
-                ? $"{MemberDeclaringType.Namespace}.{formatTypeName}"
-                : formatTypeName,
+            DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
             MemberAttributes = ModifiersFormater.FormatAttributes(memberInfo),
             ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds,
             AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes()
@@ -171,7 +165,7 @@ public partial class LookupComposer
         if (value is null) return CreateNullableValue();
         if (value is IVariant {Value: null}) return CreateNullableValue();
 
-        value = RedirectValue(value, targetMember, out var valueDescriptor);
+        value = RedirectValue(value, targetMember, out var valueDescriptor, out var description);
 
         var valueType = value.GetType();
         var formatTypeName = ReflexionFormater.FormatTypeName(valueType);
@@ -183,9 +177,9 @@ public partial class LookupComposer
         {
             RawValue = value,
             Name = hasUnknownName ? formatTypeName : valueDescriptor.Name!,
-            Description = valueDescriptor.Description,
+            Description = description,
             TypeName = formatTypeName,
-            TypeFullName = $"{valueType.Namespace}.{formatTypeName}",
+            TypeFullName = ReflexionFormater.FormatTypeFullName(valueType, formatTypeName),
             Descriptor = valueDescriptor
         };
     }

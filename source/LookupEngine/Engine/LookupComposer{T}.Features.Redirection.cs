@@ -28,8 +28,9 @@ public partial class LookupComposer<TContext>
     {
         if (!_options.EnableRedirection) return value;
 
+        var redirections = 0;
         var valueDescriptor = _options.TypeResolver.Invoke(value, null);
-        while (true)
+        while (redirections++ < MaxRedirections)
         {
             var redirected = false;
 
@@ -60,7 +61,7 @@ public partial class LookupComposer<TContext>
     /// <summary>
     ///     Redirect the decomposed in-context value to another object
     /// </summary>
-    private protected override object RedirectValue(object value, string target, out Descriptor valueDescriptor)
+    private protected override object RedirectValue(object value, string target, out Descriptor valueDescriptor, out string? description)
     {
         var variant = value as IVariant;
         if (variant is not null)
@@ -70,7 +71,7 @@ public partial class LookupComposer<TContext>
 
         valueDescriptor = _options.TypeResolver.Invoke(value, null);
 
-        var description = valueDescriptor.Description;
+        description = valueDescriptor.Description;
         if (variant is not null && description is null)
         {
             description = variant.Description;
@@ -78,7 +79,8 @@ public partial class LookupComposer<TContext>
 
         if (_options.EnableRedirection)
         {
-            while (true)
+            var redirections = 0;
+            while (redirections++ < MaxRedirections)
             {
                 var redirected = false;
 
@@ -109,7 +111,6 @@ public partial class LookupComposer<TContext>
             }
         }
 
-        valueDescriptor.Description = description;
         return value;
     }
 }

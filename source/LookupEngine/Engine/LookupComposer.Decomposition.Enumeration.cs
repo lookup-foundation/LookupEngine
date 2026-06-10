@@ -35,7 +35,6 @@ public partial class LookupComposer
             {
                 WriteEnumerableMember(enumerator.Current, index);
                 index++;
-                _depth--;
             }
         }
         finally

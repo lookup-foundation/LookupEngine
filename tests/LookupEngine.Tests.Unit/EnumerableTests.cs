@@ -1,3 +1,5 @@
+using LookupEngine.Descriptors;
+
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
@@ -187,9 +189,113 @@ public sealed class EnumerableTests
             await Assert.That(disposableEnumerable.IsDisposed).IsTrue();
         }
     }
+
+    [Test]
+    public async Task Decompose_Enumerable_EnumeratesSourceOnce()
+    {
+        // Arrange
+        var countingEnumerable = new CountingEnumerable();
+
+        // Act
+        var result = LookupComposer.Decompose(countingEnumerable);
+
+        // Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(countingEnumerable.EnumerationCount).IsEqualTo(1);
+            await Assert.That(result.Members.Count(member => member.Name.Contains('['))).IsEqualTo(2);
+        }
+    }
+
+    [Test]
+    public async Task Decompose_EnumerableItems_HaveSameDepth()
+    {
+        // Arrange
+        var list = new List<string> {"A", "B", "C"};
+
+        // Act
+        var result = LookupComposer.Decompose(list);
+
+        // Assert
+        var itemDepths = result.Members
+            .Where(member => member.Name.Contains('['))
+            .Select(member => member.Depth)
+            .Distinct()
+            .ToList();
+
+        await Assert.That(itemDepths).Count().IsEqualTo(1);
+    }
+
+    [Test]
+    public async Task EnumerableDescriptor_IsEmpty_EvaluatesCorrectly()
+    {
+        // Arrange
+        var emptyCollection = new EnumerableDescriptor(new List<int>());
+        var filledCollection = new EnumerableDescriptor(new List<int> {1});
+        var emptyIterator = new EnumerableDescriptor(EmptyIterator());
+        var filledIterator = new EnumerableDescriptor(FilledIterator());
+
+        // Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(emptyCollection.IsEmpty).IsTrue();
+            await Assert.That(filledCollection.IsEmpty).IsFalse();
+            await Assert.That(emptyIterator.IsEmpty).IsTrue();
+            await Assert.That(filledIterator.IsEmpty).IsFalse();
+        }
+
+        static IEnumerable<int> EmptyIterator()
+        {
+            yield break;
+        }
+
+        static IEnumerable<int> FilledIterator()
+        {
+            yield return 1;
+        }
+    }
+
+    [Test]
+    public async Task EnumerableDescriptor_Enumerator_ReturnsFreshEnumerator()
+    {
+        // Arrange
+        var descriptor = new EnumerableDescriptor(new List<int> {1, 2, 3});
+
+        // Act - IsEmpty must not advance or dispose the exposed enumerator
+        var isEmpty = descriptor.IsEmpty;
+
+        var firstPass = 0;
+        var enumerator = descriptor.Enumerator;
+        while (enumerator.MoveNext()) firstPass++;
+
+        var secondPass = 0;
+        var freshEnumerator = descriptor.Enumerator;
+        while (freshEnumerator.MoveNext()) secondPass++;
+
+        // Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(isEmpty).IsFalse();
+            await Assert.That(firstPass).IsEqualTo(3);
+            await Assert.That(secondPass).IsEqualTo(3);
+        }
+    }
 }
 
 // Test helper classes
+file sealed class CountingEnumerable : System.Collections.IEnumerable
+{
+    private int _enumerationCount;
+
+    public int EnumerationCount => _enumerationCount;
+
+    public System.Collections.IEnumerator GetEnumerator()
+    {
+        _enumerationCount++;
+        return new[] {1, 2}.GetEnumerator();
+    }
+}
+
 file sealed class CustomEnumerable : IEnumerable<int>
 {
     public IEnumerator<int> GetEnumerator()

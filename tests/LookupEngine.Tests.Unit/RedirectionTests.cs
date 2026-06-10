@@ -120,11 +120,107 @@ public sealed class RedirectionTests
             await Assert.That(comparableContextResult.Members[0].Value.TypeName).IsNotEqualTo(comparableResult.Members[0].Value.TypeName);
         }
     }
+    [Test]
+    public async Task Decompose_CyclicRedirection_Terminates()
+    {
+        //Arrange
+        var data = new CycleContainerObject();
+        var options = new DecomposeOptions
+        {
+            EnableRedirection = true,
+            TypeResolver = (obj, _) =>
+            {
+                return obj switch
+                {
+                    CycleFirstObject => new CycleFirstDescriptor(),
+                    CycleSecondObject => new CycleSecondDescriptor(),
+                    _ => new ObjectDescriptor(obj)
+                };
+            }
+        };
+
+        //Act
+        var result = LookupComposer.Decompose(data, options);
+
+        //Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(result).IsNotNull();
+            await Assert.That(result.Members).IsNotEmpty();
+        }
+    }
+
+    [Test]
+    public async Task Decompose_CyclicContextRedirection_Terminates()
+    {
+        //Arrange
+        var data = new CycleContainerObject();
+        var contextOptions = new DecomposeOptions<EngineTestContext>
+        {
+            Context = new EngineTestContext(),
+            EnableRedirection = true,
+            TypeResolver = (obj, _) =>
+            {
+                return obj switch
+                {
+                    CycleFirstObject => new CycleContextDescriptor(),
+                    CycleSecondObject => new CycleContextDescriptor(),
+                    _ => new ObjectDescriptor(obj)
+                };
+            }
+        };
+
+        //Act
+        var result = LookupComposer.Decompose(data, contextOptions);
+
+        //Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(result).IsNotNull();
+            await Assert.That(result.Members).IsNotEmpty();
+        }
+    }
 }
 
 file sealed class RedirectContainerObject
 {
     public RedirectableObject PropertyToRedirect => new();
+}
+
+file sealed class CycleContainerObject
+{
+    public CycleFirstObject PropertyToRedirect => new();
+}
+
+file sealed class CycleFirstObject;
+
+file sealed class CycleSecondObject;
+
+file sealed class CycleFirstDescriptor : Descriptor, IDescriptorRedirector
+{
+    public bool TryRedirect(string target, out object result)
+    {
+        result = new CycleSecondObject();
+        return true;
+    }
+}
+
+file sealed class CycleSecondDescriptor : Descriptor, IDescriptorRedirector
+{
+    public bool TryRedirect(string target, out object result)
+    {
+        result = new CycleFirstObject();
+        return true;
+    }
+}
+
+file sealed class CycleContextDescriptor : Descriptor, IDescriptorRedirector<EngineTestContext>
+{
+    public bool TryRedirect(string target, EngineTestContext context, out object result)
+    {
+        result = new CycleSecondObject();
+        return true;
+    }
 }
 
 file sealed class RedirectableObject

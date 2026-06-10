@@ -58,9 +58,15 @@ public sealed class SerializationTests
             for (var i = 0; i < original.Members.Count; i++)
             {
                 await Assert.That(deserialized.Members[i].Name).IsEqualTo(original.Members[i].Name);
+                await Assert.That(deserialized.Members[i].Depth).IsEqualTo(original.Members[i].Depth);
+                await Assert.That(deserialized.Members[i].MemberAttributes).IsEqualTo(original.Members[i].MemberAttributes);
+                await Assert.That(deserialized.Members[i].ComputationTime).IsEqualTo(original.Members[i].ComputationTime);
+                await Assert.That(deserialized.Members[i].AllocatedBytes).IsEqualTo(original.Members[i].AllocatedBytes);
+                await Assert.That(deserialized.Members[i].DeclaringTypeFullName).IsEqualTo(original.Members[i].DeclaringTypeFullName);
                 await Assert.That(deserialized.Members[i].Value.Name).IsEqualTo(original.Members[i].Value.Name);
                 await Assert.That(deserialized.Members[i].Value.TypeName).IsEqualTo(original.Members[i].Value.TypeName);
                 await Assert.That(deserialized.Members[i].Value.TypeFullName).IsEqualTo(original.Members[i].Value.TypeFullName);
+                await Assert.That(deserialized.Members[i].Value.Description).IsEqualTo(original.Members[i].Value.Description);
             }
         }
     }

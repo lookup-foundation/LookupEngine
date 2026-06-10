@@ -214,6 +214,46 @@ public sealed class ThreadSafetyTests
     }
 
     [Test]
+    public async Task Decompose_ManyDescriptorTypesConcurrently_ExtensionCacheIsThreadSafe()
+    {
+        // Arrange - each closed generic descriptor type forces a new extension cache entry
+        var markerType = typeof(int);
+        var descriptors = new Descriptor[100];
+        for (var i = 0; i < descriptors.Length; i++)
+        {
+            var descriptorType = typeof(CacheStressDescriptor<>).MakeGenericType(markerType);
+            descriptors[i] = (Descriptor) Activator.CreateInstance(descriptorType)!;
+            markerType = typeof(List<>).MakeGenericType(markerType);
+        }
+
+        // Act
+        var results = new DecomposedObject[descriptors.Length];
+        Parallel.For(0, descriptors.Length, index =>
+        {
+            var options = new DecomposeOptions
+            {
+                EnableExtensions = true,
+                TypeResolver = (obj, _) => obj switch
+                {
+                    ExtensibleObject => descriptors[index],
+                    _ => new ObjectDescriptor(obj)
+                }
+            };
+
+            results[index] = LookupComposer.Decompose(new ExtensibleObject(), options);
+        });
+
+        // Assert
+        using (Assert.Multiple())
+        {
+            foreach (var result in results)
+            {
+                await Assert.That(result.Members.Any(member => member.Name == "Marker")).IsTrue();
+            }
+        }
+    }
+
+    [Test]
     public async Task Decompose_HighConcurrency_NoDeadlocks()
     {
         // Arrange
@@ -252,6 +292,21 @@ file sealed class ExtensionDescriptor : Descriptor, IDescriptorExtension
         IVariant Extension()
         {
             return Variants.Value("Extended");
+        }
+    }
+}
+
+// ReSharper disable once UnusedTypeParameter
+file sealed class CacheStressDescriptor<TMarker> : Descriptor, IDescriptorExtension
+{
+    public void RegisterExtensions(IExtensionManager manager)
+    {
+        manager.Define("Marker").Register(Marker);
+        return;
+
+        IVariant Marker()
+        {
+            return Variants.Value(typeof(TMarker).Name);
         }
     }
 }
