@@ -24,7 +24,7 @@ public partial class LookupComposer
     /// </summary>
     private void AddEnumerableItems()
     {
-        if (_input is not IEnumerable enumerable) return;
+        if (Input is not IEnumerable enumerable) return;
 
         var enumerator = enumerable.GetEnumerator();
 

@@ -34,7 +34,7 @@ public partial class LookupComposer
             TimeDiagnoser.StartMonitoring();
             MemoryDiagnoser.StartMonitoring();
 
-            return member.GetValue(_input);
+            return member.GetValue(Input);
         }
         finally
         {
@@ -53,7 +53,7 @@ public partial class LookupComposer
             TimeDiagnoser.StartMonitoring();
             MemoryDiagnoser.StartMonitoring();
 
-            return member.GetValue(_input);
+            return member.GetValue(Input);
         }
         finally
         {
@@ -72,7 +72,7 @@ public partial class LookupComposer
             TimeDiagnoser.StartMonitoring();
             MemoryDiagnoser.StartMonitoring();
 
-            return member.Invoke(_input, null);
+            return member.Invoke(Input, null);
         }
         finally
         {

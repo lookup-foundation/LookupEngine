@@ -12,8 +12,6 @@
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 
-using JetBrains.Annotations;
-
 namespace LookupEngine.Abstractions.Decomposition.Containers;
 
 /// <summary>

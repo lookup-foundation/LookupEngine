@@ -13,7 +13,6 @@
 // UNINTERRUPTED OR ERROR FREE.
 
 using System.Diagnostics;
-using JetBrains.Annotations;
 
 namespace LookupEngine.Abstractions.Decomposition;
 

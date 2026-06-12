@@ -184,11 +184,11 @@ public sealed class MemberAttributesTests
 
 file sealed class ExtensibleObject;
 
-file sealed class ExtensionDescriptor : Descriptor, IDescriptorExtension
+file sealed class ExtensionDescriptor : Descriptor, IDescriptorConfigurator
 {
-    public void RegisterExtensions(IExtensionManager manager)
+    public void Configure(IMemberManager manager)
     {
-        manager.Define("Extension").Register(Extension);
+        manager.Extension("Extension").Register(Extension);
         return;
 
         IVariant Extension()

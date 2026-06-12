@@ -27,7 +27,7 @@ public partial class LookupComposer
     private DecomposedObject DecomposeInstance()
     {
         _decomposedObject = DecomposeInstanceObject();
-        var objectType = _input.GetType();
+        var objectType = Input.GetType();
         var members = DecomposeInstanceMembers(objectType);
         _decomposedObject.Members.AddRange(members);
 
@@ -40,10 +40,10 @@ public partial class LookupComposer
     [Pure]
     private DecomposedObject DecomposeInstanceObject()
     {
-        _input = RedirectValue(_input, out var instanceDescriptor, out var instanceDescription);
+        Input = RedirectValue(Input, out var instanceDescriptor, out var instanceDescription);
 
-        var objectType = _input.GetType();
-        return CreateInstanceDecomposition(_input, objectType, instanceDescriptor, instanceDescription);
+        var objectType = Input.GetType();
+        return CreateInstanceDecomposition(Input, objectType, instanceDescriptor, instanceDescription);
     }
 
     /// <summary>
@@ -75,7 +75,7 @@ public partial class LookupComposer
     [Pure]
     private List<DecomposedMember> DecomposeInstanceMembers()
     {
-        return DecomposeInstanceMembers(_input.GetType());
+        return DecomposeInstanceMembers(Input.GetType());
     }
 
     /// <summary>
@@ -90,17 +90,18 @@ public partial class LookupComposer
         for (var i = objectTypeHierarchy.Count - 1; i >= 0; i--)
         {
             MemberDeclaringType = objectTypeHierarchy[i];
-            MemberDeclaringDescriptor = _options.TypeResolver.Invoke(_input, MemberDeclaringType);
+            MemberDeclaringDescriptor = _options.TypeResolver.Invoke(Input, MemberDeclaringType);
 
             var flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
             if (_options.IncludeStaticMembers) flags |= BindingFlags.Static;
             if (_options.IncludePrivateMembers) flags |= BindingFlags.NonPublic;
 
+            ConfigureMembers();
             DecomposeFields(flags);
             DecomposeProperties(flags);
             DecomposeMethods(flags);
             DecomposeEvents(flags);
-            ExecuteExtensions();
+            FlushExtensions();
 
             _depth--;
         }
@@ -128,9 +129,11 @@ public partial class LookupComposer
             MemberDeclaringType = objectTypeHierarchy[i];
             MemberDeclaringDescriptor = _options.TypeResolver.Invoke(null, MemberDeclaringType);
 
+            ConfigureMembers();
             DecomposeFields(flags);
             DecomposeProperties(flags);
             DecomposeMethods(flags);
+            FlushExtensions();
 
             _depth--;
         }

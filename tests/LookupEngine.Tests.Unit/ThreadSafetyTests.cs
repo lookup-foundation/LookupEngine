@@ -282,11 +282,11 @@ public sealed class ThreadSafetyTests
 
 file sealed class ExtensibleObject;
 
-file sealed class ExtensionDescriptor : Descriptor, IDescriptorExtension
+file sealed class ExtensionDescriptor : Descriptor, IDescriptorConfigurator
 {
-    public void RegisterExtensions(IExtensionManager manager)
+    public void Configure(IMemberManager manager)
     {
-        manager.Define("Extension").Register(Extension);
+        manager.Extension("Extension").Register(Extension);
         return;
 
         IVariant Extension()
@@ -297,11 +297,11 @@ file sealed class ExtensionDescriptor : Descriptor, IDescriptorExtension
 }
 
 // ReSharper disable once UnusedTypeParameter
-file sealed class CacheStressDescriptor<TMarker> : Descriptor, IDescriptorExtension
+file sealed class CacheStressDescriptor<TMarker> : Descriptor, IDescriptorConfigurator
 {
-    public void RegisterExtensions(IExtensionManager manager)
+    public void Configure(IMemberManager manager)
     {
-        manager.Define("Marker").Register(Marker);
+        manager.Extension("Marker").Register(Marker);
         return;
 
         IVariant Marker()

@@ -14,7 +14,7 @@
 
 using System.Reflection;
 using JetBrains.Annotations;
-using LookupEngine.Abstractions.Configuration;
+using LookupEngine.Abstractions.Enums;
 
 // ReSharper disable once CheckNamespace
 namespace LookupEngine;
@@ -32,17 +32,42 @@ public partial class LookupComposer
         {
             if (member.IsSpecialName) continue;
 
-            object? value;
             var parameters = member.CanRead ? member.GetMethod!.GetParameters() : [];
+            TryLookupMember(member.Name, parameters, out var handler, out var evaluationOverride);
 
+            if (evaluationOverride == MemberEvaluationPolicy.Disabled)
+            {
+                WriteDisabledMember(member, member.PropertyType, parameters);
+                continue;
+            }
+
+            if (handler is null)
+            {
+                if (!member.CanRead)
+                {
+                    WriteUnsupportedMember(member, member.PropertyType, parameters);
+                    continue;
+                }
+
+                if (parameters.Length > 0)
+                {
+                    if (!_options.IncludeUnsupported) continue;
+
+                    WriteUnsupportedMember(member, member.PropertyType, parameters);
+                    continue;
+                }
+            }
+
+            if (evaluationOverride == MemberEvaluationPolicy.Deferred)
+            {
+                WriteDeferredMember(member, member.PropertyType, parameters, handler);
+                continue;
+            }
+
+            object? value;
             try
             {
-                if (!TryResolve(member, parameters, out value))
-                {
-                    if (!TrySuppress(member, parameters, out value)) continue;
-
-                    value ??= EvaluateValue(member);
-                }
+                value = handler is not null ? EvaluateValue(handler) : EvaluateValue(member);
             }
             catch (TargetInvocationException exception)
             {
@@ -55,45 +80,5 @@ public partial class LookupComposer
 
             WriteDecompositionMember(value, member, parameters);
         }
-    }
-
-    /// <summary>
-    ///     Try to resolve parametric properties
-    /// </summary>
-    private protected virtual bool TryResolve(PropertyInfo member, ParameterInfo[] parameters, out object? value)
-    {
-        value = null;
-        if (MemberDeclaringDescriptor is not IDescriptorResolver resolver) return false;
-
-        var handler = resolver.Resolve(member.Name, parameters);
-        if (handler is null) return false;
-
-        value = EvaluateValue(handler);
-
-        return true;
-    }
-
-    /// <summary>
-    ///     Try to suppress unsupported properties
-    /// </summary>
-    private bool TrySuppress(PropertyInfo member, ParameterInfo[] parameters, out object? value)
-    {
-        value = null;
-
-        if (!member.CanRead)
-        {
-            value = new InvalidOperationException("Property does not have a get accessor, it cannot be read");
-            return true;
-        }
-
-        if (parameters.Length > 0)
-        {
-            if (!_options.IncludeUnsupported) return false;
-
-            value = new NotSupportedException("Unsupported property overload");
-            return true;
-        }
-
-        return true;
     }
 }

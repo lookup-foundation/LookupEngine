@@ -77,20 +77,6 @@ public sealed class VariantsTests
     }
 
     [Test]
-    public async Task Variants_Disabled_CreatesDisabledVariant()
-    {
-        // Act
-        var variant = Variants.Disabled();
-
-        // Assert
-        using (Assert.Multiple())
-        {
-            await Assert.That(variant).IsNotNull();
-            await Assert.That(variant.Value).IsTypeOf<InvalidOperationException>();
-        }
-    }
-
-    [Test]
     public async Task Variants_AddNull_SkipsNull()
     {
         // Act

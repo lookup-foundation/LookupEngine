@@ -57,6 +57,12 @@ public class DecomposeOptions
     public bool EnableRedirection { get; set; }
 
     /// <summary>
+    ///     Controls which methods are evaluated during decomposition.
+    ///     Deferred methods are included in the decomposition with an evaluation handle
+    /// </summary>
+    public MethodEvaluationPolicy EvaluationPolicy { get; set; } = MethodEvaluationPolicy.None;
+
+    /// <summary>
     ///     Map for resolving unsupported members
     /// </summary>
     public Func<object?, Type?, Descriptor> TypeResolver

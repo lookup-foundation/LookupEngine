@@ -1,24 +1,19 @@
 using System.Collections;
-using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 using LookupEngine.Abstractions.Configuration;
 using LookupEngine.Abstractions.Decomposition;
 
 namespace LookupEngine.Descriptors;
 
-public sealed class EnumerableDescriptor : Descriptor, IDescriptorEnumerator, IDescriptorResolver
+[SuppressMessage("ReSharper", "NotDisposedResourceIsReturnedByProperty")]
+public sealed class EnumerableDescriptor(IEnumerable value) : Descriptor, IDescriptorEnumerator, IDescriptorConfigurator
 {
-    private readonly IEnumerable _value;
     private bool? _isEmpty;
-
-    public EnumerableDescriptor(IEnumerable value)
-    {
-        _value = value;
-    }
 
     /// <summary>
     ///     A new enumerator of the described collection. Each access creates a fresh, non-advanced enumerator
     /// </summary>
-    public IEnumerator Enumerator => _value.GetEnumerator();
+    public IEnumerator Enumerator => value.GetEnumerator();
 
     /// <summary>
     ///     Indicates that the described collection is empty. Evaluated lazily to avoid enumerating the source until requested
@@ -28,9 +23,9 @@ public sealed class EnumerableDescriptor : Descriptor, IDescriptorEnumerator, ID
     private bool ComputeIsEmpty()
     {
         //Checking types to reduce memory allocation when creating an iterator and increase performance
-        if (_value is ICollection collection) return collection.Count == 0;
+        if (value is ICollection collection) return collection.Count == 0;
 
-        var enumerator = _value.GetEnumerator();
+        var enumerator = value.GetEnumerator();
         try
         {
             return !enumerator.MoveNext();
@@ -44,17 +39,8 @@ public sealed class EnumerableDescriptor : Descriptor, IDescriptorEnumerator, ID
         }
     }
 
-    public Func<IVariant>? Resolve(string target, ParameterInfo[] parameters)
+    public void Configure(IMemberManager manager)
     {
-        return target switch
-        {
-            nameof(IEnumerable.GetEnumerator) => ResolveGetEnumerator,
-            _ => null
-        };
-
-        IVariant ResolveGetEnumerator()
-        {
-            return Variants.Empty<IEnumerator>();
-        }
+        manager.Member(nameof(IEnumerable.GetEnumerator)).Resolve(Variants.Empty<IEnumerator>);
     }
 }

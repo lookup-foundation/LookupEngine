@@ -149,6 +149,74 @@ public partial class LookupComposer
         DecomposedMembers.Add(member);
     }
 
+    private void WriteDeferredMember(MemberInfo memberInfo, Type returnType, ParameterInfo[] parameters, Func<IVariant>? handler)
+    {
+        WriteInactiveMember(memberInfo, returnType, parameters, MemberEvaluationPolicy.Deferred, target =>
+        {
+            CreateEvaluationComposer().EvaluateDeferredMember(target, memberInfo, handler);
+        });
+    }
+
+    private void WriteDisabledMember(MemberInfo memberInfo, Type returnType, ParameterInfo[] parameters)
+    {
+        WriteInactiveMember(memberInfo, returnType, parameters, MemberEvaluationPolicy.Disabled, target =>
+        {
+            CreateEvaluationComposer().EvaluateDisabledMember(target, memberInfo.Name);
+        });
+    }
+
+    private void WriteUnsupportedMember(MemberInfo memberInfo, Type returnType, ParameterInfo[] parameters)
+    {
+        WriteInactiveMember(memberInfo, returnType, parameters, MemberEvaluationPolicy.Unsupported, null);
+    }
+
+    private void WriteInactiveMember(MemberInfo memberInfo, Type returnType, ParameterInfo[] parameters, MemberEvaluationPolicy policy, Action<DecomposedMember>? evaluator)
+    {
+        var formatTypeName = ReflexionFormater.FormatTypeName(MemberDeclaringType);
+        var returnTypeName = ReflexionFormater.FormatTypeName(returnType);
+
+        var member = new DecomposedMember
+        {
+            Depth = _depth,
+            Name = ReflexionFormater.FormatMemberName(memberInfo, parameters),
+            DeclaringTypeName = formatTypeName,
+            DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
+            MemberAttributes = ModifiersFormater.FormatAttributes(memberInfo),
+            EvaluationPolicy = policy,
+            Evaluator = evaluator,
+            Value = new DecomposedValue
+            {
+                RawValue = null,
+                Name = string.Empty,
+                TypeName = returnTypeName,
+                TypeFullName = ReflexionFormater.FormatTypeFullName(returnType, returnTypeName)
+            }
+        };
+
+        DecomposedMembers.Add(member);
+    }
+
+    private protected void WriteExtensionResultMember(string name, MemberAttributes attributes, MemberEvaluationPolicy policy)
+    {
+        var formatTypeName = ReflexionFormater.FormatTypeName(MemberDeclaringType);
+
+        var member = new DecomposedMember
+        {
+            Depth = _depth,
+            Name = name,
+            Value = CreateNullableValue(),
+            DeclaringTypeName = formatTypeName,
+            DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
+            MemberAttributes = attributes,
+            EvaluationPolicy = policy,
+            Evaluator = policy == MemberEvaluationPolicy.Disabled
+                ? target => CreateEvaluationComposer().EvaluateDisabledMember(target, name)
+                : null
+        };
+
+        DecomposedMembers.Add(member);
+    }
+
     private DecomposedValue CreateNullableValue()
     {
         return new DecomposedValue

@@ -1,18 +1,17 @@
 // Copyright (c) Lookup Foundation and Contributors
-// 
+//
 // Permission to use, copy, modify, and distribute this software in
 // object code form for any purpose and without fee is hereby granted,
 // provided that the above copyright notice appears in all copies and
 // that both that copyright notice and the limited warranty and
 // restricted rights notice below appear in all supporting
 // documentation.
-// 
+//
 // THIS PROGRAM IS PROVIDED "AS IS" AND WITH ALL FAULTS.
 // NO IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE IS PROVIDED.
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 
-using JetBrains.Annotations;
 using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Abstractions.Enums;
 
@@ -27,8 +26,7 @@ public struct ExtensionBuilder<TContext>
 {
     private readonly string _name;
     private readonly Action<string, MemberAttributes, Func<TContext, IVariant>> _registerCallback;
-    private readonly Action<string, MemberAttributes, bool> _registerResultCallback;
-    private readonly Func<string, MemberAttributes, Func<TContext, IVariant>, bool> _tryRegisterCallback;
+    private readonly Action<string, MemberAttributes, MemberEvaluationPolicy> _registerResultCallback;
     private MemberAttributes _attributes = MemberAttributes.Extension;
 
     /// <summary>
@@ -37,13 +35,11 @@ public struct ExtensionBuilder<TContext>
     public ExtensionBuilder(
         string name,
         Action<string, MemberAttributes, Func<TContext, IVariant>> registerCallback,
-        Action<string, MemberAttributes, bool> registerResultCallback,
-        Func<string, MemberAttributes, Func<TContext, IVariant>, bool> tryRegisterCallback)
+        Action<string, MemberAttributes, MemberEvaluationPolicy> registerResultCallback)
     {
         _name = name;
         _registerCallback = registerCallback;
         _registerResultCallback = registerResultCallback;
-        _tryRegisterCallback = tryRegisterCallback;
     }
 
     /// <summary>
@@ -68,34 +64,33 @@ public struct ExtensionBuilder<TContext>
     ///     Registers the extension with the specified context-aware evaluation handler
     /// </summary>
     /// <param name="handler">The function that evaluates the extension value using the context</param>
-    public void Register(Func<TContext, IVariant> handler)
+    public readonly void Register(Func<TContext, IVariant> handler)
     {
         _registerCallback(_name, _attributes, handler);
     }
 
     /// <summary>
-    ///     Registers the extension and returns whether the evaluated result is truthy
+    ///     Registers the extension with the specified context-aware evaluation handler
     /// </summary>
     /// <param name="handler">The function that evaluates the extension value using the context</param>
-    /// <returns>True if the evaluated value is boolean true; false otherwise or on exception</returns>
-    public bool TryRegister(Func<TContext, IVariant> handler)
+    public readonly void Register(Func<TContext, object?> handler)
     {
-        return _tryRegisterCallback(_name, _attributes, handler);
+        _registerCallback(_name, _attributes, context => Variants.Value(handler(context)));
     }
 
     /// <summary>
     ///     Marks the extension as not supported, visible only when IncludeUnsupported is enabled
     /// </summary>
-    public void AsNotSupported()
+    public readonly void AsNotSupported()
     {
-        _registerResultCallback(_name, _attributes, false);
+        _registerResultCallback(_name, _attributes, MemberEvaluationPolicy.Unsupported);
     }
 
     /// <summary>
     ///     Marks the extension as disabled, visible only when IncludeUnsupported is enabled
     /// </summary>
-    public void AsDisabled()
+    public readonly void AsDisabled()
     {
-        _registerResultCallback(_name, _attributes, true);
+        _registerResultCallback(_name, _attributes, MemberEvaluationPolicy.Disabled);
     }
 }

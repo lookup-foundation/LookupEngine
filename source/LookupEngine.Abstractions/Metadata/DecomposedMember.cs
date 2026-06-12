@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using JetBrains.Annotations;
+using System.Text.Json.Serialization;
 using LookupEngine.Abstractions.Enums;
 
 // ReSharper disable once CheckNamespace
@@ -31,24 +31,48 @@ public sealed class DecomposedMember
     ///     Object type full name that the member belongs to
     /// </summary>
     public required string DeclaringTypeFullName { get; init; }
-
-    /// <summary>
-    ///     Time of evaluation the member value
-    /// </summary>
-    public double ComputationTime { get; init; }
-
-    /// <summary>
-    ///     Allocating memory for member evaluation
-    /// </summary>
-    public long AllocatedBytes { get; init; }
-
+    
     /// <summary>
     ///     The member attributes
     /// </summary>
     public MemberAttributes MemberAttributes { get; init; }
 
     /// <summary>
+    ///     Time of evaluation the member value
+    /// </summary>
+    public double ComputationTime { get; set; }
+
+    /// <summary>
+    ///     Allocating memory for member evaluation
+    /// </summary>
+    public long AllocatedBytes { get; set; }
+
+    /// <summary>
+    ///     The evaluation policy override
+    /// </summary>
+    public MemberEvaluationPolicy EvaluationPolicy { get; set; }
+
+    /// <summary>
     ///     Evaluated member value metadata
     /// </summary>
-    public required DecomposedValue Value { get; init; }
+    public required DecomposedValue Value { get; set; }
+
+    /// <summary>
+    ///     Engine-provided handle that evaluates the deferred member.
+    ///     Null for evaluated members and after deserialization
+    /// </summary>
+    [JsonIgnore]
+    public Action<DecomposedMember>? Evaluator { get; set; }
+
+    /// <summary>
+    ///     Force evaluation of the deferred member through the engine, updating the value and metrics in place
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The member is not deferred or was deserialized</exception>
+    public void Evaluate()
+    {
+        if (Evaluator is null) throw new InvalidOperationException("The member is not deferred or was deserialized");
+
+        Evaluator.Invoke(this);
+        Evaluator = null;
+    }
 }

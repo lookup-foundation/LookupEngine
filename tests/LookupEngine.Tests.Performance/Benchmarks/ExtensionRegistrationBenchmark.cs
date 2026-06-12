@@ -161,19 +161,6 @@ public class ExtensionRegistrationBenchmark
         return _structManager.MemberCount;
     }
 
-    [Benchmark]
-    public int Struct_TryRegister()
-    {
-        _structManager.Reset();
-        var result = false;
-        for (var i = 0; i < Count; i++)
-        {
-            result = _structManager.Define("Extension").TryRegister(() => new Variant(true));
-        }
-
-        return result ? 1 : 0;
-    }
-
     private static Func<Variant> NotSupported { get; } = () => new Variant(new NotSupportedException());
 }
 
@@ -238,21 +225,6 @@ public sealed class StructManager
         }
     }
 
-    public bool TryRegisterExtension(string name, Func<Variant> handler)
-    {
-        try
-        {
-            var result = handler();
-            _members.Add(result);
-            return result.Value is true;
-        }
-        catch (Exception exception)
-        {
-            _members.Add(exception);
-            return false;
-        }
-    }
-
     public void RegisterNotSupported(string name)
     {
     }
@@ -281,8 +253,6 @@ public struct StructBuilder(StructManager manager, string name)
     }
 
     public void Register(Func<Variant> handler) => manager.RegisterExtension(name, handler);
-
-    public bool TryRegister(Func<Variant> handler) => manager.TryRegisterExtension(name, handler);
 
     public void AsNotSupported() => manager.RegisterNotSupported(name);
 

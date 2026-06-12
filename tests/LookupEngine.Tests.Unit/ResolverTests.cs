@@ -7,7 +7,7 @@ using LookupEngine.Options;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-/// Tests for <see cref="IDescriptorResolver"/> functionality and custom type resolution.
+/// Tests for <see cref="IDescriptorConfigurator"/> member resolution and custom type resolution.
 /// </summary>
 public sealed class ResolverTests
 {
@@ -93,6 +93,7 @@ public sealed class ResolverTests
         var sharedDescriptor = new SharedValueDescriptor();
         var options = new DecomposeOptions
         {
+            EvaluationPolicy = MethodEvaluationPolicy.All,
             TypeResolver = (obj, _) =>
             {
                 return obj switch
@@ -136,26 +137,12 @@ file sealed class DescribedValueObject;
 
 file sealed class SharedValueDescriptor : Descriptor;
 
-file sealed class DescribingResolverDescriptor : Descriptor, IDescriptorResolver
+file sealed class DescribingResolverDescriptor : Descriptor, IDescriptorConfigurator
 {
-    public Func<IVariant>? Resolve(string target, ParameterInfo[] parameters)
+    public void Configure(IMemberManager manager)
     {
-        return target switch
-        {
-            nameof(DescribedContainerObject.DescribedMethod) => ResolveDescribedMethod,
-            nameof(DescribedContainerObject.PlainMethod) => ResolvePlainMethod,
-            _ => null
-        };
-
-        IVariant ResolveDescribedMethod()
-        {
-            return Variants.Value(new DescribedValueObject(), "Variant description");
-        }
-
-        IVariant ResolvePlainMethod()
-        {
-            return Variants.Value(new DescribedValueObject());
-        }
+        manager.Member(nameof(DescribedContainerObject.DescribedMethod)).Resolve(() => Variants.Value(new DescribedValueObject(), "Variant description"));
+        manager.Member(nameof(DescribedContainerObject.PlainMethod)).Resolve(() => Variants.Value(new DescribedValueObject()));
     }
 }
 
@@ -183,47 +170,24 @@ file sealed class EngineTestContext
     public string Metadata { get; } = "Test context";
 }
 
-file sealed class ResolverDescriptor : Descriptor, IDescriptorResolver, IDescriptorResolver<EngineTestContext>
+file sealed class ResolverDescriptor : Descriptor, IDescriptorConfigurator, IDescriptorConfigurator<EngineTestContext>
 {
     public ResolverDescriptor()
     {
         Name = "Redirection";
     }
 
-    public Func<IVariant>? Resolve(string target, ParameterInfo[] parameters)
+    public void Configure(IMemberManager manager)
     {
-        return target switch
-        {
-            nameof(ResolvableObject.UnsupportedMethod) => ResolveUnsupportedMethod,
-            nameof(ResolvableObject.UnsupportedDescribedMethod) => ResolveUnsupportedDescribedMethod,
-            _ => null
-        };
-
-        IVariant ResolveUnsupportedMethod()
-        {
-            return Variants.Value("Resolved");
-        }
-
-        IVariant ResolveUnsupportedDescribedMethod()
-        {
-            return Variants.Value("Resolved", "Value description");
-        }
+        manager.Member(nameof(ResolvableObject.UnsupportedMethod)).Resolve(() => Variants.Value("Resolved"));
+        manager.Member(nameof(ResolvableObject.UnsupportedDescribedMethod)).Resolve(() => Variants.Value("Resolved", "Value description"));
     }
 
-    Func<EngineTestContext, IVariant>? IDescriptorResolver<EngineTestContext>.Resolve(string target, ParameterInfo[] parameters)
+    public void Configure(IMemberManager<EngineTestContext> manager)
     {
-        return target switch
-        {
-            nameof(ResolvableObject.UnsupportedMultiMethod) => ResolveUnsupportedMultiMethod,
-            _ => null
-        };
-
-        IVariant ResolveUnsupportedMultiMethod(EngineTestContext context)
-        {
-            return Variants.Values<string>(2)
-                .Add("Resolved 1")
-                .Add("Resolved 2", "Value description")
-                .Consume();
-        }
+        manager.Member(nameof(ResolvableObject.UnsupportedMultiMethod)).Resolve(_ => Variants.Values<string>(2)
+            .Add("Resolved 1")
+            .Add("Resolved 2", "Value description")
+            .Consume());
     }
 }

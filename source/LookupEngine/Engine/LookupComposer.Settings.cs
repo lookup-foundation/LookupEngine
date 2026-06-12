@@ -29,7 +29,7 @@ public partial class LookupComposer
     private readonly DecomposeOptions _options;
 
     private int _depth;
-    private object _input;
+    private protected object Input;
     private DecomposedObject? _decomposedObject;
 
     /// <summary>
@@ -37,7 +37,7 @@ public partial class LookupComposer
     /// </summary>
     private protected LookupComposer(object value, DecomposeOptions options)
     {
-        _input = value;
+        Input = value;
         _options = options;
     }
 

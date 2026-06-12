@@ -1,5 +1,6 @@
 using LookupEngine.Abstractions.Configuration;
 using LookupEngine.Abstractions.Decomposition;
+using LookupEngine.Abstractions.Enums;
 using LookupEngine.Descriptors;
 
 namespace LookupEngine.Tests.Unit;
@@ -22,7 +23,7 @@ public sealed class DiagnosticsTests
         using (Assert.Multiple())
         {
             await Assert.That(result.Members).IsNotEmpty();
-            foreach (var member in result.Members)
+            foreach (var member in result.Members.Where(member => member.EvaluationPolicy == MemberEvaluationPolicy.Evaluated))
             {
                 await Assert.That(member.ComputationTime).IsGreaterThan(0);
             }
@@ -192,11 +193,11 @@ file sealed class ThrowingFieldObject
 
 file sealed class ExtensibleObject;
 
-file sealed class ExtensionDescriptor : Descriptor, IDescriptorExtension
+file sealed class ExtensionDescriptor : Descriptor, IDescriptorConfigurator
 {
-    public void RegisterExtensions(IExtensionManager manager)
+    public void Configure(IMemberManager manager)
     {
-        manager.Define("Extension").Register(Extension);
+        manager.Extension("Extension").Register(Extension);
         return;
 
         IVariant Extension()

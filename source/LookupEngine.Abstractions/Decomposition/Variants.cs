@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using LookupEngine.Abstractions.Decomposition.Containers;
+﻿using LookupEngine.Abstractions.Decomposition.Containers;
 
 namespace LookupEngine.Abstractions.Decomposition;
 
@@ -47,14 +46,5 @@ public static class Variants
     public static IVariant Empty<T>()
     {
         return new Variants<T>(0);
-    }
-
-    /// <summary>
-    ///     A variant that disables the member evaluation
-    /// </summary>
-    [Pure]
-    public static IVariant Disabled()
-    {
-        return new Variant(new InvalidOperationException("Member execution disabled"));
     }
 }

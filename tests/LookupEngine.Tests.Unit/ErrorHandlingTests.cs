@@ -30,9 +30,13 @@ public sealed class ErrorHandlingTests
     {
         // Arrange
         var testObject = new ThrowingMethodObject();
+        var options = new DecomposeOptions
+        {
+            EvaluationPolicy = MethodEvaluationPolicy.All
+        };
 
         // Act
-        var result = LookupComposer.Decompose(testObject);
+        var result = LookupComposer.Decompose(testObject, options);
 
         // Assert
         await Assert.That(result.Members).IsNotEmpty();

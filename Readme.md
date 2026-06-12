@@ -4,12 +4,13 @@ A high-performance .NET library for runtime object analysis that provides deep i
 
 ## Features
 
-- Runtime inspection of public, private and static fields, properties and methods of any object
-- Built-in computation time and memory allocation tracking for each evaluated member
-- Extensible type descriptor system with custom resolvers and value converters
-- Context-aware member resolution for enhanced metadata and value evaluation
-- Support for multiple value variants based on method overloads and parameters
-- Safe execution model with configurable error handling and member access control
+- Runtime inspection of public, private and static fields, properties and methods of any object.
+- Built-in computation time and memory allocation tracking for each evaluated member.
+- Extensible type descriptor system with custom resolvers and value converters.
+- Context-aware member resolution for enhanced metadata and value evaluation.
+- Support for multiple value variants based on method overloads and parameters.
+- Deferred method evaluation with namespace and return type policies, per-member descriptor overrides, and on-demand force evaluation.
+- Safe execution model with configurable error handling and member access control.
 
 ## How to use
 
@@ -60,6 +61,7 @@ var options = new DecomposeOptions
     IncludeStaticMembers = true,
     EnableExtensions = true,
     EnableRedirection = true,
+    EvaluationPolicy = MethodEvaluationPolicy.All,
     TypeResolver = (obj, type) =>
     {
         return obj switch
@@ -148,162 +150,76 @@ var options = new DecomposeOptions
 };
 ```
 
-Describing an object is implemented with interfaces. There are quite a lot of them, let's consider each of them.
+Describing an object is implemented with interfaces.
 
-### IDescriptorResolver
+### IDescriptorConfigurator
 
-Describes exactly how the return value should be resolved.
-There is support for a single value or multiple values.
-To return the result of a member, use the `Variants` class, that contains possible scenarios for evaluating the value.
-
-Resolution with only one variant:
+A single place to configure how the engine handles a type: resolve member handlers, override the evaluation policy per member, and register synthetic extension members. 
+`manager.Member(name)` configures an existing member; `manager.Extension(name)` adds a member the type does not have.
 
 ```c#
-public class ElementDescriptor(Element element) : Descriptor, IDescriptorResolver
+public sealed class ElementDescriptor(Element element) : Descriptor, IDescriptorConfigurator
 {
-    public virtual Func<IVariant>? Resolve(string target, ParameterInfo[] parameters)
+    public void Configure(IMemberManager manager)
     {
-        return target switch
-        {
-            nameof(Element.IsHidden) => ResolveIsHidden,
-            nameof(Element.CanBeHidden) => ResolveCanBeHidden,
-            _ => null
-        };
+        // existing members
+        manager.Member(nameof(Element.IsHidden)).Resolve(() => element.IsHidden(Context.ActiveView));
+        manager.Member(nameof(Element.CanBeHidden)).Defer(() => element.CanBeHidden(Context.ActiveView));
+        manager.Member(nameof(Element.Delete)).Disable();
 
-        IVariant ResolveCanBeHidden()
-        {
-            return Variants.Value(_element.CanBeHidden(Context.ActiveView));
-        }
-
-        IVariant ResolveIsHidden()
-        {
-            return Variants.Value(_element.IsHidden(Context.ActiveView), "Active view");
-        }
+        // synthetic members
+        manager.Extension("HEX").Register(() => ColorRepresentationUtils.ColorToHex(element.Color));
     }
 }
 ```
 
-Resolution with multiple values:
+`Resolve` - handler, evaluated per the global evaluation policy.
+`Defer` - force the policy to defer evaluation.
+`Evaluate` - force the policy to auto member evaluation.
+`Disable` - force the policy to disable evaluation.
+
+Handlers may return a plain value, which is wrapped automatically, or an `IVariant` from the `Variants` class when you need an evaluation-context description or multiple values:
 
 ```c#
-public class ElementDescriptor(Element element) : Descriptor, IDescriptorResolver
+public sealed class ElementDescriptor(Element element) : Descriptor, IDescriptorConfigurator
 {
-    public virtual Func<IVariant>? Resolve(string target, ParameterInfo[] parameters)
+    public void Configure(IMemberManager manager)
     {
-        return target switch
-        {
-            nameof(Element.GetMaterialIds) => ResolveGetMaterialIds,
-            nameof(Element.GetBoundingBox) => ResolveBoundingBox,
-            _ => null
-        };
+        manager.Member(nameof(Element.Name)).Resolve(() => element.Name); // plain value
+        manager.Member(nameof(Element.IsHidden)).Resolve(() => Variants.Value(element.IsHidden(Context.ActiveView), "Active view")); // value with description
 
-        IVariant ResolveGetMaterialIds()
-        {
-            return Variants.Values<ICollection<ElementId>>(2)
-                .Add(_element.GetMaterialIds(true))
-                .Add(_element.GetMaterialIds(false))
-                .Consume();
-        }
-
-        IVariant ResolveBoundingBox()
-        {
-            return Variants.Values<BoundingBoxXYZ>(2)
-                .Add(_element.get_BoundingBox(null), "Model")
-                .Add(_element.get_BoundingBox(Context.ActiveView), "Active view")
-                .Consume();
-        }
+        manager.Member(nameof(Element.GetBoundingBox)).Resolve(() => Variants.Values<BoundingBoxXYZ>(2) // multiple values
+            .Add(element.get_BoundingBox(null), "Model")
+            .Add(element.get_BoundingBox(Context.ActiveView), "Active view")
+            .Consume());
     }
 }
 ```
 
-If you need an evaluation context for member resolving, use the generic interface version.
-Context is passed to the engine as an option and is single for all descriptors.
-Generic and none-generic version can be contained in the single class:
+`When` can filter members by its runtime parameters:
+
+```c#
+public sealed class EntityDescriptor(Entity entity) : Descriptor, IDescriptorConfigurator
+{
+    public void Configure(IMemberManager manager)
+    {
+        manager.Member(nameof(Entity.Get))
+            .When(parameters => parameters is [{ParameterType: var type}] && type == typeof(string))
+            .Resolve(() => entity.Get<string>(/* ... */));
+    }
+}
+```
+
+If you need an evaluation context, use the generic interface version.
+The context is passed to the engine as an option and is single for all descriptors. The generic and non-generic versions can live in the same class:
 
 ```C#
-public sealed class ReferenceDescriptor(Reference reference) : Descriptor, IDescriptorResolver<Document>
+public sealed class ReferenceDescriptor(Reference reference) : Descriptor, IDescriptorConfigurator<Document>
 {
-    public Func<Document, IVariant>? Resolve(string target, ParameterInfo[] parameters)
+    public void Configure(IMemberManager<Document> manager)
     {
-        return target switch
-        {
-            nameof(Reference.ConvertToStableRepresentation) => ResolveConvertToStableRepresentation,
-            _ => null
-        };
-
-        IVariant ResolveConvertToStableRepresentation(Document context)
-        {
-            return Variants.Value(reference.ConvertToStableRepresentation(context));
-        }
-    }
-}
-```
-
-Disable the member evaluation:
-
-```c#
-public class DocumentDescriptor(Document document) : Descriptor, IDescriptorResolver
-{
-    public virtual Func<IVariant>? Resolve(string target, ParameterInfo[] parameters)
-    {
-        return target switch
-        {
-            nameof(Document.Close) => Variants.Disabled
-            _ => null
-        };
-    }
-}
-```
-
-If you only want to resolve a specific overload, parameters are your friends:
-
-```C#
-public sealed class EntityDescriptor(Entity entity) : Descriptor, IDescriptorResolver
-{
-    public Func<IVariant>? Resolve(string target, ParameterInfo[] parameters)
-    {
-        return target switch
-        {
-            nameof(Entity.Get) when parameters.Length == 1 &&
-                                    parameters[0].ParameterType == typeof(string) => ResolveGetByField,
-            nameof(Entity.Get) when parameters.Length == 2 &&
-                                    parameters[0].ParameterType == typeof(string) &&
-                                    parameters[1].ParameterType == typeof(ForgeTypeId) => ResolveGetByFieldForge,
-            _ => null
-        };
-    }
-}
-```
-
-### IDescriptorExtension
-
-Adds registration of additional metadata for the object. For example, new methods or properties that the original object doesn't have:
-
-```c#
-public sealed class ColorDescriptor(Color color) : Descriptor, IDescriptorExtension
-{
-    public void RegisterExtensions(IExtensionManager manager)
-    {
-        manager.Register("HEX", () => Variants.Value(ColorRepresentationUtils.ColorToHex(color)));
-        manager.Register("RGB", () => Variants.Value(ColorRepresentationUtils.ColorToRgb(color)));
-        manager.Register("CMYK", () => Variants.Value(ColorRepresentationUtils.ColorToCmyk(color)));
-    }
-}
-```
-
-If you need an evaluation context for extension registration, use the generic interface version.
-Context is passed to the engine as an option and is single for all descriptors.
-Generic and none-generic version can be contained in the single class:
-
-```C#
-public sealed class SchemaDescriptor(Schema schema) : Descriptor, IDescriptorExtension<Document>
-{
-    public void RegisterExtensions(IExtensionManager<Document> manager)
-    {
-        manager.Register("GetElements", context => Variants.Value(context
-            .GetElements()
-            .WherePasses(new ExtensibleStorageFilter(schema.GUID))
-            .ToElements()));
+        manager.Member(nameof(Reference.ConvertToStableRepresentation))
+            .Resolve(document => reference.ConvertToStableRepresentation(document));
     }
 }
 ```
@@ -356,3 +272,75 @@ public sealed class ApplicationDescriptor : Descriptor, IDescriptorCollector
     }
 }
 ```
+
+## Evaluation policy
+
+Invoking methods during decomposition can cause side effects, so the engine defers them by default.
+Deferred methods are included in the decomposition without being invoked and can be evaluated later on demand.
+
+To evaluate methods automatically, set the `EvaluationPolicy` property of `DecomposeOptions`, that controls which methods are allowed to be invoked:
+
+```C#
+// Defer all methods (default)
+var options = new DecomposeOptions
+{
+    EvaluationPolicy = MethodEvaluationPolicy.None
+};
+
+// Evaluate all methods except the excluded return types
+var options = new DecomposeOptions
+{
+    EvaluationPolicy = MethodEvaluationPolicy.All
+};
+
+// Evaluate methods declared in the matching namespaces only
+var options = new DecomposeOptions
+{
+    EvaluationPolicy = new MethodEvaluationPolicy
+    {
+        IncludedNamespaces = ["Autodesk.Revit.*"],
+        ExcludedReturnTypes = [typeof(void), typeof(bool)]
+    }
+};
+```
+
+`IncludedNamespaces` - contains wildcard patterns matched against the namespace of the type where the method is declared.
+`ExcludedReturnTypes` - defers methods by their return type even when the namespace matches.
+By default, methods without a return value are only executed explicitly.
+
+### Member evaluation policy overrides
+
+Descriptors override the evaluation policy for specific members through `IDescriptorConfigurator`, in both directions and for methods and properties alike:
+
+```C#
+public sealed class DocumentDescriptor(Document document) : Descriptor, IDescriptorConfigurator
+{
+    public void Configure(IMemberManager manager)
+    {
+        manager.Member(nameof(Document.GetTypeOfStorage)).Evaluate(); // evaluate during decomposition, even when the policy defers
+        manager.Member(nameof(Document.EnumerateUserDefinedParameters)).Defer(); // never evaluate automatically, force evaluation runs it
+        manager.Member(nameof(Document.Close)).Disable(); // never evaluate, force evaluation reports the disabled result
+    }
+}
+```
+
+### Force evaluation
+
+A deferred member is marked with the `EvaluationPolicy` property, and its value contains the method return type instead of the evaluation result.
+To evaluate the member on demand, for example by a user action in the UI, call `Evaluate()`.
+The value and performance metrics are updated in place:
+
+```C#
+var data = Colors.Red;
+var decomposition = LookupComposer.Decompose(data);
+
+foreach (var member in decomposition.Members)
+{
+    if (member.EvaluationPolicy == MemberEvaluationPolicy.Deferred)
+    {
+        member.Evaluate();
+    }
+}
+```
+
+Force evaluation runs the same pipeline as the decomposition: the resolver handler or the method invocation, with redirection, type resolution and metrics.

@@ -60,6 +60,7 @@ public sealed class SerializationTests
                 await Assert.That(deserialized.Members[i].Name).IsEqualTo(original.Members[i].Name);
                 await Assert.That(deserialized.Members[i].Depth).IsEqualTo(original.Members[i].Depth);
                 await Assert.That(deserialized.Members[i].MemberAttributes).IsEqualTo(original.Members[i].MemberAttributes);
+                await Assert.That(deserialized.Members[i].EvaluationPolicy).IsEqualTo(original.Members[i].EvaluationPolicy);
                 await Assert.That(deserialized.Members[i].ComputationTime).IsEqualTo(original.Members[i].ComputationTime);
                 await Assert.That(deserialized.Members[i].AllocatedBytes).IsEqualTo(original.Members[i].AllocatedBytes);
                 await Assert.That(deserialized.Members[i].DeclaringTypeFullName).IsEqualTo(original.Members[i].DeclaringTypeFullName);

@@ -6,7 +6,7 @@ using LookupEngine.Options;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-/// Tests for <see cref="IDescriptorExtension"/> functionality and context data enrichment.
+/// Tests for <see cref="IDescriptorConfigurator"/> extension functionality and context data enrichment.
 /// </summary>
 public sealed class ExtensionTests
 {
@@ -101,16 +101,16 @@ file sealed class EngineTestContext
     public string Metadata { get; } = "Test context";
 }
 
-file sealed class ExtensionDescriptor : Descriptor, IDescriptorExtension, IDescriptorExtension<EngineTestContext>
+file sealed class ExtensionDescriptor : Descriptor, IDescriptorConfigurator, IDescriptorConfigurator<EngineTestContext>
 {
-    public void RegisterExtensions(IExtensionManager manager)
+    public void Configure(IMemberManager manager)
     {
-        manager.Define("Extension").Register(() => Variants.Value("Extended"));
+        manager.Extension("Extension").Register(() => Variants.Value("Extended"));
     }
 
-    public void RegisterExtensions(IExtensionManager<EngineTestContext> manager)
+    public void Configure(IMemberManager<EngineTestContext> manager)
     {
-        manager.Define("VersionExtension").Register(context => Variants.Value(context.Version));
-        manager.Define("MetadataExtension").Register(context => Variants.Value(context.Metadata));
+        manager.Extension("VersionExtension").Register(context => Variants.Value(context.Version));
+        manager.Extension("MetadataExtension").Register(context => Variants.Value(context.Metadata));
     }
 }
