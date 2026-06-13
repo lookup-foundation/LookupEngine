@@ -6,7 +6,7 @@ using BenchmarkDotNet.Running;
 using LookupEngine.Tests.Performance.Benchmarks;
 
 var configuration = ManualConfig.Create(DefaultConfig.Instance)
-    .AddJob(Job.ShortRun)
+    .AddJob(Job.Default)
     .AddDiagnoser(MemoryDiagnoser.Default)
     .AddExporter(MarkdownExporter.GitHub);
 
@@ -17,4 +17,5 @@ var configuration = ManualConfig.Create(DefaultConfig.Instance)
 // BenchmarkRunner.Run<ResolveTypeBenchmark>(configuration);
 // BenchmarkRunner.Run<SortBenchmark>(configuration);
 // BenchmarkRunner.Run<TypeEqualBenchmark>(configuration);
-BenchmarkRunner.Run<ExtensionRegistrationBenchmark>(configuration);
+// BenchmarkRunner.Run<ExtensionRegistrationBenchmark>(configuration);
+BenchmarkRunner.Run<DecomposeBenchmark>(configuration);

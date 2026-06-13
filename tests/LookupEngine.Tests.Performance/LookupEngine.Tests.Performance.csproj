@@ -9,4 +9,8 @@
         <PackageReference Include="BenchmarkDotNet"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\..\source\LookupEngine\LookupEngine.csproj"/>
+    </ItemGroup>
+
 </Project>
