@@ -1,6 +1,5 @@
 using Build.Options;
 using Microsoft.Extensions.Options;
-using ModularPipelines.Attributes;
 using ModularPipelines.Context;
 using ModularPipelines.Git.Extensions;
 using ModularPipelines.Git.Options;

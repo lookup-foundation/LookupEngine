@@ -1,4 +1,3 @@
-using System.Reflection;
 using LookupEngine.Abstractions.Configuration;
 using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Descriptors;

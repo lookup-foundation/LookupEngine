@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using LookupEngine.Abstractions.Configuration;
 using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Abstractions.Enums;
