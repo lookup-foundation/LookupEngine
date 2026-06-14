@@ -103,14 +103,14 @@ file sealed class EngineTestContext
 
 file sealed class ExtensionDescriptor : Descriptor, IDescriptorConfigurator, IDescriptorConfigurator<EngineTestContext>
 {
-    public void Configure(IMemberManager manager)
+    public void Configure(IMemberConfigurator configuration)
     {
-        manager.Extension("Extension").Register(() => Variants.Value("Extended"));
+        configuration.Extension("Extension").Register(() => Variants.Value("Extended"));
     }
 
-    public void Configure(IMemberManager<EngineTestContext> manager)
+    public void Configure(IMemberConfigurator<EngineTestContext> configuration)
     {
-        manager.Extension("VersionExtension").Register(context => Variants.Value(context.Version));
-        manager.Extension("MetadataExtension").Register(context => Variants.Value(context.Metadata));
+        configuration.Extension("VersionExtension").Register(context => Variants.Value(context.Version));
+        configuration.Extension("MetadataExtension").Register(context => Variants.Value(context.Metadata));
     }
 }

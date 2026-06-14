@@ -284,9 +284,9 @@ file sealed class ExtensibleObject;
 
 file sealed class ExtensionDescriptor : Descriptor, IDescriptorConfigurator
 {
-    public void Configure(IMemberManager manager)
+    public void Configure(IMemberConfigurator configuration)
     {
-        manager.Extension("Extension").Register(Extension);
+        configuration.Extension("Extension").Register(Extension);
         return;
 
         IVariant Extension()
@@ -299,9 +299,9 @@ file sealed class ExtensionDescriptor : Descriptor, IDescriptorConfigurator
 // ReSharper disable once UnusedTypeParameter
 file sealed class CacheStressDescriptor<TMarker> : Descriptor, IDescriptorConfigurator
 {
-    public void Configure(IMemberManager manager)
+    public void Configure(IMemberConfigurator configuration)
     {
-        manager.Extension("Marker").Register(Marker);
+        configuration.Extension("Marker").Register(Marker);
         return;
 
         IVariant Marker()

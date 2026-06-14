@@ -575,13 +575,13 @@ file sealed class EvaluationTestContext
 
 file sealed class ResolverDescriptor : Descriptor, IDescriptorConfigurator, IDescriptorConfigurator<EvaluationTestContext>
 {
-    public void Configure(IMemberManager manager)
+    public void Configure(IMemberConfigurator configuration)
     {
-        manager.Member(nameof(ResolvableObject.ResolvableMethod)).Resolve(() => Variants.Value("Resolved", "Value description"));
+        configuration.Member(nameof(ResolvableObject.ResolvableMethod)).Resolve(() => Variants.Value("Resolved", "Value description"));
     }
 
-    public void Configure(IMemberManager<EvaluationTestContext> manager)
+    public void Configure(IMemberConfigurator<EvaluationTestContext> configuration)
     {
-        manager.Member(nameof(ResolvableObject.ContextMethod)).Resolve(context => Variants.Value(context.Metadata));
+        configuration.Member(nameof(ResolvableObject.ContextMethod)).Resolve(context => Variants.Value(context.Metadata));
     }
 }

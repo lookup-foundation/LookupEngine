@@ -23,6 +23,6 @@ public interface IDescriptorConfigurator<TContext> : IDescriptorCollector
     /// <summary>
     ///     Configures the members of the described object
     /// </summary>
-    /// <param name="manager">The manager that registers context-aware member handlers, overrides, and extensions</param>
-    void Configure(IMemberManager<TContext> manager);
+    /// <param name="configuration">Configures and registers context-aware member handlers, overrides, and extensions</param>
+    void Configure(IMemberConfigurator<TContext> configuration);
 }

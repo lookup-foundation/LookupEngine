@@ -15,19 +15,20 @@
 namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
-///     The manager that configures member handlers, evaluation overrides, and extensions for a descriptor
+///     Configures context-aware member handlers, evaluation overrides, and extensions for a descriptor
 /// </summary>
-public interface IMemberManager
+/// <typeparam name="TContext">The type of execution context</typeparam>
+public interface IMemberConfigurator<TContext>
 {
     /// <summary>
     ///     Configures an existing member of the described type by name
     /// </summary>
     /// <param name="name">The member name; affects all overloads unless narrowed with <c>When</c></param>
-    MemberResolverBuilder Member(string name);
+    MemberResolverBuilder<TContext> Member(string name);
 
     /// <summary>
     ///     Defines a synthetic member that the described type does not have
     /// </summary>
     /// <param name="name">The extension member name</param>
-    ExtensionBuilder Extension(string name);
+    ExtensionBuilder<TContext> Extension(string name);
 }

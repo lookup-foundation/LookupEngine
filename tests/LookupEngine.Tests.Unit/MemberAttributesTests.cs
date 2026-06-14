@@ -186,9 +186,9 @@ file sealed class ExtensibleObject;
 
 file sealed class ExtensionDescriptor : Descriptor, IDescriptorConfigurator
 {
-    public void Configure(IMemberManager manager)
+    public void Configure(IMemberConfigurator configuration)
     {
-        manager.Extension("Extension").Register(Extension);
+        configuration.Extension("Extension").Register(Extension);
         return;
 
         IVariant Extension()

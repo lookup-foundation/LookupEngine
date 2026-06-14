@@ -23,7 +23,7 @@ using LookupEngine.Abstractions.Enums;
 namespace LookupEngine;
 
 [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
-public partial class LookupComposer : IMemberManager
+public partial class LookupComposer : IMemberConfigurator
 {
     private static readonly ConcurrentDictionary<(Type Descriptor, Type Interface), bool> ImplementationOwnerCache = new();
 

@@ -297,7 +297,7 @@ public sealed class EvaluationOverrideTests
         await Assert.That(member.Value.RawValue).IsEqualTo("Context metadata");
     }
 
-    private static DecomposeOptions CreateOptions(Action<IMemberManager> configure, MethodEvaluationPolicy? policy = null)
+    private static DecomposeOptions CreateOptions(Action<IMemberConfigurator> configure, MethodEvaluationPolicy? policy = null)
     {
         return new DecomposeOptions
         {
@@ -313,7 +313,7 @@ public sealed class EvaluationOverrideTests
         };
     }
 
-    private static DecomposeOptions CreateOverloadOptions(Action<IMemberManager> configure)
+    private static DecomposeOptions CreateOverloadOptions(Action<IMemberConfigurator> configure)
     {
         return new DecomposeOptions
         {
@@ -329,7 +329,7 @@ public sealed class EvaluationOverrideTests
         };
     }
 
-    private static DecomposeOptions CreatePropertyOptions(Action<IMemberManager> configure)
+    private static DecomposeOptions CreatePropertyOptions(Action<IMemberConfigurator> configure)
     {
         return new DecomposeOptions
         {
@@ -412,17 +412,17 @@ file sealed class OverrideTestContext
     public string Metadata { get; } = "Context metadata";
 }
 
-file sealed class DelegatingConfigurator(Action<IMemberManager> configure) : Descriptor, IDescriptorConfigurator
+file sealed class DelegatingConfigurator(Action<IMemberConfigurator> configure) : Descriptor, IDescriptorConfigurator
 {
-    public void Configure(IMemberManager manager)
+    public void Configure(IMemberConfigurator configuration)
     {
-        configure.Invoke(manager);
+        configure.Invoke(configuration);
     }
 }
 
 file sealed class ContextPropertyConfigurator : Descriptor, IDescriptorConfigurator<OverrideTestContext>
 {
-    public void Configure(IMemberManager<OverrideTestContext> manager)
+    public void Configure(IMemberConfigurator<OverrideTestContext> manager)
     {
         manager.Member(nameof(OverridablePropertyObject.ContextResolvable)).Defer(context => context.Metadata);
     }

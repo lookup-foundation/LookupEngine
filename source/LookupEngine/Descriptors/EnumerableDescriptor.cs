@@ -39,8 +39,8 @@ public sealed class EnumerableDescriptor(IEnumerable value) : Descriptor, IDescr
         }
     }
 
-    public void Configure(IMemberManager manager)
+    public void Configure(IMemberConfigurator configuration)
     {
-        manager.Member(nameof(IEnumerable.GetEnumerator)).Resolve(Variants.Empty<IEnumerator>);
+        configuration.Member(nameof(IEnumerable.GetEnumerator)).Resolve(Variants.Empty<IEnumerator>);
     }
 }

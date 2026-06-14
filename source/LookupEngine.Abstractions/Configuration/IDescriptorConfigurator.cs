@@ -26,6 +26,6 @@ public interface IDescriptorConfigurator : IDescriptorCollector
     /// <summary>
     ///     Configures the members of the described object
     /// </summary>
-    /// <param name="manager">The manager that registers member handlers, overrides, and extensions</param>
-    void Configure(IMemberManager manager);
+    /// <param name="configuration">Configures and registers member handlers, overrides, and extensions</param>
+    void Configure(IMemberConfigurator configuration);
 }

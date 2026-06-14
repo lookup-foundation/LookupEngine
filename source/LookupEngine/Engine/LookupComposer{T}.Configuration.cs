@@ -20,14 +20,14 @@ using LookupEngine.Abstractions.Enums;
 // ReSharper disable once CheckNamespace
 namespace LookupEngine;
 
-public partial class LookupComposer<TContext> : IMemberManager<TContext>
+public partial class LookupComposer<TContext> : IMemberConfigurator<TContext>
 {
-    MemberResolverBuilder<TContext> IMemberManager<TContext>.Member(string name)
+    MemberResolverBuilder<TContext> IMemberConfigurator<TContext>.Member(string name)
     {
         return new MemberResolverBuilder<TContext>(name, AddContextMemberRegistration);
     }
 
-    ExtensionBuilder<TContext> IMemberManager<TContext>.Extension(string name)
+    ExtensionBuilder<TContext> IMemberConfigurator<TContext>.Extension(string name)
     {
         return new ExtensionBuilder<TContext>(name, EnqueueContextExtension, EnqueueExtensionResult);
     }

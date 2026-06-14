@@ -155,20 +155,20 @@ Describing an object is implemented with interfaces.
 ### IDescriptorConfigurator
 
 A single place to configure how the engine handles a type: resolve member handlers, override the evaluation policy per member, and register synthetic extension members. 
-`manager.Member(name)` configures an existing member; `manager.Extension(name)` adds a member the type does not have.
+`configuration.Member(name)` configures an existing member; `configuration.Extension(name)` adds a member the type does not have.
 
 ```c#
 public sealed class ElementDescriptor(Element element) : Descriptor, IDescriptorConfigurator
 {
-    public void Configure(IMemberManager manager)
+    public void Configure(IMemberConfigurator configuration)
     {
         // existing members
-        manager.Member(nameof(Element.IsHidden)).Resolve(() => element.IsHidden(Context.ActiveView));
-        manager.Member(nameof(Element.CanBeHidden)).Defer(() => element.CanBeHidden(Context.ActiveView));
-        manager.Member(nameof(Element.Delete)).Disable();
+        configuration.Member(nameof(Element.IsHidden)).Resolve(() => element.IsHidden(Context.ActiveView));
+        configuration.Member(nameof(Element.CanBeHidden)).Defer(() => element.CanBeHidden(Context.ActiveView));
+        configuration.Member(nameof(Element.Delete)).Disable();
 
         // synthetic members
-        manager.Extension("HEX").Register(() => ColorRepresentationUtils.ColorToHex(element.Color));
+        configuration.Extension("HEX").Register(() => ColorRepresentationUtils.ColorToHex(element.Color));
     }
 }
 ```
@@ -183,12 +183,12 @@ Handlers may return a plain value, which is wrapped automatically, or an `IVaria
 ```c#
 public sealed class ElementDescriptor(Element element) : Descriptor, IDescriptorConfigurator
 {
-    public void Configure(IMemberManager manager)
+    public void Configure(IMemberConfigurator configuration)
     {
-        manager.Member(nameof(Element.Name)).Resolve(() => element.Name); // plain value
-        manager.Member(nameof(Element.IsHidden)).Resolve(() => Variants.Value(element.IsHidden(Context.ActiveView), "Active view")); // value with description
+        configuration.Member(nameof(Element.Name)).Resolve(() => element.Name); // plain value
+        configuration.Member(nameof(Element.IsHidden)).Resolve(() => Variants.Value(element.IsHidden(Context.ActiveView), "Active view")); // value with description
 
-        manager.Member(nameof(Element.GetBoundingBox)).Resolve(() => Variants.Values<BoundingBoxXYZ>(2) // multiple values
+        configuration.Member(nameof(Element.GetBoundingBox)).Resolve(() => Variants.Values<BoundingBoxXYZ>(2) // multiple values
             .Add(element.get_BoundingBox(null), "Model")
             .Add(element.get_BoundingBox(Context.ActiveView), "Active view")
             .Consume());
@@ -201,9 +201,9 @@ public sealed class ElementDescriptor(Element element) : Descriptor, IDescriptor
 ```c#
 public sealed class EntityDescriptor(Entity entity) : Descriptor, IDescriptorConfigurator
 {
-    public void Configure(IMemberManager manager)
+    public void Configure(IMemberConfigurator configuration)
     {
-        manager.Member(nameof(Entity.Get))
+        configuration.Member(nameof(Entity.Get))
             .When(parameters => parameters is [{ParameterType: var type}] && type == typeof(string))
             .Resolve(() => entity.Get<string>(/* ... */));
     }
@@ -216,9 +216,9 @@ The context is passed to the engine as an option and is single for all descripto
 ```C#
 public sealed class ReferenceDescriptor(Reference reference) : Descriptor, IDescriptorConfigurator<Document>
 {
-    public void Configure(IMemberManager<Document> manager)
+    public void Configure(IMemberConfigurator<Document> configuration)
     {
-        manager.Member(nameof(Reference.ConvertToStableRepresentation))
+        configuration.Member(nameof(Reference.ConvertToStableRepresentation))
             .Resolve(document => reference.ConvertToStableRepresentation(document));
     }
 }
@@ -315,11 +315,11 @@ Descriptors override the evaluation policy for specific members through `IDescri
 ```C#
 public sealed class DocumentDescriptor(Document document) : Descriptor, IDescriptorConfigurator
 {
-    public void Configure(IMemberManager manager)
+    public void Configure(IMemberConfigurator configuration)
     {
-        manager.Member(nameof(Document.GetTypeOfStorage)).Evaluate(); // evaluate during decomposition, even when the policy defers
-        manager.Member(nameof(Document.EnumerateUserDefinedParameters)).Defer(); // never evaluate automatically, force evaluation runs it
-        manager.Member(nameof(Document.Close)).Disable(); // never evaluate, force evaluation reports the disabled result
+        configuration.Member(nameof(Document.GetTypeOfStorage)).Evaluate(); // evaluate during decomposition, even when the policy defers
+        configuration.Member(nameof(Document.EnumerateUserDefinedParameters)).Defer(); // never evaluate automatically, force evaluation runs it
+        configuration.Member(nameof(Document.Close)).Disable(); // never evaluate, force evaluation reports the disabled result
     }
 }
 ```

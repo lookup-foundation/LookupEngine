@@ -139,10 +139,10 @@ file sealed class SharedValueDescriptor : Descriptor;
 
 file sealed class DescribingResolverDescriptor : Descriptor, IDescriptorConfigurator
 {
-    public void Configure(IMemberManager manager)
+    public void Configure(IMemberConfigurator configuration)
     {
-        manager.Member(nameof(DescribedContainerObject.DescribedMethod)).Resolve(() => Variants.Value(new DescribedValueObject(), "Variant description"));
-        manager.Member(nameof(DescribedContainerObject.PlainMethod)).Resolve(() => Variants.Value(new DescribedValueObject()));
+        configuration.Member(nameof(DescribedContainerObject.DescribedMethod)).Resolve(() => Variants.Value(new DescribedValueObject(), "Variant description"));
+        configuration.Member(nameof(DescribedContainerObject.PlainMethod)).Resolve(() => Variants.Value(new DescribedValueObject()));
     }
 }
 
@@ -177,15 +177,15 @@ file sealed class ResolverDescriptor : Descriptor, IDescriptorConfigurator, IDes
         Name = "Redirection";
     }
 
-    public void Configure(IMemberManager manager)
+    public void Configure(IMemberConfigurator configuration)
     {
-        manager.Member(nameof(ResolvableObject.UnsupportedMethod)).Resolve(() => Variants.Value("Resolved"));
-        manager.Member(nameof(ResolvableObject.UnsupportedDescribedMethod)).Resolve(() => Variants.Value("Resolved", "Value description"));
+        configuration.Member(nameof(ResolvableObject.UnsupportedMethod)).Resolve(() => Variants.Value("Resolved"));
+        configuration.Member(nameof(ResolvableObject.UnsupportedDescribedMethod)).Resolve(() => Variants.Value("Resolved", "Value description"));
     }
 
-    public void Configure(IMemberManager<EngineTestContext> manager)
+    public void Configure(IMemberConfigurator<EngineTestContext> configuration)
     {
-        manager.Member(nameof(ResolvableObject.UnsupportedMultiMethod)).Resolve(_ => Variants.Values<string>(2)
+        configuration.Member(nameof(ResolvableObject.UnsupportedMultiMethod)).Resolve(_ => Variants.Values<string>(2)
             .Add("Resolved 1")
             .Add("Resolved 2", "Value description")
             .Consume());
