@@ -37,7 +37,7 @@ public class FormatMemberNameBenchmark
         _parameters = method.GetParameters();
     }
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     public string LinqSelectJoin()
     {
         if (_parameters.Length == 0) return _member.Name;
@@ -83,7 +83,7 @@ public class FormatMemberNameBenchmark
         return builder.ToString();
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public string StringBuilderSpanTrim()
     {
         if (_parameters.Length == 0) return _member.Name;
