@@ -15,6 +15,6 @@
 namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
-///     Indicates that the descriptor can retrieve object members
+///     Marker interface indicating that a descriptor participates in member collection.
 /// </summary>
 public interface IDescriptorCollector;

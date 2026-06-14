@@ -15,17 +15,14 @@
 namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
-///     Indicates that the descriptor configures how its members are evaluated
+///     Allows a descriptor to configure how its described object's members are evaluated.
+///     Implement this to resolve member handlers, override evaluation policies per member, and register synthetic extension members.
 /// </summary>
-/// <remarks>
-///     A single place to resolve member handlers, override the evaluation policy per member,
-///     and register synthetic extension members
-/// </remarks>
 public interface IDescriptorConfigurator : IDescriptorCollector
 {
     /// <summary>
-    ///     Configures the members of the described object
+    ///     Called by the engine once per decomposition to apply member configuration.
     /// </summary>
-    /// <param name="configuration">Configures and registers member handlers, overrides, and extensions</param>
+    /// <param name="configuration">Builder for registering member handlers, policy overrides, and extensions.</param>
     void Configure(IMemberConfigurator configuration);
 }

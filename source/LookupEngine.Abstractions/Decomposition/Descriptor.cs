@@ -17,12 +17,26 @@ using System.Diagnostics;
 namespace LookupEngine.Abstractions.Decomposition;
 
 /// <summary>
-///     The base descriptor to describe the evaluated object
+///     Base class for all descriptors. A descriptor provides the display name for the object it describes
+///     and an optional contextual description shown alongside it in decomposition results.
 /// </summary>
+/// <remarks>
+///     Implement <see cref="IDescriptorConfigurator"/>, <see cref="IDescriptorRedirector"/>,
+///     or <see cref="IDescriptorEnumerator"/> on a derived class to add member configuration,
+///     object redirection, or collection enumeration behavior.
+/// </remarks>
 [PublicAPI]
 [DebuggerDisplay("Name = {Name}")]
 public abstract class Descriptor
 {
+    /// <summary>
+    ///     The display name of the described object shown in decomposition results.
+    ///     When <see langword="null"/>, the engine falls back to the formatted type name.
+    /// </summary>
     public string? Name { get; init; }
+
+    /// <summary>
+    ///     An optional description of the described object or the context in which it was resolved.
+    /// </summary>
     public string? Description { get; set; }
 }

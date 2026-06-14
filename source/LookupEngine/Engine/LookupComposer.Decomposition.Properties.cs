@@ -13,7 +13,6 @@
 // UNINTERRUPTED OR ERROR FREE.
 
 using System.Reflection;
-using JetBrains.Annotations;
 using LookupEngine.Abstractions.Enums;
 
 // ReSharper disable once CheckNamespace

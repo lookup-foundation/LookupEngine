@@ -16,6 +16,9 @@ using LookupEngine.Abstractions.Decomposition;
 
 namespace LookupEngine.Descriptors;
 
+/// <summary>
+///     Default fallback descriptor for any object type. Derives the display name from <see cref="object.ToString()"/>.
+/// </summary>
 public sealed class ObjectDescriptor : Descriptor
 {
     public ObjectDescriptor(object? value)

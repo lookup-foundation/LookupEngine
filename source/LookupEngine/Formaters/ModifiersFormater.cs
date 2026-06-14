@@ -4,13 +4,10 @@ using LookupEngine.Abstractions.Enums;
 namespace LookupEngine.Formaters;
 
 /// <summary>
-///     Member modifiers formater
+///     Converts reflection metadata into <see cref="MemberAttributes"/> flags.
 /// </summary>
 internal static class ModifiersFormater
 {
-    /// <summary>
-    ///     Formats the member modifiers
-    /// </summary>
     internal static MemberAttributes FormatAttributes(MemberInfo member)
     {
         return member switch

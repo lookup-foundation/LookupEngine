@@ -15,17 +15,29 @@
 namespace LookupEngine.Abstractions.Enums;
 
 /// <summary>
-///     The member attributes
+///     Describes the kind and visibility modifiers of a decomposed member.
 /// </summary>
 [Flags]
 public enum MemberAttributes
 {
+    /// <summary>A non-public member.</summary>
     Private = 0b1,
+
+    /// <summary>A static member.</summary>
     Static = 0b10,
 
+    /// <summary>A field member.</summary>
     Field = 0b100,
+
+    /// <summary>A property member.</summary>
     Property = 0b1000,
+
+    /// <summary>A method member.</summary>
     Method = 0b10000,
+
+    /// <summary>A synthetic member registered through <see cref="IMemberConfigurator"/>.</summary>
     Extension = 0b100000,
+
+    /// <summary>An event member.</summary>
     Event = 0b1000000
 }

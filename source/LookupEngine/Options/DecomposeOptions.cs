@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using JetBrains.Annotations;
 using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Descriptors;
 
@@ -7,63 +6,73 @@ using LookupEngine.Descriptors;
 namespace LookupEngine;
 
 /// <summary>
-///     Object decomposition options
+///     Controls which members are included in a decomposition and how they are evaluated.
+///     All opt-in flags default to <see langword="false"/>; only the features you enable are active.
 /// </summary>
 [PublicAPI]
 public class DecomposeOptions
 {
     /// <summary>
-    ///     Decompose object root
+    ///     When <see langword="true"/>, includes <see cref="object"/> itself at the top of the type hierarchy.
+    ///     When <see langword="false"/> (default), the hierarchy stops at the first non-<see cref="object"/> base type.
     /// </summary>
     public bool IncludeRoot { get; set; }
 
     /// <summary>
-    ///     Decompose object fields
+    ///     When <see langword="true"/>, includes field members in the decomposition result.
     /// </summary>
     public bool IncludeFields { get; set; }
 
     /// <summary>
-    ///     Include events
+    ///     When <see langword="true"/>, includes event members in the decomposition result.
     /// </summary>
     public bool IncludeEvents { get; set; }
 
     /// <summary>
-    ///     Include unsupported members in the decomposition
+    ///     When <see langword="true"/>, includes members with
+    ///     <see cref="MemberEvaluationPolicy.Unsupported"/> or <see cref="MemberEvaluationPolicy.Disabled"/> status.
     /// </summary>
     public bool IncludeUnsupported { get; set; }
 
     /// <summary>
-    ///     Decompose private members
+    ///     When <see langword="true"/>, includes non-public members in the decomposition result.
     /// </summary>
     public bool IncludePrivateMembers { get; set; }
 
     /// <summary>
-    ///     Decompose static members
+    ///     When <see langword="true"/>, includes static members in the decomposition result.
     /// </summary>
     /// <remarks>
-    ///     Applies to instance decomposition and extensions.
-    ///     Decomposing a <see cref="Type"/> always includes static members, they are the content of the type itself
+    ///     Applies to instance decomposition and registered extensions.
+    ///     Decomposing a <see cref="Type"/> always includes static members regardless of this flag,
+    ///     because static members are the entire content of a type decomposition.
     /// </remarks>
     public bool IncludeStaticMembers { get; set; }
 
     /// <summary>
-    ///     Enable object extensions
+    ///     When <see langword="true"/>, calls <see cref="IDescriptorConfigurator.Configure"/> on the descriptor
+    ///     for each type level, enabling synthetic extension members and member configuration overrides.
     /// </summary>
     public bool EnableExtensions { get; set; }
 
     /// <summary>
-    ///     Enable member redirection
+    ///     When <see langword="true"/>, calls <see cref="IDescriptorRedirector.TryRedirect"/> on the descriptor
+    ///     for each evaluated value, allowing substitution with a different object.
     /// </summary>
     public bool EnableRedirection { get; set; }
 
     /// <summary>
-    ///     Controls which methods are evaluated during decomposition.
-    ///     Deferred methods are included in the decomposition with an evaluation handle
+    ///     Determines which methods are evaluated eagerly during decomposition.
+    ///     Methods that do not match the policy are deferred and included with an evaluation handle.
+    ///     Defaults to <see cref="MethodEvaluationPolicy.None"/>, which defers all methods.
     /// </summary>
     public MethodEvaluationPolicy EvaluationPolicy { get; set; } = MethodEvaluationPolicy.None;
 
     /// <summary>
-    ///     Map for resolving unsupported members
+    ///     Maps an object value and its declared type to the <see cref="Descriptor"/> that names and describes it.
+    ///     Override this to plug in custom descriptors for your own types.
+    ///     Defaults to the built-in resolver that covers common system types and falls back to
+    ///     <see cref="ObjectDescriptor"/> for everything else.
     /// </summary>
     public Func<object?, Type?, Descriptor> TypeResolver
     {
@@ -75,7 +84,7 @@ public class DecomposeOptions
     }
 
     /// <summary>
-    ///     The default map for resolving system types
+    ///     Returns a <see cref="DecomposeOptions"/> instance with all options at their defaults.
     /// </summary>
     public static DecomposeOptions Default => new();
 

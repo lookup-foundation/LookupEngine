@@ -4,7 +4,8 @@ using System.Reflection;
 namespace LookupEngine;
 
 /// <summary>
-///     Controls which methods are evaluated automatically during decomposition
+///     Determines which methods are evaluated eagerly during decomposition based on the namespace of their
+///     declaring type. Methods that do not match are deferred and included with an evaluation handle.
 /// </summary>
 [PublicAPI]
 public sealed class MethodEvaluationPolicy
@@ -12,11 +13,13 @@ public sealed class MethodEvaluationPolicy
     private readonly CompiledPattern[] _compiledNamespaces = [];
 
     /// <summary>
-    ///     Namespace wildcard patterns of declaring types whose methods are evaluated automatically
+    ///     Namespace wildcard patterns that identify declaring types whose methods are evaluated eagerly.
+    ///     The <c>*</c> wildcard matches zero or more characters; matching is ordinal and case-sensitive.
+    ///     Empty by default, meaning all methods are deferred.
     /// </summary>
     /// <remarks>
-    ///     The <c>*</c> wildcard matches zero or more characters, matching is ordinal and case-sensitive.
-    ///     Empty by default: no methods are evaluated, all are deferred
+    ///     Examples: <c>"MyApp.Domain"</c> matches that exact namespace; <c>"MyApp.*"</c> matches all
+    ///     sub-namespaces; <c>"*"</c> matches everything (equivalent to <see cref="All"/>).
     /// </remarks>
     public string[] IncludedNamespaces
     {
@@ -29,21 +32,20 @@ public sealed class MethodEvaluationPolicy
     } = [];
 
     /// <summary>
-    ///     Return types excluded from automatic evaluation even when the namespace matches
-    /// </summary>
-    /// <remarks>
+    ///     Return types excluded from eager evaluation even when the declaring type's namespace matches.
     ///     Excluded methods are deferred and available for force evaluation.
-    ///     By default, methods without a return value are only executed explicitly
-    /// </remarks>
+    ///     Defaults to <c>[typeof(void)]</c> so side-effect-only methods are never auto-invoked.
+    /// </summary>
     public Type[] ExcludedReturnTypes { get; init; } = [typeof(void)];
 
     /// <summary>
-    ///     Defer evaluation of all methods
+    ///     A policy that defers all methods. No methods are evaluated eagerly.
     /// </summary>
     public static MethodEvaluationPolicy None { get; } = new();
 
     /// <summary>
-    ///     Evaluate all methods except the excluded return types
+    ///     A policy that evaluates all methods eagerly, except those whose return type is in
+    ///     <see cref="ExcludedReturnTypes"/>.
     /// </summary>
     public static MethodEvaluationPolicy All { get; } = new() { IncludedNamespaces = ["*"] };
 
@@ -79,13 +81,6 @@ public sealed class MethodEvaluationPolicy
         return compiled;
     }
 
-    /// <summary>
-    ///     A namespace wildcard pattern parsed once when the policy is created.
-    /// </summary>
-    /// <remarks>
-    ///     Trailing-star patterns (<c>Autodesk.Revit.*</c>, <c>*</c>) collapse to a single vectorized
-    ///     prefix check; any other shape falls back to segment matching.
-    /// </remarks>
     private readonly struct CompiledPattern(string pattern)
     {
         private readonly string? _prefix = pattern.Length > 0 && pattern[^1] == '*' && pattern.IndexOf('*') == pattern.Length - 1
@@ -100,11 +95,6 @@ public sealed class MethodEvaluationPolicy
         }
     }
 
-    /// <summary>
-    ///     Match the input against a pattern where <c>*</c> matches zero or more characters by splitting
-    ///     the pattern on <c>*</c> and matching each literal segment with vectorized
-    ///     <c>StartsWith</c>/<c>IndexOf</c>/<c>EndsWith</c>.
-    /// </summary>
     private static bool MatchesWildcardSegments(ReadOnlySpan<char> input, ReadOnlySpan<char> pattern)
     {
         var firstStar = pattern.IndexOf('*');

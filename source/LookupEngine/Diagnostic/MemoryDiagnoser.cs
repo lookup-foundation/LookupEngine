@@ -15,7 +15,7 @@
 namespace LookupEngine.Diagnostic;
 
 /// <summary>
-///     The engine diagnoser to measure memory allocation
+///     Measures the bytes allocated on the current thread between <see cref="StartMonitoring"/> and <see cref="StopMonitoring"/>.
 /// </summary>
 internal sealed class MemoryDiagnoser : IEngineDiagnoser
 {

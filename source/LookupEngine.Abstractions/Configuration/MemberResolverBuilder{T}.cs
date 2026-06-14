@@ -19,9 +19,10 @@ using LookupEngine.Abstractions.Enums;
 namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
-///     A builder for configuring how an existing member is resolved and evaluated using an execution context
+///     Fluent builder for configuring how an existing member is resolved and evaluated using caller-supplied context.
+///     Obtained from <see cref="IMemberConfigurator{TContext}.Member"/>.
 /// </summary>
-/// <typeparam name="TContext">The type of execution context</typeparam>
+/// <typeparam name="TContext">The type of execution context available to registered handlers.</typeparam>
 [PublicAPI]
 public struct MemberResolverBuilder<TContext>
 {
@@ -30,7 +31,7 @@ public struct MemberResolverBuilder<TContext>
     private Func<ParameterInfo[], bool>? _predicate;
 
     /// <summary>
-    ///     Creates a new context-aware member resolver builder
+    ///     Initializes the builder with the member name and the engine callback.
     /// </summary>
     public MemberResolverBuilder(string name, Action<string, Func<ParameterInfo[], bool>?, Func<TContext, IVariant>?, MemberEvaluationPolicy?> callback)
     {
@@ -39,9 +40,10 @@ public struct MemberResolverBuilder<TContext>
     }
 
     /// <summary>
-    ///     Restricts the configuration to the overload whose parameters match the predicate
+    ///     Restricts this configuration to the overload whose parameter list satisfies the predicate.
+    ///     Without this call, the configuration applies to all overloads.
     /// </summary>
-    /// <param name="predicate">The predicate evaluated against the member runtime parameters</param>
+    /// <param name="predicate">Evaluated against the runtime parameter list of each overload.</param>
     public MemberResolverBuilder<TContext> When(Func<ParameterInfo[], bool> predicate)
     {
         _predicate = predicate;
@@ -49,7 +51,8 @@ public struct MemberResolverBuilder<TContext>
     }
 
     /// <summary>
-    ///     Resolves the member with the specified handler, evaluated according to the engine evaluation policy
+    ///     Supplies a context-aware handler whose result replaces the reflected value.
+    ///     The engine's <see cref="MethodEvaluationPolicy"/> still decides whether to evaluate eagerly or defer.
     /// </summary>
     public readonly void Resolve(Func<TContext, IVariant> handler)
     {
@@ -57,7 +60,8 @@ public struct MemberResolverBuilder<TContext>
     }
 
     /// <summary>
-    ///     Resolves the member with the specified handler, evaluated according to the engine evaluation policy
+    ///     Supplies a context-aware handler whose result replaces the reflected value.
+    ///     The engine's <see cref="MethodEvaluationPolicy"/> still decides whether to evaluate eagerly or defer.
     /// </summary>
     public readonly void Resolve(Func<TContext, object?> handler)
     {
@@ -65,7 +69,8 @@ public struct MemberResolverBuilder<TContext>
     }
 
     /// <summary>
-    ///     Defers the member regardless of the evaluation policy; force evaluation invokes the handler
+    ///     Forces the member to be deferred regardless of the evaluation policy.
+    ///     Force evaluation invokes the provided context-aware handler.
     /// </summary>
     public readonly void Defer(Func<TContext, IVariant> handler)
     {
@@ -73,7 +78,8 @@ public struct MemberResolverBuilder<TContext>
     }
 
     /// <summary>
-    ///     Defers the member regardless of the evaluation policy; force evaluation invokes the handler
+    ///     Forces the member to be deferred regardless of the evaluation policy.
+    ///     Force evaluation invokes the provided context-aware handler.
     /// </summary>
     public readonly void Defer(Func<TContext, object?> handler)
     {
@@ -81,7 +87,8 @@ public struct MemberResolverBuilder<TContext>
     }
 
     /// <summary>
-    ///     Defers the member regardless of the evaluation policy; force evaluation invokes the member directly
+    ///     Forces the member to be deferred regardless of the evaluation policy.
+    ///     Force evaluation invokes the member directly via reflection.
     /// </summary>
     public readonly void Defer()
     {
@@ -89,7 +96,8 @@ public struct MemberResolverBuilder<TContext>
     }
 
     /// <summary>
-    ///     Evaluates the member during decomposition regardless of the evaluation policy
+    ///     Forces the member to be evaluated eagerly during decomposition regardless of the evaluation policy.
+    ///     Uses the provided context-aware handler as the value source.
     /// </summary>
     public readonly void Evaluate(Func<TContext, IVariant> handler)
     {
@@ -97,7 +105,8 @@ public struct MemberResolverBuilder<TContext>
     }
 
     /// <summary>
-    ///     Evaluates the member during decomposition regardless of the evaluation policy
+    ///     Forces the member to be evaluated eagerly during decomposition regardless of the evaluation policy.
+    ///     Uses the provided context-aware handler as the value source.
     /// </summary>
     public readonly void Evaluate(Func<TContext, object?> handler)
     {
@@ -105,7 +114,8 @@ public struct MemberResolverBuilder<TContext>
     }
 
     /// <summary>
-    ///     Evaluates the member during decomposition regardless of the evaluation policy, invoking the member directly
+    ///     Forces the member to be evaluated eagerly during decomposition regardless of the evaluation policy.
+    ///     Invokes the member directly via reflection.
     /// </summary>
     public readonly void Evaluate()
     {
@@ -113,7 +123,7 @@ public struct MemberResolverBuilder<TContext>
     }
 
     /// <summary>
-    ///     Disables the member; it is never evaluated and force evaluation reports the disabled result
+    ///     Permanently disables the member. It is never evaluated, and force evaluation reports the disabled result.
     /// </summary>
     public readonly void Disable()
     {

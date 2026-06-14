@@ -15,27 +15,26 @@
 namespace LookupEngine.Abstractions.Enums;
 
 /// <summary>
-///     The evaluation state of a decomposed member value
+///     The evaluation state of a decomposed member.
 /// </summary>
 public enum MemberEvaluationPolicy
 {
-    /// <summary>
-    ///     The member value was evaluated during decomposition
-    /// </summary>
+    /// <summary>The member was evaluated eagerly during decomposition.</summary>
     Evaluated = 0,
 
     /// <summary>
-    ///     The member evaluation was deferred and is available for force evaluation
+    ///     The member was not evaluated during decomposition. Call <see cref="DecomposedMember.Evaluate()"/>
+    ///     to trigger evaluation on demand.
     /// </summary>
     Deferred = 1,
 
     /// <summary>
-    ///     The member evaluation is disabled, force evaluation reports the disabled result
+    ///     The member is permanently disabled. Force evaluation reports the disabled result without invoking it.
     /// </summary>
     Disabled = 2,
 
     /// <summary>
-    ///     The member cannot be evaluated by the engine
+    ///     The member cannot be evaluated by the engine.
     /// </summary>
     Unsupported = 3
 }

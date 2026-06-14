@@ -19,7 +19,7 @@ using LookupEngine.Abstractions.Enums;
 namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
-///     A builder for configuring how an existing member is resolved and evaluated
+///     Builder for configuring how an existing member is resolved and evaluated.
 /// </summary>
 [PublicAPI]
 public struct MemberResolverBuilder
@@ -29,7 +29,7 @@ public struct MemberResolverBuilder
     private Func<ParameterInfo[], bool>? _predicate;
 
     /// <summary>
-    ///     Creates a new member resolver builder
+    ///     Initializes the builder with the member name and the engine callback.
     /// </summary>
     public MemberResolverBuilder(string name, Action<string, Func<ParameterInfo[], bool>?, Func<IVariant>?, MemberEvaluationPolicy?> callback)
     {
@@ -38,9 +38,10 @@ public struct MemberResolverBuilder
     }
 
     /// <summary>
-    ///     Restricts the configuration to the overload whose parameters match the predicate
+    ///     Restricts this configuration to the overload whose parameter list satisfies the predicate.
+    ///     Without this call, the configuration applies to all overloads.
     /// </summary>
-    /// <param name="predicate">The predicate evaluated against the member runtime parameters</param>
+    /// <param name="predicate">Evaluated against the runtime parameter list of each overload.</param>
     public MemberResolverBuilder When(Func<ParameterInfo[], bool> predicate)
     {
         _predicate = predicate;
@@ -48,7 +49,8 @@ public struct MemberResolverBuilder
     }
 
     /// <summary>
-    ///     Resolves the member with the specified handler, evaluated according to the engine evaluation policy
+    ///     Supplies a custom handler whose result replaces the reflected value.
+    ///     The engine's <see cref="MethodEvaluationPolicy"/> still decides whether to evaluate eagerly or defer.
     /// </summary>
     public readonly void Resolve(Func<IVariant> handler)
     {
@@ -56,7 +58,8 @@ public struct MemberResolverBuilder
     }
 
     /// <summary>
-    ///     Resolves the member with the specified handler, evaluated according to the engine evaluation policy
+    ///     Supplies a custom handler whose result replaces the reflected value.
+    ///     The engine's <see cref="MethodEvaluationPolicy"/> still decides whether to evaluate eagerly or defer.
     /// </summary>
     public readonly void Resolve(Func<object?> handler)
     {
@@ -64,7 +67,8 @@ public struct MemberResolverBuilder
     }
 
     /// <summary>
-    ///     Defers the member regardless of the evaluation policy; force evaluation invokes the handler
+    ///     Forces the member to be deferred regardless of the evaluation policy.
+    ///     Force evaluation invokes the provided handler.
     /// </summary>
     public readonly void Defer(Func<IVariant> handler)
     {
@@ -72,7 +76,8 @@ public struct MemberResolverBuilder
     }
 
     /// <summary>
-    ///     Defers the member regardless of the evaluation policy; force evaluation invokes the handler
+    ///     Forces the member to be deferred regardless of the evaluation policy.
+    ///     Force evaluation invokes the provided handler.
     /// </summary>
     public readonly void Defer(Func<object?> handler)
     {
@@ -80,7 +85,8 @@ public struct MemberResolverBuilder
     }
 
     /// <summary>
-    ///     Defers the member regardless of the evaluation policy; force evaluation invokes the member directly
+    ///     Forces the member to be deferred regardless of the evaluation policy.
+    ///     Force evaluation invokes the member directly via reflection.
     /// </summary>
     public readonly void Defer()
     {
@@ -88,7 +94,8 @@ public struct MemberResolverBuilder
     }
 
     /// <summary>
-    ///     Evaluates the member during decomposition regardless of the evaluation policy
+    ///     Forces the member to be evaluated eagerly during decomposition regardless of the evaluation policy.
+    ///     Uses the provided handler as the value source.
     /// </summary>
     public readonly void Evaluate(Func<IVariant> handler)
     {
@@ -96,7 +103,8 @@ public struct MemberResolverBuilder
     }
 
     /// <summary>
-    ///     Evaluates the member during decomposition regardless of the evaluation policy
+    ///     Forces the member to be evaluated eagerly during decomposition regardless of the evaluation policy.
+    ///     Uses the provided handler as the value source.
     /// </summary>
     public readonly void Evaluate(Func<object?> handler)
     {
@@ -104,7 +112,8 @@ public struct MemberResolverBuilder
     }
 
     /// <summary>
-    ///     Evaluates the member during decomposition regardless of the evaluation policy, invoking the member directly
+    ///     Forces the member to be evaluated eagerly during decomposition regardless of the evaluation policy.
+    ///     Invokes the member directly via reflection.
     /// </summary>
     public readonly void Evaluate()
     {
@@ -112,7 +121,7 @@ public struct MemberResolverBuilder
     }
 
     /// <summary>
-    ///     Disables the member; it is never evaluated and force evaluation reports the disabled result
+    ///     Permanently disables the member. It is never evaluated, and force evaluation reports the disabled result.
     /// </summary>
     public readonly void Disable()
     {

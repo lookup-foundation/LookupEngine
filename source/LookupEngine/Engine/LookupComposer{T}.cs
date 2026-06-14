@@ -12,7 +12,6 @@
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 
-using JetBrains.Annotations;
 using LookupEngine.Abstractions;
 using LookupEngine.Options;
 
@@ -22,12 +21,13 @@ namespace LookupEngine;
 public partial class LookupComposer
 {
     /// <summary>
-    ///     Decompose an in-context object into its internal components and evaluate their values
+    ///     Decomposes the object and all its members using the caller-supplied execution context, forwarding it to any context-aware descriptors and handlers registered in <paramref name="options"/>.
+    ///     Returns a well-defined result with no members for a <see langword="null"/> value.
     /// </summary>
-    /// <param name="value">The object to decompose</param>
-    /// <param name="options">The decomposition options</param>
-    /// <typeparam name="TContext">The type of execution context to resolve context-dependent members</typeparam>
-    /// <returns>Decomposed object and its structure</returns>
+    /// <param name="value">The object to decompose, or <see langword="null"/>.</param>
+    /// <param name="options">Controls which members are included, how they are evaluated, and the context passed to descriptors.</param>
+    /// <typeparam name="TContext">The type of execution context passed through to context-aware descriptors.</typeparam>
+    /// <returns>The decomposed object and its evaluated members.</returns>
     [Pure]
     public static DecomposedObject Decompose<TContext>(object? value, DecomposeOptions<TContext> options)
     {
@@ -41,12 +41,13 @@ public partial class LookupComposer
     }
 
     /// <summary>
-    ///     Decompose an in-context object without internal components
+    ///     Decomposes the object's identity and type metadata without evaluating any members, forwarding the execution context to any context-aware descriptors.
+    ///     Returns a well-defined result for a <see langword="null"/> value.
     /// </summary>
-    /// <param name="value">The object to decompose</param>
-    /// <param name="options">The decomposition options</param>
-    /// <typeparam name="TContext">The type of execution context to resolve context-dependent members</typeparam>
-    /// <returns>The decomposed object</returns>
+    /// <param name="value">The object to describe, or <see langword="null"/>.</param>
+    /// <param name="options">Controls descriptor resolution, optional redirection, and the context passed to descriptors.</param>
+    /// <typeparam name="TContext">The type of execution context passed through to context-aware descriptors.</typeparam>
+    /// <returns>The decomposed object with an empty <see cref="DecomposedObject.Members"/> list.</returns>
     [Pure]
     public static DecomposedObject DecomposeObject<TContext>(object? value, DecomposeOptions<TContext> options)
     {
@@ -60,12 +61,13 @@ public partial class LookupComposer
     }
 
     /// <summary>
-    ///     Decompose the in-context object's internal components and evaluate their values
+    ///     Decomposes and evaluates all members of the object using the caller-supplied execution context, without producing a root object description.
+    ///     Returns an empty list for a <see langword="null"/> value.
     /// </summary>
-    /// <param name="value">The object to decompose</param>
-    /// <param name="options">The decomposition options</param>
-    /// <typeparam name="TContext">The type of execution context to resolve context-dependent members</typeparam>
-    /// <returns>The decomposed object structure</returns>
+    /// <param name="value">The object whose members to decompose, or <see langword="null"/>.</param>
+    /// <param name="options">Controls which members are included, how they are evaluated, and the context passed to descriptors.</param>
+    /// <typeparam name="TContext">The type of execution context passed through to context-aware descriptors.</typeparam>
+    /// <returns>The evaluated members, or an empty list when <paramref name="value"/> is <see langword="null"/>.</returns>
     [Pure]
     public static List<DecomposedMember> DecomposeMembers<TContext>(object? value, DecomposeOptions<TContext> options)
     {

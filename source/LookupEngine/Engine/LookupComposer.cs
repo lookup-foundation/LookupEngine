@@ -12,7 +12,6 @@
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 
-using JetBrains.Annotations;
 using LookupEngine.Abstractions;
 
 // ReSharper disable once CheckNamespace
@@ -21,11 +20,13 @@ namespace LookupEngine;
 public partial class LookupComposer
 {
     /// <summary>
-    ///     Decompose an object into its internal components and evaluate their values
+    ///     Decomposes the object and all its members, evaluating each member's value and recording the time and memory cost of each evaluation.
+    ///     Pass a <see cref="Type"/> to decompose static members.
+    ///     Any other value decomposes instance members. Returns a well-defined result with no members for a <see langword="null"/> value.
     /// </summary>
-    /// <param name="value">The object to decompose</param>
-    /// <param name="options">The decomposition options</param>
-    /// <returns>Decomposed object and its structure</returns>
+    /// <param name="value">The object to decompose, or <see langword="null"/>.</param>
+    /// <param name="options">Controls which members are included and how they are evaluated. Defaults to <see cref="DecomposeOptions.Default"/>.</param>
+    /// <returns>The decomposed object and its evaluated members.</returns>
     [Pure]
     public static DecomposedObject Decompose(object? value, DecomposeOptions? options = null)
     {
@@ -40,11 +41,12 @@ public partial class LookupComposer
     }
 
     /// <summary>
-    ///     Decompose an object without internal components
+    ///     Decomposes the object's identity and type metadata without evaluating any members.
+    ///     Returns a well-defined result for a <see langword="null"/> value.
     /// </summary>
-    /// <param name="value">The object to decompose</param>
-    /// <param name="options">The decomposition options</param>
-    /// <returns>The decomposed object</returns>
+    /// <param name="value">The object to describe, or <see langword="null"/>.</param>
+    /// <param name="options">Controls descriptor resolution and optional redirection. Defaults to <see cref="DecomposeOptions.Default"/>.</param>
+    /// <returns>The decomposed object with an empty <see cref="DecomposedObject.Members"/> list.</returns>
     [Pure]
     public static DecomposedObject DecomposeObject(object? value, DecomposeOptions? options = null)
     {
@@ -59,11 +61,12 @@ public partial class LookupComposer
     }
 
     /// <summary>
-    ///     Decompose the object's internal components and evaluate their values
+    ///     Decomposes and evaluates all members of the object without producing a root object description.
+    ///     Returns an empty list for a <see langword="null"/> value.
     /// </summary>
-    /// <param name="value">The object to decompose</param>
-    /// <param name="options">The decomposition options</param>
-    /// <returns>The decomposed object structure</returns>
+    /// <param name="value">The object whose members to decompose, or <see langword="null"/>.</param>
+    /// <param name="options">Controls which members are included and how they are evaluated. Defaults to <see cref="DecomposeOptions.Default"/>.</param>
+    /// <returns>The evaluated members, or an empty list when <paramref name="value"/> is <see langword="null"/>.</returns>
     [Pure]
     public static List<DecomposedMember> DecomposeMembers(object? value, DecomposeOptions? options = null)
     {

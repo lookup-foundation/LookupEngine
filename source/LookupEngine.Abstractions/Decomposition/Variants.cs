@@ -3,13 +3,14 @@
 namespace LookupEngine.Abstractions.Decomposition;
 
 /// <summary>
-///     A factory for <see cref="IVariant"/>.
+///     Factory for creating <see cref="IVariant"/> instances to return from descriptor handlers.
 /// </summary>
 public static class Variants
 {
     /// <summary>
-    ///     Create a single evaluated member value variant
+    ///     Creates a variant that holds a single evaluated value.
     /// </summary>
+    /// <param name="value">The evaluated value.</param>
     [Pure]
     public static IVariant Value(object? value)
     {
@@ -17,10 +18,10 @@ public static class Variants
     }
 
     /// <summary>
-    ///     Create a single evaluated member value variant
+    ///     Creates a variant that holds a single evaluated value with a description.
     /// </summary>
-    /// <param name="value">The evaluated value</param>
-    /// <param name="description">The description of the evaluation context</param>
+    /// <param name="value">The evaluated value.</param>
+    /// <param name="description">A description of the context in which this value was resolved.</param>
     [Pure]
     public static IVariant Value(object? value, string description)
     {
@@ -28,9 +29,11 @@ public static class Variants
     }
 
     /// <summary>
-    ///     Create an evaluated member value variants collection
+    ///     Creates a typed, mutable collection for multiple variant values.
+    ///     Populate with <see cref="IVariantsCollection{T}.Add(T?)"/>, then return it from the handler.
     /// </summary>
-    /// <param name="capacity">The initial variants capacity. Required for atomic performance optimizations</param>
+    /// <typeparam name="T">The element type of each value.</typeparam>
+    /// <param name="capacity">The expected number of values. Pre-sizing avoids reallocations on the hot path.</param>
     [Pure]
     public static IVariantsCollection<T> Values<T>(int capacity)
     {
@@ -38,10 +41,8 @@ public static class Variants
     }
 
     /// <summary>
-    ///     Creates an empty variant collection
+    ///     Creates an empty variant for a member that produced no result.
     /// </summary>
-    /// <returns>An empty variant collection</returns>
-    /// <remarks>An empty collection is returned when there are no solutions for a member</remarks>
     [Pure]
     public static IVariant Empty<T>()
     {

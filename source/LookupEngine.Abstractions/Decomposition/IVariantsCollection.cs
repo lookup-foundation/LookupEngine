@@ -1,13 +1,13 @@
 ﻿namespace LookupEngine.Abstractions.Decomposition;
 
 /// <summary>
-///     Represents a collection of variants
+///     A mutable accumulator for multiple <see cref="IVariant"/> values produced by a single member.
 /// </summary>
 public interface IVariantsCollection
 {
     /// <summary>
-    ///     Consume variants and evaluate values
+    ///     Finalizes the collection and returns it as a single <see cref="IVariant"/> for the engine to record.
     /// </summary>
-    /// <returns>The evaluated variant</returns>
+    /// <returns>The collection itself as an <see cref="IVariant"/>.</returns>
     IVariant Consume();
 }

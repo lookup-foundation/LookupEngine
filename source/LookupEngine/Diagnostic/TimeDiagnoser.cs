@@ -17,7 +17,7 @@ using System.Diagnostics;
 namespace LookupEngine.Diagnostic;
 
 /// <summary>
-///     The engine diagnoser to measure the evaluation member time
+///     Measures the elapsed time between <see cref="StartMonitoring"/> and <see cref="StopMonitoring"/>.
 /// </summary>
 internal sealed class TimeDiagnoser : IEngineDiagnoser
 {

@@ -16,6 +16,9 @@ using LookupEngine.Abstractions.Decomposition;
 
 namespace LookupEngine.Descriptors;
 
+/// <summary>
+///     Descriptor for <see cref="bool"/> values. Uses <c>"True"</c> or <c>"False"</c> as the display name.
+/// </summary>
 public sealed class BooleanDescriptor : Descriptor
 {
     public BooleanDescriptor(bool value)

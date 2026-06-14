@@ -12,7 +12,6 @@
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 
-using JetBrains.Annotations;
 using LookupEngine.Abstractions;
 using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Exceptions;
@@ -21,8 +20,15 @@ using LookupEngine.Exceptions;
 namespace LookupEngine;
 
 /// <summary>
-///     Provides functionality to work with the internal structure of an object
+///     Static entry point for decomposing any runtime object into a structured, evaluated representation of its members, values, and diagnostic metrics.
+///     Pass a <see cref="Type"/> to decompose the static surface of a type.
+///     Pass any other value to decompose an instance.
+///     A <see langword="null"/> value always produces a well-defined result with no members.
 /// </summary>
+/// <remarks>
+///     Each decomposition call is fully isolated: it creates a dedicated internal instance so concurrent calls are safe without any external synchronization.
+///     Decomposition never throws — any reflection failure is captured and surfaced as the member's value.
+/// </remarks>
 [PublicAPI]
 public partial class LookupComposer
 {

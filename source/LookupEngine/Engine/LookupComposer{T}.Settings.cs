@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using LookupEngine.Options;
+﻿using LookupEngine.Options;
 
 // ReSharper disable once CheckNamespace
 namespace LookupEngine;

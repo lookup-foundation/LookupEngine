@@ -15,17 +15,18 @@
 namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
-///     Indicates that the object can be redirected to another
+///     Allows a descriptor to substitute the described object with a different one during decomposition, using caller-supplied context to resolve the substitute.
+///     Active only when <c>DecomposeOptions.EnableRedirection</c> is <see langword="true"/>.
 /// </summary>
-/// <typeparam name="TContext">The type of execution context</typeparam>
+/// <typeparam name="TContext">The type of execution context passed through from the decomposition options.</typeparam>
 public interface IDescriptorRedirector<in TContext>
 {
     /// <summary>
-    ///     Tries to redirect the object to another
+    ///     Attempts to resolve a substitute object for the described value using the execution context.
     /// </summary>
-    /// <param name="target">The target object member name</param>
-    /// <param name="context">The type of execution context</param>
-    /// <param name="result">The result of redirection</param>
-    /// <returns>True if the redirection was successful, otherwise false</returns>
+    /// <param name="target">The member name that triggered the redirect attempt.</param>
+    /// <param name="context">The execution context provided by the caller.</param>
+    /// <param name="result">The substitute object when redirection succeeds.</param>
+    /// <returns><see langword="true"/> if a substitute was resolved; otherwise <see langword="false"/>.</returns>
     bool TryRedirect(string target, TContext context, out object result);
 }

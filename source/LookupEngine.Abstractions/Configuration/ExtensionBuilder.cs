@@ -18,7 +18,7 @@ using LookupEngine.Abstractions.Enums;
 namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
-///     A builder for configuring and registering an extension member
+///     Builder for configuring and registering a synthetic extension member.
 /// </summary>
 [PublicAPI]
 public struct ExtensionBuilder
@@ -29,7 +29,7 @@ public struct ExtensionBuilder
     private MemberAttributes _attributes = MemberAttributes.Extension;
 
     /// <summary>
-    ///     Creates a new extension builder
+    ///     Initializes the builder with the extension name and the engine registration callbacks.
     /// </summary>
     public ExtensionBuilder(
         string name,
@@ -42,9 +42,10 @@ public struct ExtensionBuilder
     }
 
     /// <summary>
-    ///     Maps the extension to a specific API member name for cross-version compilation tracking
+    ///     Associates this extension with an existing API member name for compile-time tracking across API versions.
     /// </summary>
-    /// <param name="apiName">The API member name, typically provided via nameof()</param>
+    /// <param name="apiName">The real API member name, typically supplied via <c>nameof()</c>.</param>
+    /// <remarks>Has no effect at runtime.</remarks>
     public ExtensionBuilder Map(string apiName)
     {
         // The apiName parameter ensures compile-time validation of API member existence.
@@ -53,7 +54,7 @@ public struct ExtensionBuilder
     }
 
     /// <summary>
-    ///     Marks the extension as static, visible only when IncludeStaticMembers is enabled
+    ///     Marks the extension as static. It appears in results only when <c>DecomposeOptions.IncludeStaticMembers</c> is enabled.
     /// </summary>
     public ExtensionBuilder AsStatic()
     {
@@ -62,25 +63,25 @@ public struct ExtensionBuilder
     }
 
     /// <summary>
-    ///     Registers the extension with the specified evaluation handler
+    ///     Registers the extension with the evaluation handler that produces its value.
     /// </summary>
-    /// <param name="handler">The function that evaluates the extension value</param>
+    /// <param name="handler">Returns the resolved value for this extension.</param>
     public readonly void Register(Func<IVariant> handler)
     {
         _registerCallback(_name, _attributes, handler);
     }
 
     /// <summary>
-    ///     Registers the extension with the specified evaluation handler
+    ///     Registers the extension with the evaluation handler that produces its value.
     /// </summary>
-    /// <param name="handler">The function that evaluates the extension value</param>
+    /// <param name="handler">Returns the resolved value for this extension.</param>
     public readonly void Register(Func<object?> handler)
     {
         _registerCallback(_name, _attributes, () => Variants.Value(handler()));
     }
 
     /// <summary>
-    ///     Marks the extension as not supported, visible only when IncludeUnsupported is enabled
+    ///     Registers the extension as unsupported. It appears in results only when <c>DecomposeOptions.IncludeUnsupported</c> is enabled.
     /// </summary>
     public readonly void AsNotSupported()
     {
@@ -88,7 +89,7 @@ public struct ExtensionBuilder
     }
 
     /// <summary>
-    ///     Marks the extension as disabled, visible only when IncludeUnsupported is enabled
+    ///     Registers the extension as disabled. It appears in results only when <c>DecomposeOptions.IncludeUnsupported</c> is enabled.
     /// </summary>
     public readonly void AsDisabled()
     {

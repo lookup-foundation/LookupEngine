@@ -16,6 +16,9 @@ using LookupEngine.Abstractions.Decomposition;
 
 namespace LookupEngine.Descriptors;
 
+/// <summary>
+///     Descriptor for <see cref="Exception"/> values. Uses the innermost exception message as the display name.
+/// </summary>
 public sealed class ExceptionDescriptor : Descriptor
 {
     public ExceptionDescriptor(Exception exception)

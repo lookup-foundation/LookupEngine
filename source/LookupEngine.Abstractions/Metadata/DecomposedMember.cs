@@ -6,68 +6,73 @@ using LookupEngine.Abstractions.Enums;
 namespace LookupEngine.Abstractions;
 
 /// <summary>
-///     Represents a decomposed object member
+///     Represents a single evaluated member of a decomposed object.
 /// </summary>
 [PublicAPI]
 [DebuggerDisplay("Name = {Name}, Value = {Value.Name}")]
 public sealed class DecomposedMember
 {
     /// <summary>
-    ///     Depth of object hierarchy
+    ///     Inheritance depth at which this member was declared, where 0 is the most derived type.
     /// </summary>
     public required int Depth { get; init; }
 
     /// <summary>
-    ///     The member name
+    ///     The member name. Methods are formatted with their parameter types (e.g. <c>GetValue (Int32)</c>).
     /// </summary>
     public required string Name { get; init; }
 
     /// <summary>
-    ///     Object type name that the member belongs to
+    ///     The short name of the type that declares this member.
     /// </summary>
     public required string DeclaringTypeName { get; init; }
 
     /// <summary>
-    ///     Object type full name that the member belongs to
+    ///     The fully qualified name of the type that declares this member.
     /// </summary>
     public required string DeclaringTypeFullName { get; init; }
-    
+
     /// <summary>
-    ///     The member attributes
+    ///     Flags describing the kind and visibility of this member.
     /// </summary>
     public MemberAttributes MemberAttributes { get; init; }
 
     /// <summary>
-    ///     Time of evaluation the member value
+    ///     Time elapsed while evaluating this member, in milliseconds.
+    ///     Zero for deferred, disabled, and unsupported members.
     /// </summary>
     public double ComputationTime { get; set; }
 
     /// <summary>
-    ///     Allocating memory for member evaluation
+    ///     Bytes allocated on the managed heap while evaluating this member.
+    ///     Zero for deferred, disabled, and unsupported members.
     /// </summary>
     public long AllocatedBytes { get; set; }
 
     /// <summary>
-    ///     The evaluation policy override
+    ///     The evaluation state of this member.
     /// </summary>
     public MemberEvaluationPolicy EvaluationPolicy { get; set; }
 
     /// <summary>
-    ///     Evaluated member value metadata
+    ///     The evaluated value of this member.
     /// </summary>
     public required DecomposedValue Value { get; set; }
 
     /// <summary>
-    ///     Engine-provided handle that evaluates the deferred member.
-    ///     Null for evaluated members and after deserialization
+    ///     Engine-provided handle that triggers evaluation of a deferred member.
+    ///     <see langword="null"/> for already-evaluated members and after deserialization.
     /// </summary>
     [JsonIgnore]
     public Action<DecomposedMember>? Evaluator { get; set; }
 
     /// <summary>
-    ///     Force evaluation of the deferred member through the engine, updating the value and metrics in place
+    ///     Triggers evaluation of this deferred member through the engine, updating
+    ///     <see cref="Value"/>, <see cref="ComputationTime"/>, and <see cref="AllocatedBytes"/> in place.
     /// </summary>
-    /// <exception cref="InvalidOperationException">The member is not deferred or was deserialized</exception>
+    /// <exception cref="InvalidOperationException">
+    ///     The member is not deferred, or <see cref="Evaluator"/> was cleared after deserialization.
+    /// </exception>
     public void Evaluate()
     {
         if (Evaluator is null) throw new InvalidOperationException("The member is not deferred or was deserialized");

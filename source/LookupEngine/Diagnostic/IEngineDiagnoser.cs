@@ -1,17 +1,13 @@
 ﻿namespace LookupEngine.Diagnostic;
 
 /// <summary>
-///     Engine diagnostic provider
+///     Measures a single diagnostic dimension around a member evaluation.
 /// </summary>
 internal interface IEngineDiagnoser
 {
-    /// <summary>
-    ///     Start composer monitoring
-    /// </summary>
+    /// <summary>Marks the start of the monitored region.</summary>
     void StartMonitoring();
 
-    /// <summary>
-    ///     Stop composer monitoring    
-    /// </summary>
+    /// <summary>Marks the end of the monitored region.</summary>
     void StopMonitoring();
 }

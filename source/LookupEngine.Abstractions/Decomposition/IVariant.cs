@@ -15,17 +15,17 @@
 namespace LookupEngine.Abstractions.Decomposition;
 
 /// <summary>
-///     Variant of the evaluated member value
+///     A single resolved value produced by a member evaluation handler.
 /// </summary>
 public interface IVariant
 {
     /// <summary>
-    ///     The evaluated value
+    ///     The resolved value, or <see langword="null"/> if the evaluation produced no result.
     /// </summary>
     object? Value { get; }
 
     /// <summary>
-    ///     The description of the evaluation context
+    ///     An optional description of the context in which this value was resolved.
     /// </summary>
     string? Description { get; }
 }

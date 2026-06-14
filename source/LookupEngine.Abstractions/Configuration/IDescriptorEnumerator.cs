@@ -17,18 +17,19 @@ using System.Collections;
 namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
-///     Indicates that the descriptor is handled as a collection of descriptors
+///     Allows a descriptor to expose its object as an ordered sequence of decomposable items.
+///     The engine iterates this sequence and adds each element as a member of the decomposed result.
 /// </summary>
 public interface IDescriptorEnumerator : IDescriptorCollector
 {
     /// <summary>
-    ///     Indicates that the current described collection is empty
+    ///     <see langword="true"/> when the described collection contains no elements.
     /// </summary>
     bool IsEmpty { get; }
 
     /// <summary>
-    ///     The enumerator of the current described collection
+    ///     Returns a fresh, non-advanced enumerator over the described collection.
+    ///     Each access must return a new enumerator positioned before the first element.
     /// </summary>
-    /// <remarks>Each access returns a fresh, non-advanced enumerator</remarks>
-    public IEnumerator Enumerator { get; }
+    IEnumerator Enumerator { get; }
 }

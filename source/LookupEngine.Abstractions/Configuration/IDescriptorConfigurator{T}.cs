@@ -15,14 +15,16 @@
 namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
-///     Indicates that the descriptor configures how its members are evaluated using an execution context
+///     Allows a descriptor to configure member evaluation using caller-supplied context.
+///     Implement this to resolve member handlers, override evaluation policies per member, and register synthetic extension members.
+///     Use this generic variant when handlers need data from the decomposition's execution context.
 /// </summary>
-/// <typeparam name="TContext">The type of execution context</typeparam>
+/// <typeparam name="TContext">The type of execution context passed through from the decomposition options.</typeparam>
 public interface IDescriptorConfigurator<TContext> : IDescriptorCollector
 {
     /// <summary>
-    ///     Configures the members of the described object
+    ///     Called by the engine once per decomposition to apply context-aware member configuration.
     /// </summary>
-    /// <param name="configuration">Configures and registers context-aware member handlers, overrides, and extensions</param>
+    /// <param name="configuration">Builder for registering context-aware member handlers, policy overrides, and extensions.</param>
     void Configure(IMemberConfigurator<TContext> configuration);
 }

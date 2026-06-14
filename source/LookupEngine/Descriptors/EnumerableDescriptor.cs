@@ -5,18 +5,21 @@ using LookupEngine.Abstractions.Decomposition;
 
 namespace LookupEngine.Descriptors;
 
+/// <summary>
+///     Descriptor for any <see cref="IEnumerable"/> value. Exposes its elements as indexed members and suppresses the <c>GetEnumerator</c> method from the decomposition result.
+/// </summary>
 [SuppressMessage("ReSharper", "NotDisposedResourceIsReturnedByProperty")]
 public sealed class EnumerableDescriptor(IEnumerable value) : Descriptor, IDescriptorEnumerator, IDescriptorConfigurator
 {
     private bool? _isEmpty;
 
     /// <summary>
-    ///     A new enumerator of the described collection. Each access creates a fresh, non-advanced enumerator
+    ///     Returns a fresh, non-advanced enumerator over the described collection.
     /// </summary>
     public IEnumerator Enumerator => value.GetEnumerator();
 
     /// <summary>
-    ///     Indicates that the described collection is empty. Evaluated lazily to avoid enumerating the source until requested
+    ///     <see langword="true"/> when the described collection contains no elements. Evaluated lazily.
     /// </summary>
     public bool IsEmpty => _isEmpty ??= ComputeIsEmpty();
 
