@@ -16,6 +16,12 @@ using BenchmarkDotNet.Attributes;
 
 namespace LookupEngine.Tests.Performance.Benchmarks;
 
+/// <summary>
+///     Compares builder shapes for the deferred extension-registration model used by the engine:
+///     a builder threads <see cref="MemberAttributes" /> through two cached callbacks that enqueue closures,
+///     and the queue is drained on flush. Each candidate carries its own clean code and does not reference
+///     the engine implementation.
+/// </summary>
 public class ExtensionRegistrationBenchmark
 {
     [Params(1, 100, 500)]
@@ -27,15 +33,16 @@ public class ExtensionRegistrationBenchmark
     private readonly StructCachedDelegateManager _structCachedDelegateManager = new();
     private readonly StructInterfaceManager _structInterfaceManager = new();
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     public int Composer_DirectRegister()
     {
         _composerManager.Reset();
         for (var i = 0; i < Count; i++)
         {
-            _composerManager.Register("Extension", () => new Variant(42));
+            _composerManager.EnqueueExtension("Extension", MemberAttributes.Extension, static () => new Variant(42));
         }
 
+        _composerManager.Flush();
         return _composerManager.MemberCount;
     }
 
@@ -45,9 +52,10 @@ public class ExtensionRegistrationBenchmark
         _structManager.Reset();
         for (var i = 0; i < Count; i++)
         {
-            _structManager.Define("Extension").Register(() => new Variant(42));
+            _structManager.Define("Extension").Register(static () => new Variant(42));
         }
 
+        _structManager.Flush();
         return _structManager.MemberCount;
     }
 
@@ -57,21 +65,23 @@ public class ExtensionRegistrationBenchmark
         _classManager.Reset();
         for (var i = 0; i < Count; i++)
         {
-            _classManager.Define("Extension").Register(() => new Variant(42));
+            _classManager.Define("Extension").Register(static () => new Variant(42));
         }
 
+        _classManager.Flush();
         return _classManager.MemberCount;
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public int StructCachedDelegate_DefineRegister()
     {
         _structCachedDelegateManager.Reset();
         for (var i = 0; i < Count; i++)
         {
-            _structCachedDelegateManager.Define("Extension").Register(() => new Variant(42));
+            _structCachedDelegateManager.Define("Extension").Register(static () => new Variant(42));
         }
 
+        _structCachedDelegateManager.Flush();
         return _structCachedDelegateManager.MemberCount;
     }
 
@@ -81,9 +91,10 @@ public class ExtensionRegistrationBenchmark
         _structInterfaceManager.Reset();
         for (var i = 0; i < Count; i++)
         {
-            _structInterfaceManager.Define("Extension").Register(() => new Variant(42));
+            _structInterfaceManager.Define("Extension").Register(static () => new Variant(42));
         }
 
+        _structInterfaceManager.Flush();
         return _structInterfaceManager.MemberCount;
     }
 
@@ -93,9 +104,10 @@ public class ExtensionRegistrationBenchmark
         _composerManager.Reset();
         for (var i = 0; i < Count; i++)
         {
-            _composerManager.Register("Extension", NotSupported);
+            _composerManager.EnqueueExtensionResult("Extension", MemberAttributes.Extension, MemberEvaluationPolicy.Unsupported);
         }
 
+        _composerManager.Flush();
         return _composerManager.MemberCount;
     }
 
@@ -108,6 +120,7 @@ public class ExtensionRegistrationBenchmark
             _structManager.Define("Extension").AsNotSupported();
         }
 
+        _structManager.Flush();
         return _structManager.MemberCount;
     }
 
@@ -117,10 +130,11 @@ public class ExtensionRegistrationBenchmark
         _composerManager.Reset();
         for (var i = 0; i < Count; i++)
         {
-            _composerManager.Register("Extension", () => new Variant(i * 2));
-            _composerManager.Register("Disabled", NotSupported);
+            _composerManager.EnqueueExtension("Extension", MemberAttributes.Extension, static () => new Variant(42));
+            _composerManager.EnqueueExtensionResult("Disabled", MemberAttributes.Extension, MemberEvaluationPolicy.Disabled);
         }
 
+        _composerManager.Flush();
         return _composerManager.MemberCount;
     }
 
@@ -130,10 +144,11 @@ public class ExtensionRegistrationBenchmark
         _structManager.Reset();
         for (var i = 0; i < Count; i++)
         {
-            _structManager.Define("Extension").Register(() => new Variant(i * 2));
-            _structManager.Define("Disabled").AsNotSupported();
+            _structManager.Define("Extension").Register(static () => new Variant(42));
+            _structManager.Define("Disabled").AsDisabled();
         }
 
+        _structManager.Flush();
         return _structManager.MemberCount;
     }
 
@@ -143,9 +158,10 @@ public class ExtensionRegistrationBenchmark
         _structManager.Reset();
         for (var i = 0; i < Count; i++)
         {
-            _structManager.Define("Extension").Map("ApiMethod").Register(() => new Variant(42));
+            _structManager.Define("Extension").Map("ApiMethod").Register(static () => new Variant(42));
         }
 
+        _structManager.Flush();
         return _structManager.MemberCount;
     }
 
@@ -155,13 +171,32 @@ public class ExtensionRegistrationBenchmark
         _structManager.Reset();
         for (var i = 0; i < Count; i++)
         {
-            _structManager.Define("Extension").AsStatic().Register(() => new Variant(42));
+            _structManager.Define("Extension").AsStatic().Register(static () => new Variant(42));
         }
 
+        _structManager.Flush();
         return _structManager.MemberCount;
     }
+}
 
-    private static Func<Variant> NotSupported { get; } = () => new Variant(new NotSupportedException());
+/// <summary>
+///     The member attributes threaded through the builder into the queued registration
+/// </summary>
+[Flags]
+public enum MemberAttributes
+{
+    Static = 0b10,
+    Extension = 0b100000
+}
+
+/// <summary>
+///     The evaluation policy recorded for a non-evaluated extension
+/// </summary>
+public enum MemberEvaluationPolicy
+{
+    Evaluated = 0,
+    Disabled = 2,
+    Unsupported = 3
 }
 
 /// <summary>
@@ -173,90 +208,144 @@ public sealed class Variant(object? value)
 }
 
 /// <summary>
-///     Original LookupComposer approach: direct Register(name, handler) with NotSupportedException type check after evaluation
+///     Direct registration without a builder: callers pass the attributes explicitly and the manager
+///     enqueues a closure that is evaluated on flush. Establishes the cost floor of the deferred model.
 /// </summary>
 public sealed class ComposerManager
 {
     private readonly List<object> _members = new(64);
+    private readonly List<Action> _extensionQueue = new(64);
+    private readonly bool _includeStatic = true;
+    private readonly bool _includeUnsupported = true;
 
     public int MemberCount => _members.Count;
 
-    public void Reset() => _members.Clear();
-
-    public void Register(string name, Func<Variant> handler)
+    public void Reset()
     {
-        try
-        {
-            var result = handler();
-            if (result.Value is NotSupportedException) return;
+        _members.Clear();
+        _extensionQueue.Clear();
+    }
 
-            _members.Add(result);
-        }
-        catch (Exception exception)
+    public void EnqueueExtension(string name, MemberAttributes attributes, Func<Variant> handler)
+    {
+        _extensionQueue.Add(() =>
         {
-            _members.Add(exception);
+            if ((attributes & MemberAttributes.Static) != 0 && !_includeStatic) return;
+
+            try
+            {
+                var result = handler();
+                _members.Add(result);
+            }
+            catch (Exception exception)
+            {
+                _members.Add(exception);
+            }
+        });
+    }
+
+    public void EnqueueExtensionResult(string name, MemberAttributes attributes, MemberEvaluationPolicy policy)
+    {
+        _extensionQueue.Add(() =>
+        {
+            if (!_includeUnsupported) return;
+            if ((attributes & MemberAttributes.Static) != 0 && !_includeStatic) return;
+
+            _members.Add(policy);
+        });
+    }
+
+    public void Flush()
+    {
+        foreach (var registration in _extensionQueue)
+        {
+            registration.Invoke();
         }
     }
 }
 
 /// <summary>
-///     Struct builder approach: Define(name) returns a stack-allocated struct with direct manager reference (zero-alloc)
+///     Struct builder approach: Define(name) returns a stack-allocated struct holding a direct manager
+///     reference (zero builder allocation). Each registration enqueues a closure.
 /// </summary>
 public sealed class StructManager
 {
     private readonly List<object> _members = new(64);
+    private readonly List<Action> _extensionQueue = new(64);
+    private readonly bool _includeStatic = true;
+    private readonly bool _includeUnsupported = true;
 
     public int MemberCount => _members.Count;
 
-    public void Reset() => _members.Clear();
+    public void Reset()
+    {
+        _members.Clear();
+        _extensionQueue.Clear();
+    }
 
     public StructBuilder Define(string name) => new(this, name);
 
-    public void RegisterExtension(string name, Func<Variant> handler)
+    public void EnqueueExtension(string name, MemberAttributes attributes, Func<Variant> handler)
     {
-        try
+        _extensionQueue.Add(() =>
         {
-            var result = handler();
-            _members.Add(result);
-        }
-        catch (Exception exception)
-        {
-            _members.Add(exception);
-        }
+            if ((attributes & MemberAttributes.Static) != 0 && !_includeStatic) return;
+
+            try
+            {
+                var result = handler();
+                _members.Add(result);
+            }
+            catch (Exception exception)
+            {
+                _members.Add(exception);
+            }
+        });
     }
 
-    public void RegisterNotSupported(string name)
+    public void EnqueueExtensionResult(string name, MemberAttributes attributes, MemberEvaluationPolicy policy)
     {
+        _extensionQueue.Add(() =>
+        {
+            if (!_includeUnsupported) return;
+            if ((attributes & MemberAttributes.Static) != 0 && !_includeStatic) return;
+
+            _members.Add(policy);
+        });
     }
 
-    public void RegisterDisabled(string name)
+    public void Flush()
     {
+        foreach (var registration in _extensionQueue)
+        {
+            registration.Invoke();
+        }
     }
 }
 
 /// <summary>
-///     Struct builder returned by <see cref="StructManager" />
+///     Struct builder returned by <see cref="StructManager" />, carrying the attributes mutated by the fluent calls
 /// </summary>
 public struct StructBuilder(StructManager manager, string name)
 {
-    private string? _apiName;
+    private MemberAttributes _attributes = MemberAttributes.Extension;
 
     public StructBuilder Map(string apiName)
     {
-        _apiName = apiName;
         return this;
     }
 
     public StructBuilder AsStatic()
     {
+        _attributes |= MemberAttributes.Static;
         return this;
     }
 
-    public void Register(Func<Variant> handler) => manager.RegisterExtension(name, handler);
+    public readonly void Register(Func<Variant> handler) => manager.EnqueueExtension(name, _attributes, handler);
 
-    public void AsNotSupported() => manager.RegisterNotSupported(name);
+    public readonly void AsNotSupported() => manager.EnqueueExtensionResult(name, _attributes, MemberEvaluationPolicy.Unsupported);
 
-    public void AsDisabled() => manager.RegisterDisabled(name);
+    public readonly void AsDisabled() => manager.EnqueueExtensionResult(name, _attributes, MemberEvaluationPolicy.Disabled);
 }
 
 /// <summary>
@@ -265,23 +354,42 @@ public struct StructBuilder(StructManager manager, string name)
 public sealed class ClassManager
 {
     private readonly List<object> _members = new(64);
+    private readonly List<Action> _extensionQueue = new(64);
+    private readonly bool _includeStatic = true;
 
     public int MemberCount => _members.Count;
 
-    public void Reset() => _members.Clear();
+    public void Reset()
+    {
+        _members.Clear();
+        _extensionQueue.Clear();
+    }
 
     public ClassBuilder Define(string name) => new(this, name);
 
-    public void RegisterExtension(string name, Func<Variant> handler)
+    public void EnqueueExtension(string name, MemberAttributes attributes, Func<Variant> handler)
     {
-        try
+        _extensionQueue.Add(() =>
         {
-            var result = handler();
-            _members.Add(result);
-        }
-        catch (Exception exception)
+            if ((attributes & MemberAttributes.Static) != 0 && !_includeStatic) return;
+
+            try
+            {
+                var result = handler();
+                _members.Add(result);
+            }
+            catch (Exception exception)
+            {
+                _members.Add(exception);
+            }
+        });
+    }
+
+    public void Flush()
+    {
+        foreach (var registration in _extensionQueue)
         {
-            _members.Add(exception);
+            registration.Invoke();
         }
     }
 }
@@ -291,100 +399,160 @@ public sealed class ClassManager
 /// </summary>
 public sealed class ClassBuilder(ClassManager manager, string name)
 {
-    private string? _apiName;
+    private MemberAttributes _attributes = MemberAttributes.Extension;
 
     public ClassBuilder Map(string apiName)
     {
-        _apiName = apiName;
         return this;
     }
 
     public ClassBuilder AsStatic()
     {
+        _attributes |= MemberAttributes.Static;
         return this;
     }
 
-    public void Register(Func<Variant> handler) => manager.RegisterExtension(name, handler);
+    public void Register(Func<Variant> handler) => manager.EnqueueExtension(name, _attributes, handler);
 }
 
 /// <summary>
-///     Struct builder with cached delegate approach: struct builder uses a cached Action delegate instead of direct manager reference
-///     (one delegate allocation per manager lifetime)
+///     Struct builder with two cached delegates instead of a direct manager reference (the shape used by the engine):
+///     the register and result callbacks are allocated once per manager lifetime, not per Define call.
 /// </summary>
 public sealed class StructCachedDelegateManager
 {
     private readonly List<object> _members = new(64);
-    private readonly Action<string, Func<Variant>> _registerCallback;
+    private readonly List<Action> _extensionQueue = new(64);
+    private readonly Action<string, MemberAttributes, Func<Variant>> _registerCallback;
+    private readonly Action<string, MemberAttributes, MemberEvaluationPolicy> _registerResultCallback;
+    private readonly bool _includeStatic = true;
+    private readonly bool _includeUnsupported = true;
 
     public StructCachedDelegateManager()
     {
-        _registerCallback = RegisterExtension;
+        _registerCallback = EnqueueExtension;
+        _registerResultCallback = EnqueueExtensionResult;
     }
 
     public int MemberCount => _members.Count;
 
-    public void Reset() => _members.Clear();
-
-    public CachedDelegateBuilder Define(string name) => new(name, _registerCallback);
-
-    private void RegisterExtension(string name, Func<Variant> handler)
+    public void Reset()
     {
-        try
+        _members.Clear();
+        _extensionQueue.Clear();
+    }
+
+    public CachedDelegateBuilder Define(string name) => new(name, _registerCallback, _registerResultCallback);
+
+    public void Flush()
+    {
+        foreach (var registration in _extensionQueue)
         {
-            var result = handler();
-            _members.Add(result);
+            registration.Invoke();
         }
-        catch (Exception exception)
+    }
+
+    private void EnqueueExtension(string name, MemberAttributes attributes, Func<Variant> handler)
+    {
+        _extensionQueue.Add(() =>
         {
-            _members.Add(exception);
-        }
+            if ((attributes & MemberAttributes.Static) != 0 && !_includeStatic) return;
+
+            try
+            {
+                var result = handler();
+                _members.Add(result);
+            }
+            catch (Exception exception)
+            {
+                _members.Add(exception);
+            }
+        });
+    }
+
+    private void EnqueueExtensionResult(string name, MemberAttributes attributes, MemberEvaluationPolicy policy)
+    {
+        _extensionQueue.Add(() =>
+        {
+            if (!_includeUnsupported) return;
+            if ((attributes & MemberAttributes.Static) != 0 && !_includeStatic) return;
+
+            _members.Add(policy);
+        });
     }
 }
 
 /// <summary>
 ///     Struct builder returned by <see cref="StructCachedDelegateManager" />
 /// </summary>
-public struct CachedDelegateBuilder(string name, Action<string, Func<Variant>> callback)
+public struct CachedDelegateBuilder(
+    string name,
+    Action<string, MemberAttributes, Func<Variant>> registerCallback,
+    Action<string, MemberAttributes, MemberEvaluationPolicy> registerResultCallback)
 {
-    private string? _apiName;
+    private MemberAttributes _attributes = MemberAttributes.Extension;
 
     public CachedDelegateBuilder Map(string apiName)
     {
-        _apiName = apiName;
         return this;
     }
 
     public CachedDelegateBuilder AsStatic()
     {
+        _attributes |= MemberAttributes.Static;
         return this;
     }
 
-    public void Register(Func<Variant> handler) => callback(name, handler);
+    public readonly void Register(Func<Variant> handler) => registerCallback(name, _attributes, handler);
+
+    public readonly void AsNotSupported() => registerResultCallback(name, _attributes, MemberEvaluationPolicy.Unsupported);
+
+    public readonly void AsDisabled() => registerResultCallback(name, _attributes, MemberEvaluationPolicy.Disabled);
 }
 
 /// <summary>
-///     Struct builder returned via interface approach: Define(name) returns IBuilder causing boxing of the struct (one boxing per Define call)
+///     Struct builder returned via interface: Define(name) returns IExtensionBuilder, boxing the struct
+///     (one boxing allocation per Define call)
 /// </summary>
 public sealed class StructInterfaceManager
 {
     private readonly List<object> _members = new(64);
+    private readonly List<Action> _extensionQueue = new(64);
+    private readonly bool _includeStatic = true;
 
     public int MemberCount => _members.Count;
 
-    public void Reset() => _members.Clear();
+    public void Reset()
+    {
+        _members.Clear();
+        _extensionQueue.Clear();
+    }
 
     public IExtensionBuilder Define(string name) => new InterfaceStructBuilder(this, name);
 
-    public void RegisterExtension(string name, Func<Variant> handler)
+    public void EnqueueExtension(string name, MemberAttributes attributes, Func<Variant> handler)
     {
-        try
+        _extensionQueue.Add(() =>
         {
-            var result = handler();
-            _members.Add(result);
-        }
-        catch (Exception exception)
+            if ((attributes & MemberAttributes.Static) != 0 && !_includeStatic) return;
+
+            try
+            {
+                var result = handler();
+                _members.Add(result);
+            }
+            catch (Exception exception)
+            {
+                _members.Add(exception);
+            }
+        });
+    }
+
+    public void Flush()
+    {
+        foreach (var registration in _extensionQueue)
         {
-            _members.Add(exception);
+            registration.Invoke();
         }
     }
 }
@@ -404,18 +572,18 @@ public interface IExtensionBuilder
 /// </summary>
 file struct InterfaceStructBuilder(StructInterfaceManager manager, string name) : IExtensionBuilder
 {
-    private string? _apiName;
+    private MemberAttributes _attributes = MemberAttributes.Extension;
 
     public IExtensionBuilder Map(string apiName)
     {
-        _apiName = apiName;
         return this;
     }
 
     public IExtensionBuilder AsStatic()
     {
+        _attributes |= MemberAttributes.Static;
         return this;
     }
 
-    public void Register(Func<Variant> handler) => manager.RegisterExtension(name, handler);
+    public void Register(Func<Variant> handler) => manager.EnqueueExtension(name, _attributes, handler);
 }

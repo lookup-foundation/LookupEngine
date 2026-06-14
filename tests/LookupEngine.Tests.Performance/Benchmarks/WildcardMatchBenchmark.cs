@@ -48,7 +48,7 @@ public class WildcardMatchBenchmark
         _compiled = new WildcardImpl.CompiledPattern(_pattern);
     }
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     public bool TwoPointer()
     {
         return WildcardImpl.MatchesWildcard(_input, _pattern);
@@ -60,7 +60,7 @@ public class WildcardMatchBenchmark
         return WildcardImpl.MatchesWildcardSegments(_input, _pattern);
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public bool Precompiled()
     {
         return _compiled.Matches(_input);
@@ -110,7 +110,7 @@ public class WildcardMatchArrayBenchmark
         }
     }
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     public bool TwoPointer()
     {
         foreach (var pattern in Patterns)
@@ -132,7 +132,7 @@ public class WildcardMatchArrayBenchmark
         return false;
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public bool Precompiled()
     {
         foreach (var compiled in _compiled)

@@ -16,6 +16,13 @@ using BenchmarkDotNet.Attributes;
 
 namespace LookupEngine.Tests.Performance.Benchmarks;
 
+/// <summary>
+///     Compares strategies for resolving a descriptor by runtime type in a pattern-matching switch, mirroring
+///     <c>DecomposeOptions.DefaultResolveMap</c>. The baseline matches by type alone; the alternatives add an
+///     optional declared-type guard via <c>type == typeof(T)</c> (the shape the engine uses) and via
+///     <c>FullName</c> comparison. Each candidate carries its own clean code and does not reference the engine
+///     implementation.
+/// </summary>
 public class TypeEqualBenchmark
 {
     private object Object { get; set; } = new RoundButton();
@@ -23,13 +30,13 @@ public class TypeEqualBenchmark
     [Params(null, typeof(ButtonBase))]
     public Type? Type { get; set; }
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     public string? PatternMatching()
     {
         return PatternMatchingSwitch(Object);
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public string? PatternMatchingWithTypeEquality()
     {
         return PatternMatchingWithTypeCheck(Object, Type);

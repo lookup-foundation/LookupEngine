@@ -17,6 +17,12 @@ using BenchmarkDotNet.Attributes;
 
 namespace LookupEngine.Tests.Performance.Benchmarks;
 
+/// <summary>
+///     Characterizes the reflection cost of enumerating members during decomposition, mirroring the
+///     <c>BindingFlags</c>, the <c>IsSpecialName</c> filtering, and the preallocated result list used by
+///     <c>LookupComposer.DecomposeProperties/Methods/Fields</c>. Each candidate carries its own clean code
+///     and does not reference the engine implementation.
+/// </summary>
 public class MemberEnumerationBenchmark
 {
     private const BindingFlags PublicInstanceFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;

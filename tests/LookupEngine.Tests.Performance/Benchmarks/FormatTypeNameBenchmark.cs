@@ -16,6 +16,12 @@ using BenchmarkDotNet.Attributes;
 
 namespace LookupEngine.Tests.Performance.Benchmarks;
 
+/// <summary>
+///     Compares strategies for rendering a generic type name as <c>Name&lt;Arg1, Arg2&gt;</c>, mirroring
+///     <c>ReflexionFormater.FormatTypeName</c>. The baseline reproduces the current string-concatenation
+///     shape; the alternatives use a <c>StringBuilder</c> and spans. Each candidate carries its own clean
+///     code and does not reference the engine implementation.
+/// </summary>
 public class FormatTypeNameBenchmark
 {
     [Params(typeof(string), typeof(List<int>), typeof(Dictionary<string, List<int>>))]
