@@ -18,4 +18,6 @@ var configuration = ManualConfig.Create(DefaultConfig.Instance)
 // BenchmarkRunner.Run<SortBenchmark>(configuration);
 // BenchmarkRunner.Run<TypeEqualBenchmark>(configuration);
 // BenchmarkRunner.Run<ExtensionRegistrationBenchmark>(configuration);
-BenchmarkRunner.Run<DecomposeBenchmark>(configuration);
+// BenchmarkRunner.Run<DecomposeBenchmark>(configuration);
+BenchmarkRunner.Run<WildcardMatchBenchmark>(configuration);
+BenchmarkRunner.Run<WildcardMatchArrayBenchmark>(configuration);
