@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text;
 
 namespace LookupEngine.Formaters;
 
@@ -44,15 +45,28 @@ internal static class ReflexionFormater
     {
         if (parameters.Length == 0) return member.Name;
 
-        var formatedParameters = parameters.Select(info =>
-        {
-            return info.ParameterType.IsByRef switch
-            {
-                true => $"ref {FormatTypeName(info.ParameterType).Replace("&", string.Empty)}",
-                false => FormatTypeName(info.ParameterType)
-            };
-        });
+        var builder = new StringBuilder();
+        builder.Append(member.Name);
+        builder.Append(" (");
 
-        return $"{member.Name} ({string.Join(", ", formatedParameters)})";
+        for (var i = 0; i < parameters.Length; i++)
+        {
+            var parameterType = parameters[i].ParameterType;
+            if (parameterType.IsByRef)
+            {
+                builder.Append("ref ");
+                var name = FormatTypeName(parameterType).AsSpan();
+                builder.Append(name[^1] == '&' ? name[..^1] : name);
+            }
+            else
+            {
+                builder.Append(FormatTypeName(parameterType));
+            }
+
+            if (i < parameters.Length - 1) builder.Append(", ");
+        }
+
+        builder.Append(')');
+        return builder.ToString();
     }
 }
