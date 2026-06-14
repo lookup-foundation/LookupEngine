@@ -1,10 +1,5 @@
 # 2.0.0
 
-## Breaking changes
-
-- Replaced the extension registration API with a unified member configuration API. `IExtensionManager` and `IDescriptorResolver` are removed in favor of `IDescriptorConfigurator`, which exposes a single `Configure(IMemberConfigurator configuration)` entry point.
-- Member handlers, evaluation overrides, and synthetic extensions are now declared through the fluent `MemberResolverBuilder` (`configuration.Member(name)`) and `ExtensionBuilder` (`configuration.Extension(name)`) builders instead of the old `Register`/`Resolve` methods.
-
 ## Engine
 
 - Added force evaluation support: deferred members carry an `Evaluator` handle and can be evaluated on demand via `DecomposedMember.Evaluate()`.
@@ -34,13 +29,10 @@
 - Added regression tests for the fixed engine defects.
 - Extended serialization round-trip checks and added more target frameworks to the test project.
 
-## Dependencies
+## Breaking changes
 
-- Upgraded `ModularPipelines` to 3.2.8.
-- Upgraded `Polyfill` to 10.9.0.
-- Upgraded `TUnit` to 1.54.0.
-- Updated the .NET SDK to 10.0.300 and replaced compiler directives with Polyfill sources.
-- Added `renovate.json` for automated dependency updates.
+- Replaced the extension registration API with a unified member configuration API. `IExtensionManager` and `IDescriptorResolver` are removed in favor of `IDescriptorConfigurator`, which exposes a single `Configure(IMemberConfigurator configuration)` entry point.
+- Member handlers, evaluation overrides, and synthetic extensions are now declared through the fluent `MemberResolverBuilder` (`configuration.Member(name)`) and `ExtensionBuilder` (`configuration.Extension(name)`) builders instead of the old `Register`/`Resolve` methods.
 
 # 1.1.0
 
