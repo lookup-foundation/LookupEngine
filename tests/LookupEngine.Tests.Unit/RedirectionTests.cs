@@ -6,7 +6,7 @@ using LookupEngine.Options;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-/// Tests for <see cref="IDescriptorRedirector"/> functionality and value redirection behavior.
+///     Tests for <see cref="IDescriptorRedirector"/> functionality and value redirection behavior.
 /// </summary>
 public sealed class RedirectionTests
 {

@@ -6,7 +6,7 @@ using LookupEngine.Options;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-/// Tests for <see cref="IDescriptorConfigurator"/> member resolution and custom type resolution.
+///     Tests for <see cref="IDescriptorConfigurator"/> member resolution and custom type resolution.
 /// </summary>
 public sealed class ResolverTests
 {

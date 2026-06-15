@@ -6,7 +6,7 @@ using LookupEngine.Descriptors;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for MemberAttributes flag tracking
+///     Tests for <see cref="MemberAttributes"/> flag assignment and combination.
 /// </summary>
 public sealed class MemberAttributesTests
 {

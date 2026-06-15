@@ -3,7 +3,7 @@ using LookupEngine.Abstractions.Decomposition;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for Variants factory and IVariant functionality
+///     Tests for <see cref="IVariant"/> factory methods and variant behavior.
 /// </summary>
 public sealed class VariantsTests
 {

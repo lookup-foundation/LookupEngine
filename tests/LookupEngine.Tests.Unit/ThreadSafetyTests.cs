@@ -6,7 +6,7 @@ using LookupEngine.Descriptors;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for thread-safety and concurrent decomposition
+///     Tests for thread safety in concurrent decomposition.
 /// </summary>
 public sealed class ThreadSafetyTests
 {

@@ -6,7 +6,7 @@ using LookupEngine.Descriptors;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for performance diagnostics (time and memory tracking)
+///     Tests for performance diagnostics with time and memory measurement.
 /// </summary>
 public sealed class DiagnosticsTests
 {

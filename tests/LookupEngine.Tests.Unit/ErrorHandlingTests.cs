@@ -1,7 +1,7 @@
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for exception handling and error scenarios
+///     Tests for exception capture and error behavior.
 /// </summary>
 public sealed class ErrorHandlingTests
 {

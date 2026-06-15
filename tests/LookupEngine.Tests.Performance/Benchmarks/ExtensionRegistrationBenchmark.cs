@@ -17,10 +17,7 @@ using BenchmarkDotNet.Attributes;
 namespace LookupEngine.Tests.Performance.Benchmarks;
 
 /// <summary>
-///     Compares builder shapes for the deferred extension-registration model used by the engine:
-///     a builder threads <see cref="MemberAttributes" /> through two cached callbacks that enqueue closures,
-///     and the queue is drained on flush. Each candidate carries its own clean code and does not reference
-///     the engine implementation.
+///     Compares builder shapes for the deferred extension-registration model used by the engine.
 /// </summary>
 public class ExtensionRegistrationBenchmark
 {
@@ -180,7 +177,7 @@ public class ExtensionRegistrationBenchmark
 }
 
 /// <summary>
-///     The member attributes threaded through the builder into the queued registration
+///     The member attributes threaded through the builder into the queued registration.
 /// </summary>
 [Flags]
 public enum MemberAttributes
@@ -190,7 +187,7 @@ public enum MemberAttributes
 }
 
 /// <summary>
-///     The evaluation policy recorded for a non-evaluated extension
+///     The evaluation policy recorded for a non-evaluated extension.
 /// </summary>
 public enum MemberEvaluationPolicy
 {
@@ -200,7 +197,7 @@ public enum MemberEvaluationPolicy
 }
 
 /// <summary>
-///     Immutable result container used by all benchmark managers
+///     Immutable result container used by all benchmark managers.
 /// </summary>
 public sealed class Variant(object? value)
 {
@@ -208,8 +205,8 @@ public sealed class Variant(object? value)
 }
 
 /// <summary>
-///     Direct registration without a builder: callers pass the attributes explicitly and the manager
-///     enqueues a closure that is evaluated on flush. Establishes the cost floor of the deferred model.
+///     Direct registration without a builder: callers pass the attributes explicitly and the manager enqueues a closure that is evaluated on flush.
+///     Establishes the cost floor of the deferred model.
 /// </summary>
 public sealed class ComposerManager
 {
@@ -265,8 +262,8 @@ public sealed class ComposerManager
 }
 
 /// <summary>
-///     Struct builder approach: Define(name) returns a stack-allocated struct holding a direct manager
-///     reference (zero builder allocation). Each registration enqueues a closure.
+///     Struct builder approach: <c>Define(name)</c> returns a stack-allocated struct that holds a direct manager reference (zero builder allocation).
+///     Each registration enqueues a closure.
 /// </summary>
 public sealed class StructManager
 {
@@ -324,7 +321,7 @@ public sealed class StructManager
 }
 
 /// <summary>
-///     Struct builder returned by <see cref="StructManager" />, carrying the attributes mutated by the fluent calls
+///     Struct builder returned by <see cref="StructManager" />, with attributes mutated by fluent calls.
 /// </summary>
 public struct StructBuilder(StructManager manager, string name)
 {
@@ -349,7 +346,7 @@ public struct StructBuilder(StructManager manager, string name)
 }
 
 /// <summary>
-///     Class builder approach: Define(name) returns a heap-allocated class builder (one allocation per Define call)
+///     Class builder approach: <c>Define(name)</c> returns a heap-allocated class builder (one allocation per <c>Define</c> call).
 /// </summary>
 public sealed class ClassManager
 {
@@ -395,7 +392,7 @@ public sealed class ClassManager
 }
 
 /// <summary>
-///     Class builder returned by <see cref="ClassManager" />
+///     Class builder returned by <see cref="ClassManager" />.
 /// </summary>
 public sealed class ClassBuilder(ClassManager manager, string name)
 {
@@ -416,8 +413,7 @@ public sealed class ClassBuilder(ClassManager manager, string name)
 }
 
 /// <summary>
-///     Struct builder with two cached delegates instead of a direct manager reference (the shape used by the engine):
-///     the register and result callbacks are allocated once per manager lifetime, not per Define call.
+///     Struct builder with two cached delegates instead of a direct manager reference (the shape used by the engine): the register and result callbacks are allocated once per manager lifetime, not per <c>Define</c> call.
 /// </summary>
 public sealed class StructCachedDelegateManager
 {
@@ -483,7 +479,7 @@ public sealed class StructCachedDelegateManager
 }
 
 /// <summary>
-///     Struct builder returned by <see cref="StructCachedDelegateManager" />
+///     Struct builder returned by <see cref="StructCachedDelegateManager" />.
 /// </summary>
 public struct CachedDelegateBuilder(
     string name,
@@ -511,8 +507,7 @@ public struct CachedDelegateBuilder(
 }
 
 /// <summary>
-///     Struct builder returned via interface: Define(name) returns IExtensionBuilder, boxing the struct
-///     (one boxing allocation per Define call)
+///     Extension manager where <c>Define(name)</c> returns an <see cref="IExtensionBuilder" />, which boxes the struct (one allocation per <c>Define</c> call).
 /// </summary>
 public sealed class StructInterfaceManager
 {
@@ -558,7 +553,7 @@ public sealed class StructInterfaceManager
 }
 
 /// <summary>
-///     Builder interface for the boxing benchmark scenario
+///     Builder interface for the struct-box benchmark scenario.
 /// </summary>
 public interface IExtensionBuilder
 {
@@ -568,7 +563,7 @@ public interface IExtensionBuilder
 }
 
 /// <summary>
-///     Struct builder implementing <see cref="IExtensionBuilder" /> — boxed when returned from <see cref="StructInterfaceManager.Define" />
+///     Struct builder that implements <see cref="IExtensionBuilder" /> — boxed when returned from <see cref="StructInterfaceManager.Define" />.
 /// </summary>
 file struct InterfaceStructBuilder(StructInterfaceManager manager, string name) : IExtensionBuilder
 {

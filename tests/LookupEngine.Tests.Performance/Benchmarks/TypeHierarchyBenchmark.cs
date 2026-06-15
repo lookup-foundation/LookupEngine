@@ -17,10 +17,7 @@ using BenchmarkDotNet.Attributes;
 namespace LookupEngine.Tests.Performance.Benchmarks;
 
 /// <summary>
-///     Compares strategies for collecting the base-type chain of a type, mirroring
-///     <c>LookupComposer.GetTypeHierarchy</c>. The baseline reproduces the current dynamic-growth list;
-///     the alternatives use a stack-based reversal and a preallocated list. Each candidate carries its own
-///     clean code and does not reference the engine implementation.
+///     Compares strategies for base-type chain traversal, as used in <c>LookupComposer.GetTypeHierarchy</c>.
 /// </summary>
 public class TypeHierarchyBenchmark
 {

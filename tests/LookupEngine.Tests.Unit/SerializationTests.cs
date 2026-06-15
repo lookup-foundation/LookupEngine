@@ -3,6 +3,9 @@ using LookupEngine.Abstractions;
 
 namespace LookupEngine.Tests.Unit;
 
+/// <summary>
+///     Tests for JSON serialization of decomposed objects and members.
+/// </summary>
 public sealed class SerializationTests
 {
     private readonly JsonSerializerOptions _serializerOptions = new()

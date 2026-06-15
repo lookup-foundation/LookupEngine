@@ -18,11 +18,7 @@ using BenchmarkDotNet.Attributes;
 namespace LookupEngine.Tests.Performance.Benchmarks;
 
 /// <summary>
-///     Compares strategies for rendering a parametric member name as <c>Name (Type1, ref Type2, ...)</c>,
-///     mirroring <c>ReflexionFormater.FormatMemberName</c>. The baseline reproduces the current LINQ
-///     <c>Select</c> + <c>string.Join</c> + <c>Replace</c> shape; the alternatives avoid the intermediate
-///     projection and the by-ref <c>Replace</c> allocation. Each candidate carries its own clean code and
-///     does not reference the engine implementation.
+///     Compares strategies for the <c>Name (Type1, ref Type2, ...)</c> member name format, as implemented in <c>ReflexionFormater.FormatMemberName</c>.
 /// </summary>
 public class FormatMemberNameBenchmark
 {
@@ -133,9 +129,6 @@ public class FormatMemberNameBenchmark
     }
 }
 
-/// <summary>
-///     Sample parametric member exercising plain, generic, and by-ref parameter formatting
-/// </summary>
 public sealed class SampleApi
 {
     public void Invoke(int count, string name, ref double weight, List<int> items)

@@ -6,7 +6,7 @@ using LookupEngine.Options;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-/// Tests for <see cref="IDescriptorConfigurator"/> extension functionality and context data enrichment.
+///     Tests for <see cref="IDescriptorConfigurator"/> extension functionality and context data enrichment.
 /// </summary>
 public sealed class ExtensionTests
 {

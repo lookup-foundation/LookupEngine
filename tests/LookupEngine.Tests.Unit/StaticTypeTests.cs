@@ -1,7 +1,7 @@
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for static type decomposition (typeof(T))
+///     Tests for static type decomposition via <c>typeof(T)</c>.
 /// </summary>
 public sealed class StaticTypeTests
 {

@@ -1,7 +1,7 @@
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-/// Tests for <see cref="DecomposeOptions"/> configuration and its effect on decomposition behavior.
+///     Tests for <see cref="DecomposeOptions"/> configuration and its effect on decomposition behavior.
 /// </summary>
 public sealed class OptionsTests
 {

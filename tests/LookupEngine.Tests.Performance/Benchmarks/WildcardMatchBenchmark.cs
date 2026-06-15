@@ -17,8 +17,8 @@ using BenchmarkDotNet.Attributes;
 namespace LookupEngine.Tests.Performance.Benchmarks;
 
 /// <summary>
-///     Compares wildcard matching strategies for a single namespace pattern where <c>*</c> matches zero or more characters.
-///     Matching is ordinal and case-sensitive, mirroring <c>MethodEvaluationPolicy</c>.
+///     Compares wildcard match strategies for a single namespace pattern where <c>*</c> matches zero or more characters.
+///     The match is ordinal and case-sensitive, as used in <c>MethodEvaluationPolicy</c>.
 /// </summary>
 public class WildcardMatchBenchmark
 {
@@ -68,9 +68,8 @@ public class WildcardMatchBenchmark
 }
 
 /// <summary>
-///     Mirrors the real <c>MethodEvaluationPolicy.IsEvaluationAllowed</c>: a single namespace is matched against an
-///     array of patterns with short-circuiting. "Raw" strategies re-parse every pattern on each call, while the
-///     precompiled strategy parses the array once and only runs the match.
+///     Mirrors the real <c>MethodEvaluationPolicy.IsEvaluationAllowed</c>: a single namespace is matched against an array of patterns with short-circuit behavior.
+///     "Raw" strategies re-parse every pattern on each call, while the precompiled strategy parses the array once and only runs the match.
 /// </summary>
 public class WildcardMatchArrayBenchmark
 {
@@ -145,13 +144,13 @@ public class WildcardMatchArrayBenchmark
 }
 
 /// <summary>
-///     Shared wildcard matching implementations used by both the single-pattern and array benchmarks.
+///     Shared wildcard match implementations used by both the single-pattern and array benchmarks.
 /// </summary>
 internal static class WildcardImpl
 {
     /// <summary>
-    ///     A namespace pattern parsed once. Trailing-star patterns ("Autodesk.Revit.*", "*")
-    ///     collapse to a vectorized prefix check; everything else uses the segment matcher.
+    ///     A namespace pattern parsed once.
+    ///     Trailing-star patterns (<c>"Autodesk.Revit.*"</c>, <c>"*"</c>) collapse to a vectorized prefix check; everything else uses the segment matcher.
     /// </summary>
     public readonly struct CompiledPattern(string pattern)
     {
@@ -167,9 +166,6 @@ internal static class WildcardImpl
         }
     }
 
-    /// <summary>
-    ///     Iterative two-pointer over <see cref="string" /> indexers
-    /// </summary>
     public static bool MatchesWildcard(string input, string pattern)
     {
         var inputIndex = 0;
@@ -210,10 +206,6 @@ internal static class WildcardImpl
         return patternIndex == pattern.Length;
     }
 
-    /// <summary>
-    ///     Splits the pattern on <c>*</c> and matches each literal segment with vectorized
-    ///     <c>StartsWith</c>/<c>IndexOf</c>/<c>EndsWith</c>.
-    /// </summary>
     public static bool MatchesWildcardSegments(ReadOnlySpan<char> input, ReadOnlySpan<char> pattern)
     {
         var firstStar = pattern.IndexOf('*');

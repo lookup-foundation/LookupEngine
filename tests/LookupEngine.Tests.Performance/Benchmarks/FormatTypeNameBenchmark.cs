@@ -17,10 +17,7 @@ using BenchmarkDotNet.Attributes;
 namespace LookupEngine.Tests.Performance.Benchmarks;
 
 /// <summary>
-///     Compares strategies for rendering a generic type name as <c>Name&lt;Arg1, Arg2&gt;</c>, mirroring
-///     <c>ReflexionFormater.FormatTypeName</c>. The baseline reproduces the current string-concatenation
-///     shape; the alternatives use a <c>StringBuilder</c> and spans. Each candidate carries its own clean
-///     code and does not reference the engine implementation.
+///     Compares strategies for the <c>Name&lt;Arg1, Arg2&gt;</c> generic type name format, as implemented in <c>ReflexionFormater.FormatTypeName</c>.
 /// </summary>
 public class FormatTypeNameBenchmark
 {

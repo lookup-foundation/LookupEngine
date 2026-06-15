@@ -19,9 +19,7 @@ using LookupEngine.Abstractions;
 namespace LookupEngine.Tests.Performance.Benchmarks;
 
 /// <summary>
-///     Tracks the end-to-end cost of <see cref="LookupComposer.Decompose(object, DecomposeOptions)" />
-///     across the available option combinations. Each benchmark decomposes the same stable sample
-///     object so that timings and allocations can be compared across engine versions.
+///     Tracks the end-to-end cost of <see cref="LookupComposer.Decompose(object, DecomposeOptions)" /> across the available option combinations.
 /// </summary>
 public class DecomposeBenchmark
 {

@@ -1,7 +1,7 @@
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Core decomposition functionality tests
+///     Tests for core decomposition behavior.
 /// </summary>
 public sealed class DecompositionTests
 {

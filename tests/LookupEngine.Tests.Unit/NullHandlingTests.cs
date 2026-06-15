@@ -3,7 +3,7 @@ using LookupEngine.Descriptors;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for null value handling throughout decomposition
+///     Tests for null value behavior throughout decomposition.
 /// </summary>
 public sealed class NullHandlingTests
 {

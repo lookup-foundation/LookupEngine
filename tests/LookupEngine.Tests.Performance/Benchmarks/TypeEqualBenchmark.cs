@@ -17,11 +17,7 @@ using BenchmarkDotNet.Attributes;
 namespace LookupEngine.Tests.Performance.Benchmarks;
 
 /// <summary>
-///     Compares strategies for resolving a descriptor by runtime type in a pattern-matching switch, mirroring
-///     <c>DecomposeOptions.DefaultResolveMap</c>. The baseline matches by type alone; the alternatives add an
-///     optional declared-type guard via <c>type == typeof(T)</c> (the shape the engine uses) and via
-///     <c>FullName</c> comparison. Each candidate carries its own clean code and does not reference the engine
-///     implementation.
+///     Compares strategies for descriptor resolution by runtime type in a pattern-match switch, as used in <c>DecomposeOptions.DefaultResolveMap</c>.
 /// </summary>
 public class TypeEqualBenchmark
 {

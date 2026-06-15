@@ -3,7 +3,7 @@ using LookupEngine.Descriptors;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for IEnumerable decomposition
+///     Tests for <c>IEnumerable</c> decomposition.
 /// </summary>
 public sealed class EnumerableTests
 {
