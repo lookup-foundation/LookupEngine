@@ -56,3 +56,7 @@ LookupEngine is a synchronous library. Reflection (`GetValue`, `Invoke`) is inhe
 * For a non-trivial member, add a short `<remarks>` with the detail a caller needs (constraints, edge cases, what an empty or null result means). Keep it brief.
 * **Never document the implementation or its internals.** Describe the observable behavior and contract, not how it is achieved. Implementation changes routinely, and docs that describe behavior do not need to change with it. For example, document that a result is computed lazily if a caller must know, but not which collection type or algorithm produces it.
 * If a doc comment references another type or member, link it with `<see cref="..."/>` so renames stay tracked.
+* **No corporate jargon.** Write plain technical English.
+* **No `-ing` verb forms for describing what a member does.** Use the third-person present indicative.
+* **Break lines at sentence boundaries, not at a fixed character limit.** Each sentence goes on its own line. Do not wrap mid-sentence because a line is getting long.
+* **No dashes or semicolons.** Use separate sentences, columns instead.
