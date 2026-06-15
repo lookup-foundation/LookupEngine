@@ -59,4 +59,4 @@ LookupEngine is a synchronous library. Reflection (`GetValue`, `Invoke`) is inhe
 * **No corporate jargon.** Write plain technical English.
 * **No `-ing` verb forms for describing what a member does.** Use the third-person present indicative.
 * **Break lines at sentence boundaries, not at a fixed character limit.** Each sentence goes on its own line. Do not wrap mid-sentence because a line is getting long.
-* **No dashes or semicolons.** Use separate sentences, columns instead.
+* **No dashes or semicolons.** Use separate sentences, commas instead.
