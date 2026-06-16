@@ -13,7 +13,6 @@
 // UNINTERRUPTED OR ERROR FREE.
 
 using System.Reflection;
-using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Diagnostic;
 
 // ReSharper disable once CheckNamespace
@@ -84,7 +83,7 @@ public partial class LookupComposer
     /// <summary>
     ///     Evaluate value with diagnostics
     /// </summary>
-    private protected IVariant EvaluateValue(Func<IVariant> handler)
+    private protected object? EvaluateValue(Func<object?> handler)
     {
         try
         {

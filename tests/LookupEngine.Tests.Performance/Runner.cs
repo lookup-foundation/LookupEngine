@@ -10,12 +10,12 @@ var configuration = ManualConfig.Create(DefaultConfig.Instance)
     .AddDiagnoser(MemoryDiagnoser.Default)
     .AddExporter(MarkdownExporter.GitHub);
 
-BenchmarkRunner.Run<FormatTypeNameBenchmark>(configuration);
-BenchmarkRunner.Run<FormatMemberNameBenchmark>(configuration);
-BenchmarkRunner.Run<TypeHierarchyBenchmark>(configuration);
-BenchmarkRunner.Run<MemberEnumerationBenchmark>(configuration);
-BenchmarkRunner.Run<TypeEqualBenchmark>(configuration);
-BenchmarkRunner.Run<ExtensionRegistrationBenchmark>(configuration);
+// BenchmarkRunner.Run<FormatTypeNameBenchmark>(configuration);
+// BenchmarkRunner.Run<FormatMemberNameBenchmark>(configuration);
+// BenchmarkRunner.Run<TypeHierarchyBenchmark>(configuration);
+// BenchmarkRunner.Run<MemberEnumerationBenchmark>(configuration);
+// BenchmarkRunner.Run<TypeEqualBenchmark>(configuration);
+// BenchmarkRunner.Run<ExtensionRegistrationBenchmark>(configuration);
 BenchmarkRunner.Run<DecomposeBenchmark>(configuration);
-BenchmarkRunner.Run<WildcardMatchBenchmark>(configuration);
-BenchmarkRunner.Run<WildcardMatchArrayBenchmark>(configuration);
+// BenchmarkRunner.Run<WildcardMatchBenchmark>(configuration);
+// BenchmarkRunner.Run<WildcardMatchArrayBenchmark>(configuration);

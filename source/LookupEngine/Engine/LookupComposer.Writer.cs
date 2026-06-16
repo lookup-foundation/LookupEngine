@@ -149,7 +149,7 @@ public partial class LookupComposer
         DecomposedMembers.Add(member);
     }
 
-    private void WriteDeferredMember(MemberInfo memberInfo, Type returnType, ParameterInfo[] parameters, Func<IVariant>? handler)
+    private void WriteDeferredMember(MemberInfo memberInfo, Type returnType, ParameterInfo[] parameters, Func<object?>? handler)
     {
         WriteInactiveMember(memberInfo, returnType, parameters, MemberEvaluationPolicy.Deferred, target =>
         {

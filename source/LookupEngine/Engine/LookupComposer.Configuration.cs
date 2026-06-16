@@ -33,10 +33,10 @@ public partial class LookupComposer : IMemberConfigurator
     /// <summary>
     ///     A descriptor-declared configuration of a member
     /// </summary>
-    private readonly struct MemberRegistration(Func<ParameterInfo[], bool>? predicate, Func<IVariant>? handler, MemberEvaluationPolicy? evaluationPolicy)
+    private readonly struct MemberRegistration(Func<ParameterInfo[], bool>? predicate, Func<object?>? handler, MemberEvaluationPolicy? evaluationPolicy)
     {
         public readonly Func<ParameterInfo[], bool>? Predicate = predicate;
-        public readonly Func<IVariant>? Handler = handler;
+        public readonly Func<object?>? Handler = handler;
         public readonly MemberEvaluationPolicy? EvaluationPolicy = evaluationPolicy;
     }
 
@@ -86,7 +86,7 @@ public partial class LookupComposer : IMemberConfigurator
     /// <summary>
     ///     Find the member configuration matching the member name and runtime parameters
     /// </summary>
-    private bool TryLookupMember(string name, ParameterInfo[] parameters, out Func<IVariant>? handler, out MemberEvaluationPolicy? evaluationPolicy)
+    private bool TryLookupMember(string name, ParameterInfo[] parameters, out Func<object?>? handler, out MemberEvaluationPolicy? evaluationPolicy)
     {
         handler = null;
         evaluationPolicy = null;
@@ -105,7 +105,7 @@ public partial class LookupComposer : IMemberConfigurator
         return false;
     }
 
-    private protected void AddMemberRegistration(string name, Func<ParameterInfo[], bool>? predicate, Func<IVariant>? handler, MemberEvaluationPolicy? @override)
+    private protected void AddMemberRegistration(string name, Func<ParameterInfo[], bool>? predicate, Func<object?>? handler, MemberEvaluationPolicy? evaluationPolicy)
     {
         if (!_memberRegistrations.TryGetValue(name, out var registrations))
         {
@@ -113,10 +113,10 @@ public partial class LookupComposer : IMemberConfigurator
             _memberRegistrations[name] = registrations;
         }
 
-        registrations.Add(new MemberRegistration(predicate, handler, @override));
+        registrations.Add(new MemberRegistration(predicate, handler, evaluationPolicy));
     }
 
-    private protected void EnqueueExtension(string name, MemberAttributes attributes, Func<IVariant> handler)
+    private protected void EnqueueExtension(string name, MemberAttributes attributes, Func<object?> handler)
     {
         _extensionQueue.Add(() =>
         {

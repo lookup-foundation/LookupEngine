@@ -43,6 +43,39 @@ public sealed class ExtensionTests
     }
 
     [Test]
+    public async Task Decompose_PlainObjectExtension_EquivalentToVariantExtension()
+    {
+        //Arrange
+        var data = new ExtensibleObject();
+        var options = new DecomposeOptions
+        {
+            EnableExtensions = true,
+            TypeResolver = (obj, _) =>
+            {
+                return obj switch
+                {
+                    ExtensibleObject => new EquivalenceExtensionDescriptor(),
+                    _ => new ObjectDescriptor(obj)
+                };
+            }
+        };
+
+        //Act
+        var result = LookupComposer.Decompose(data, options);
+        var plainMember = result.Members.Single(member => member.Name == "PlainExtension");
+        var variantMember = result.Members.Single(member => member.Name == "VariantExtension");
+
+        //Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(plainMember.Value.RawValue).IsEqualTo(variantMember.Value.RawValue);
+            await Assert.That(plainMember.Value.Name).IsEqualTo(variantMember.Value.Name);
+            await Assert.That(plainMember.Value.TypeName).IsEqualTo(variantMember.Value.TypeName);
+            await Assert.That(plainMember.Value.RawValue).IsEqualTo("Extended");
+        }
+    }
+
+    [Test]
     public async Task Decompose_IncludingContextExtensions_ExtensionHandled()
     {
         //Arrange
@@ -94,6 +127,15 @@ public sealed class ExtensionTests
 }
 
 file sealed class ExtensibleObject;
+
+file sealed class EquivalenceExtensionDescriptor : Descriptor, IDescriptorConfigurator
+{
+    public void Configure(IMemberConfigurator configuration)
+    {
+        configuration.Extension("PlainExtension").Register(() => "Extended");
+        configuration.Extension("VariantExtension").Register(() => Variants.Value("Extended"));
+    }
+}
 
 file sealed class EngineTestContext
 {

@@ -42,14 +42,14 @@ public partial class LookupComposer<TContext> : IMemberConfigurator<TContext>
         }
     }
 
-    private void AddContextMemberRegistration(string name, Func<ParameterInfo[], bool>? predicate, Func<TContext, IVariant>? handler, MemberEvaluationPolicy? @override)
+    private void AddContextMemberRegistration(string name, Func<ParameterInfo[], bool>? predicate, Func<TContext, object?>? handler, MemberEvaluationPolicy? evaluationPolicy)
     {
         var options = _options;
-        var wrapped = handler is null ? null : new Func<IVariant>(() => handler.Invoke(options.Context));
-        AddMemberRegistration(name, predicate, wrapped, @override);
+        var wrapped = handler is null ? null : new Func<object?>(() => handler.Invoke(options.Context));
+        AddMemberRegistration(name, predicate, wrapped, evaluationPolicy);
     }
 
-    private void EnqueueContextExtension(string name, MemberAttributes attributes, Func<TContext, IVariant> handler)
+    private void EnqueueContextExtension(string name, MemberAttributes attributes, Func<TContext, object?> handler)
     {
         var options = _options;
         EnqueueExtension(name, attributes, () => handler.Invoke(options.Context));

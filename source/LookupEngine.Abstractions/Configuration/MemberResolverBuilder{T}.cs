@@ -27,13 +27,13 @@ namespace LookupEngine.Abstractions.Configuration;
 public struct MemberResolverBuilder<TContext>
 {
     private readonly string _name;
-    private readonly Action<string, Func<ParameterInfo[], bool>?, Func<TContext, IVariant>?, MemberEvaluationPolicy?> _callback;
+    private readonly Action<string, Func<ParameterInfo[], bool>?, Func<TContext, object?>?, MemberEvaluationPolicy?> _callback;
     private Func<ParameterInfo[], bool>? _predicate;
 
     /// <summary>
     ///     Initializes the builder with the member name and the engine callback.
     /// </summary>
-    public MemberResolverBuilder(string name, Action<string, Func<ParameterInfo[], bool>?, Func<TContext, IVariant>?, MemberEvaluationPolicy?> callback)
+    public MemberResolverBuilder(string name, Action<string, Func<ParameterInfo[], bool>?, Func<TContext, object?>?, MemberEvaluationPolicy?> callback)
     {
         _name = name;
         _callback = callback;
@@ -65,7 +65,7 @@ public struct MemberResolverBuilder<TContext>
     /// </summary>
     public readonly void Resolve(Func<TContext, object?> handler)
     {
-        _callback(_name, _predicate, context => Variants.Value(handler(context)), null);
+        _callback(_name, _predicate, handler, null);
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public struct MemberResolverBuilder<TContext>
     /// </summary>
     public readonly void Defer(Func<TContext, object?> handler)
     {
-        _callback(_name, _predicate, context => Variants.Value(handler(context)), MemberEvaluationPolicy.Deferred);
+        _callback(_name, _predicate, handler, MemberEvaluationPolicy.Deferred);
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public struct MemberResolverBuilder<TContext>
     /// </summary>
     public readonly void Evaluate(Func<TContext, object?> handler)
     {
-        _callback(_name, _predicate, context => Variants.Value(handler(context)), MemberEvaluationPolicy.Evaluated);
+        _callback(_name, _predicate, handler, MemberEvaluationPolicy.Evaluated);
     }
 
     /// <summary>

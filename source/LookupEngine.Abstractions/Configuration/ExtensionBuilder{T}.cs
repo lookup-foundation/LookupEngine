@@ -25,7 +25,7 @@ namespace LookupEngine.Abstractions.Configuration;
 public struct ExtensionBuilder<TContext>
 {
     private readonly string _name;
-    private readonly Action<string, MemberAttributes, Func<TContext, IVariant>> _registerCallback;
+    private readonly Action<string, MemberAttributes, Func<TContext, object?>> _registerCallback;
     private readonly Action<string, MemberAttributes, MemberEvaluationPolicy> _registerResultCallback;
     private MemberAttributes _attributes = MemberAttributes.Extension;
 
@@ -34,7 +34,7 @@ public struct ExtensionBuilder<TContext>
     /// </summary>
     public ExtensionBuilder(
         string name,
-        Action<string, MemberAttributes, Func<TContext, IVariant>> registerCallback,
+        Action<string, MemberAttributes, Func<TContext, object?>> registerCallback,
         Action<string, MemberAttributes, MemberEvaluationPolicy> registerResultCallback)
     {
         _name = name;
@@ -78,7 +78,7 @@ public struct ExtensionBuilder<TContext>
     /// <param name="handler">Returns the resolved value for this extension given the execution context.</param>
     public readonly void Register(Func<TContext, object?> handler)
     {
-        _registerCallback(_name, _attributes, context => Variants.Value(handler(context)));
+        _registerCallback(_name, _attributes, handler);
     }
 
     /// <summary>

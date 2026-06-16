@@ -33,7 +33,7 @@ public partial class LookupComposer
     /// <summary>
     ///     Evaluate a deferred member, updating the value and metrics in place
     /// </summary>
-    internal void EvaluateDeferredMember(DecomposedMember target, MemberInfo member, Func<IVariant>? handler)
+    internal void EvaluateDeferredMember(DecomposedMember target, MemberInfo member, Func<object?>? handler)
     {
         object? value;
         try

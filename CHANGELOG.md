@@ -1,3 +1,7 @@
+# 2.0.1
+
+- Object-returning extension and member handlers no longer allocate a wrapping closure or a variant on each evaluation. The builder constructor callbacks now carry `Func<object?>` instead of `Func<IVariant>`; variant-returning handlers are unchanged.
+
 # 2.0.0
 
 ## Engine
