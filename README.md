@@ -309,14 +309,14 @@ var options = new DecomposeOptions
 {
     EvaluationPolicy = new MethodEvaluationPolicy
     {
-        IncludedNamespaces = ["Autodesk.Revit.*"],
-        ExcludedReturnTypes = [typeof(void), typeof(bool)]
+        EvaluatedNamespaces = ["Autodesk.Revit.*"],
+        DeferredReturnTypes = [typeof(void), typeof(bool)]
     }
 };
 ```
 
-`IncludedNamespaces` - contains wildcard patterns matched against the namespace of the type where the method is declared.
-`ExcludedReturnTypes` - defers methods by their return type even when the namespace matches.
+`EvaluatedNamespaces` - contains wildcard patterns matched against the namespace of the type where the method is declared.
+`DeferredReturnTypes` - defers methods by their return type even when the namespace matches.
 By default, methods without a return value are only executed explicitly.
 
 ### Member evaluation policy overrides

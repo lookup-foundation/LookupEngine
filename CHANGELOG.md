@@ -1,6 +1,10 @@
+# 2.0.4
+
+- Renamed `MethodEvaluationPolicy.IncludedNamespaces` to `EvaluatedNamespaces` and `MethodEvaluationPolicy.ExcludedReturnTypes` to `DeferredReturnTypes`.
+
 # 2.0.3
 
-- Added `ExtensionBuilder.Defer(Action)` and `ExtensionBuilder<TContext>.Defer(Action<TContext>)` overloads for deferring void extensions. the extension resolves to no value on force evaluation.
+- Added `ExtensionBuilder.Defer(Action)` and `ExtensionBuilder<TContext>.Defer(Action<TContext>)` overloads for deferring void extensions. The extension resolves to no value on force evaluation.
 
 # 2.0.2
 

@@ -86,7 +86,7 @@ A member can resolve to one value or several. The `Variants` factory builds `IVa
 
 ## Method Evaluation Policy
 
-`MethodEvaluationPolicy`, on `DecomposeOptions.EvaluationPolicy`, decides which methods auto-evaluate during decomposition versus defer behind an evaluation handle. It matches the declaring type's namespace against `IncludedNamespaces` wildcard patterns, where `*` matches zero or more characters and matching is ordinal and case-sensitive, and skips methods whose return type is in `ExcludedReturnTypes`. The `None` and `All` presets cover "defer everything" and "evaluate everything except the excluded return types". The defaults live in the class.
+`MethodEvaluationPolicy`, on `DecomposeOptions.EvaluationPolicy`, decides which methods auto-evaluate during decomposition versus defer behind an evaluation handle. It matches the declaring type's namespace against `EvaluatedNamespaces` wildcard patterns, where `*` matches zero or more characters and matching is ordinal and case-sensitive, and skips methods whose return type is in `DeferredReturnTypes`. The `None` and `All` presets cover "defer everything" and "evaluate everything except the deferred return types". The defaults live in the class.
 
 The policy governs **methods only**. Properties and synthetic extensions are evaluated eagerly by default and are never deferred by the policy. Defer them explicitly with a per-member `Defer` instead.
 

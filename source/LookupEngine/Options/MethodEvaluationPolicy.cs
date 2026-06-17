@@ -4,9 +4,8 @@ using System.Reflection;
 namespace LookupEngine;
 
 /// <summary>
-///     Determines which methods are evaluated eagerly during decomposition based on the namespace of their
-///     declaring type. Methods that do not match are deferred and included with an evaluation handle.
-///     The policy governs methods only; properties and synthetic extensions are evaluated eagerly by default.
+///     Determines which methods are evaluated automatically during decomposition based on the namespace of thei declaring type.
+///     Methods that do not match are deferred and included with an evaluation handle.
 /// </summary>
 [PublicAPI]
 public sealed class MethodEvaluationPolicy
@@ -14,15 +13,15 @@ public sealed class MethodEvaluationPolicy
     private readonly CompiledPattern[] _compiledNamespaces = [];
 
     /// <summary>
-    ///     Namespace wildcard patterns that identify declaring types whose methods are evaluated eagerly.
+    ///     Namespace wildcard patterns that identify declaring types whose methods are evaluated automatically during decomposition.
     ///     The <c>*</c> wildcard matches zero or more characters; matching is ordinal and case-sensitive.
-    ///     Empty by default, meaning all methods are deferred.
+    ///     Empty by default, meaning all methods are deferred until <c>Evaluate</c> is called.
     /// </summary>
     /// <remarks>
-    ///     Examples: <c>"MyApp.Domain"</c> matches that exact namespace; <c>"MyApp.*"</c> matches all
-    ///     sub-namespaces; <c>"*"</c> matches everything (equivalent to <see cref="All"/>).
+    ///     Examples: <c>"MyApp.Domain"</c> matches that exact namespace;
+    ///     <c>"MyApp.*"</c> matches all sub-namespaces; <c>"*"</c> matches everything (equivalent to <see cref="All"/>).
     /// </remarks>
-    public string[] IncludedNamespaces
+    public string[] EvaluatedNamespaces
     {
         get;
         init
@@ -33,11 +32,11 @@ public sealed class MethodEvaluationPolicy
     } = [];
 
     /// <summary>
-    ///     Return types excluded from eager evaluation even when the declaring type's namespace matches.
-    ///     Excluded methods are deferred and available for force evaluation.
+    ///     Return types deferred from automatic evaluation even when the declaring type's namespace matches.
+    ///     Deferred methods are not invoked during decomposition and remain available for force evaluation.
     ///     Defaults to <c>[typeof(void)]</c> so side-effect-only methods are never auto-invoked.
     /// </summary>
-    public Type[] ExcludedReturnTypes { get; init; } = [typeof(void)];
+    public Type[] DeferredReturnTypes { get; init; } = [typeof(void)];
 
     /// <summary>
     ///     A policy that defers all methods. No methods are evaluated eagerly.
@@ -45,17 +44,16 @@ public sealed class MethodEvaluationPolicy
     public static MethodEvaluationPolicy None { get; } = new();
 
     /// <summary>
-    ///     A policy that evaluates all methods eagerly, except those whose return type is in
-    ///     <see cref="ExcludedReturnTypes"/>.
+    ///     A policy that evaluates all methods automatically, except those whose return type is in <see cref="DeferredReturnTypes"/>.
     /// </summary>
-    public static MethodEvaluationPolicy All { get; } = new() { IncludedNamespaces = ["*"] };
+    public static MethodEvaluationPolicy All { get; } = new() { EvaluatedNamespaces = ["*"] };
 
     /// <summary>
-    ///     Check if the method is allowed to be evaluated during decomposition
+    ///     Check if the method is allowed to be evaluated during decomposition.
     /// </summary>
     internal bool IsEvaluationAllowed(MethodInfo member, Type declaringType)
     {
-        foreach (var returnType in ExcludedReturnTypes)
+        foreach (var returnType in DeferredReturnTypes)
         {
             if (member.ReturnType == returnType) return false;
         }

@@ -107,7 +107,7 @@ public sealed class MethodEvaluationTests
             IncludeRoot = true,
             EvaluationPolicy = new MethodEvaluationPolicy
             {
-                IncludedNamespaces = ["LookupEngine.*"]
+                EvaluatedNamespaces = ["LookupEngine.*"]
             }
         };
 
@@ -179,8 +179,8 @@ public sealed class MethodEvaluationTests
         {
             EvaluationPolicy = new MethodEvaluationPolicy
             {
-                IncludedNamespaces = ["*"],
-                ExcludedReturnTypes = [typeof(bool)]
+                EvaluatedNamespaces = ["*"],
+                DeferredReturnTypes = [typeof(bool)]
             }
         };
 
@@ -199,7 +199,7 @@ public sealed class MethodEvaluationTests
     }
 
     [Test]
-    public async Task Decompose_EmptyExcludedReturnTypes_VoidMethodsAreEvaluated()
+    public async Task Decompose_EmptyDeferredReturnTypes_VoidMethodsAreEvaluated()
     {
         //Arrange
         var data = new VoidMethodObject();
@@ -207,8 +207,8 @@ public sealed class MethodEvaluationTests
         {
             EvaluationPolicy = new MethodEvaluationPolicy
             {
-                IncludedNamespaces = ["*"],
-                ExcludedReturnTypes = []
+                EvaluatedNamespaces = ["*"],
+                DeferredReturnTypes = []
             }
         };
 
@@ -477,7 +477,7 @@ public sealed class MethodEvaluationTests
         {
             EvaluationPolicy = new MethodEvaluationPolicy
             {
-                IncludedNamespaces = [pattern]
+                EvaluatedNamespaces = [pattern]
             }
         };
     }
