@@ -48,7 +48,7 @@ AMD Ryzen 9 9950X3D 0.62GHz, 1 CPU, 32 logical and 16 physical cores
 | StructCachedDelegate_DefineRegister | 1       |        20.78 ns |       0.281 ns |       0.235 ns |     1.00 |     0.02 |     0.0030 |          - |       152 B |        1.00 |
 | StructInterface_DefineRegister      | 1       |        23.63 ns |       0.182 ns |       0.170 ns |     1.14 |     0.01 |     0.0038 |          - |       192 B |        1.26 |
 | Composer_NotSupported               | 1       |        16.40 ns |       0.207 ns |       0.194 ns |     0.79 |     0.01 |     0.0024 |          - |       120 B |        0.79 |
-| Struct_AsNotSupported               | 1       |        16.21 ns |       0.257 ns |       0.241 ns |     0.78 |     0.01 |     0.0024 |          - |       120 B |        0.79 |
+| Struct_NotSupported                 | 1       |        16.21 ns |       0.257 ns |       0.241 ns |     0.78 |     0.01 |     0.0024 |          - |       120 B |        0.79 |
 | Composer_MixedScenario              | 1       |        33.67 ns |       0.448 ns |       0.419 ns |     1.62 |     0.03 |     0.0054 |          - |       272 B |        1.79 |
 | Struct_MixedScenario                | 1       |        33.91 ns |       0.393 ns |       0.368 ns |     1.63 |     0.02 |     0.0054 |          - |       272 B |        1.79 |
 | Struct_WithMap                      | 1       |        20.76 ns |       0.255 ns |       0.238 ns |     1.00 |     0.02 |     0.0030 |          - |       152 B |        1.00 |
@@ -60,7 +60,7 @@ AMD Ryzen 9 9950X3D 0.62GHz, 1 CPU, 32 logical and 16 physical cores
 | StructCachedDelegate_DefineRegister | 100     |     1,855.84 ns |      22.776 ns |      21.304 ns |     1.00 |     0.02 |     0.3014 |     0.0076 |     15200 B |        1.00 |
 | StructInterface_DefineRegister      | 100     |     2,232.41 ns |      35.664 ns |      29.781 ns |     1.20 |     0.02 |     0.3815 |     0.0076 |     19200 B |        1.26 |
 | Composer_NotSupported               | 100     |     1,380.29 ns |      18.673 ns |      17.466 ns |     0.74 |     0.01 |     0.2384 |     0.0038 |     12000 B |        0.79 |
-| Struct_AsNotSupported               | 100     |     1,379.77 ns |      19.666 ns |      18.396 ns |     0.74 |     0.01 |     0.2384 |     0.0038 |     12000 B |        0.79 |
+| Struct_NotSupported                 | 100     |     1,379.77 ns |      19.666 ns |      18.396 ns |     0.74 |     0.01 |     0.2384 |     0.0038 |     12000 B |        0.79 |
 | Composer_MixedScenario              | 100     |     3,396.97 ns |      41.481 ns |      38.801 ns |     1.83 |     0.03 |     0.5417 |     0.0267 |     27200 B |        1.79 |
 | Struct_MixedScenario                | 100     |     3,307.76 ns |      36.224 ns |      32.112 ns |     1.78 |     0.03 |     0.5417 |     0.0267 |     27200 B |        1.79 |
 | Struct_WithMap                      | 100     |     1,894.26 ns |      37.273 ns |      53.455 ns |     1.02 |     0.03 |     0.3014 |     0.0076 |     15200 B |        1.00 |
@@ -72,7 +72,7 @@ AMD Ryzen 9 9950X3D 0.62GHz, 1 CPU, 32 logical and 16 physical cores
 | StructCachedDelegate_DefineRegister | 500     |     9,377.50 ns |     119.938 ns |     106.322 ns |     1.00 |     0.02 |     1.5106 |     0.1831 |     76000 B |        1.00 |
 | StructInterface_DefineRegister      | 500     |    11,043.23 ns |     133.813 ns |     125.168 ns |     1.18 |     0.02 |     1.9073 |     0.2289 |     96000 B |        1.26 |
 | Composer_NotSupported               | 500     |     6,705.41 ns |     108.464 ns |     101.457 ns |     0.72 |     0.01 |     1.1902 |     0.1221 |     60000 B |        0.79 |
-| Struct_AsNotSupported               | 500     |     6,861.38 ns |      43.415 ns |      36.254 ns |     0.73 |     0.01 |     1.1902 |     0.1221 |     60000 B |        0.79 |
+| Struct_NotSupported                 | 500     |     6,861.38 ns |      43.415 ns |      36.254 ns |     0.73 |     0.01 |     1.1902 |     0.1221 |     60000 B |        0.79 |
 | Composer_MixedScenario              | 500     |    16,106.77 ns |     212.258 ns |     198.547 ns |     1.72 |     0.03 |     2.6855 |     0.3662 |    136000 B |        1.79 |
 | Struct_MixedScenario                | 500     |    16,195.22 ns |     208.447 ns |     194.981 ns |     1.73 |     0.03 |     2.6855 |     0.3662 |    136000 B |        1.79 |
 | Struct_WithMap                      | 500     |     9,474.01 ns |      69.208 ns |      64.737 ns |     1.01 |     0.01 |     1.5106 |     0.1984 |     76000 B |        1.00 |

@@ -173,10 +173,21 @@ public sealed class ElementDescriptor(Element element) : Descriptor, IDescriptor
 }
 ```
 
+For existing members:
+
 `Resolve` - handler, evaluated per the global evaluation policy.
 `Defer` - force the policy to defer evaluation.
 `Evaluate` - force the policy to auto member evaluation.
 `Disable` - force the policy to disable evaluation.
+
+For synthetic members:
+
+`Register` - handler, evaluated eagerly.
+`Defer` - defer evaluation. The handler runs only on force evaluation.
+`Disable` - register the member as disabled.
+`NotSupported` - register the member as unsupported.
+`AsStatic` - mark the member static. It appears only when `IncludeStaticMembers` is enabled.
+`Map` - tie the member to a real API name via `nameof` for compile-time tracking across API versions.
 
 Handlers may return a plain value, which is wrapped automatically, or an `IVariant` from the `Variants` class when you need an evaluation-context description or multiple values:
 

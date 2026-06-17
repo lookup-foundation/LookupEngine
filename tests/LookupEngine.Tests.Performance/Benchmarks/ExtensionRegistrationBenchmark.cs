@@ -109,12 +109,12 @@ public class ExtensionRegistrationBenchmark
     }
 
     [Benchmark]
-    public int Struct_AsNotSupported()
+    public int Struct_NotSupported()
     {
         _structManager.Reset();
         for (var i = 0; i < Count; i++)
         {
-            _structManager.Define("Extension").AsNotSupported();
+            _structManager.Define("Extension").NotSupported();
         }
 
         _structManager.Flush();
@@ -142,7 +142,7 @@ public class ExtensionRegistrationBenchmark
         for (var i = 0; i < Count; i++)
         {
             _structManager.Define("Extension").Register(static () => new Variant(42));
-            _structManager.Define("Disabled").AsDisabled();
+            _structManager.Define("Disabled").Disable();
         }
 
         _structManager.Flush();
@@ -340,9 +340,9 @@ public struct StructBuilder(StructManager manager, string name)
 
     public readonly void Register(Func<Variant> handler) => manager.EnqueueExtension(name, _attributes, handler);
 
-    public readonly void AsNotSupported() => manager.EnqueueExtensionResult(name, _attributes, MemberEvaluationPolicy.Unsupported);
+    public readonly void NotSupported() => manager.EnqueueExtensionResult(name, _attributes, MemberEvaluationPolicy.Unsupported);
 
-    public readonly void AsDisabled() => manager.EnqueueExtensionResult(name, _attributes, MemberEvaluationPolicy.Disabled);
+    public readonly void Disable() => manager.EnqueueExtensionResult(name, _attributes, MemberEvaluationPolicy.Disabled);
 }
 
 /// <summary>
@@ -501,9 +501,9 @@ public struct CachedDelegateBuilder(
 
     public readonly void Register(Func<Variant> handler) => registerCallback(name, _attributes, handler);
 
-    public readonly void AsNotSupported() => registerResultCallback(name, _attributes, MemberEvaluationPolicy.Unsupported);
+    public readonly void NotSupported() => registerResultCallback(name, _attributes, MemberEvaluationPolicy.Unsupported);
 
-    public readonly void AsDisabled() => registerResultCallback(name, _attributes, MemberEvaluationPolicy.Disabled);
+    public readonly void Disable() => registerResultCallback(name, _attributes, MemberEvaluationPolicy.Disabled);
 }
 
 /// <summary>

@@ -6,6 +6,7 @@ namespace LookupEngine;
 /// <summary>
 ///     Determines which methods are evaluated eagerly during decomposition based on the namespace of their
 ///     declaring type. Methods that do not match are deferred and included with an evaluation handle.
+///     The policy governs methods only; properties and synthetic extensions are evaluated eagerly by default.
 /// </summary>
 [PublicAPI]
 public sealed class MethodEvaluationPolicy

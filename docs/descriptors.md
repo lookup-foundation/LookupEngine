@@ -63,7 +63,12 @@ Descriptors are immutable after construction. Capture the described value with a
     * `Evaluate(handler?)` always evaluates during decomposition.
     * `Defer(handler?)` always defers, evaluating only on force.
     * `Disable()` never evaluates, and reports the disabled result.
-* `Extension(name)` returns an `ExtensionBuilder` for a **synthetic** member. `Register(handler)` supplies its value. `AsStatic()` marks it static, visible with `IncludeStaticMembers`. `AsDisabled()` and `AsNotSupported()` register it without a value. `Map(apiName)` ties it to a real API member via `nameof` for cross-version compile-time tracking.
+* `Extension(name)` returns an `ExtensionBuilder` for a **synthetic** member.
+    * `Register(handler)` supplies its value, evaluated eagerly.
+    * `Defer(handler)` defers evaluation, running the handler only on force.
+    * `Disable()` and `NotSupported()` register it without a value.
+    * `AsStatic()` marks it static, visible with `IncludeStaticMembers`.
+    * `Map(apiName)` ties it to a real API member via `nameof` for cross-version compile-time tracking.
 
 Handlers come in two shapes everywhere. `Func<IVariant>` gives full control over value and description, and `Func<object?>` wraps the value in a variant for you.
 
@@ -82,6 +87,8 @@ A member can resolve to one value or several. The `Variants` factory builds `IVa
 ## Method Evaluation Policy
 
 `MethodEvaluationPolicy`, on `DecomposeOptions.EvaluationPolicy`, decides which methods auto-evaluate during decomposition versus defer behind an evaluation handle. It matches the declaring type's namespace against `IncludedNamespaces` wildcard patterns, where `*` matches zero or more characters and matching is ordinal and case-sensitive, and skips methods whose return type is in `ExcludedReturnTypes`. The `None` and `All` presets cover "defer everything" and "evaluate everything except the excluded return types". The defaults live in the class.
+
+The policy governs **methods only**. Properties and synthetic extensions are evaluated eagerly by default and are never deferred by the policy. Defer them explicitly with a per-member `Defer` instead.
 
 ## Built-in Descriptors (`source/LookupEngine/Descriptors`)
 

@@ -14,7 +14,6 @@
 
 using System.Reflection;
 using LookupEngine.Abstractions;
-using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Abstractions.Enums;
 
 // ReSharper disable once CheckNamespace
@@ -50,6 +49,27 @@ public partial class LookupComposer
         }
 
         target.Value = CreateValue(member.Name, value);
+        target.ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds;
+        target.AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes();
+        target.EvaluationPolicy = MemberEvaluationPolicy.Evaluated;
+    }
+
+    /// <summary>
+    ///     Evaluate a deferred extension, updating the value and metrics in place
+    /// </summary>
+    internal void EvaluateDeferredExtension(DecomposedMember target, string name, Func<object?> handler)
+    {
+        object? value;
+        try
+        {
+            value = EvaluateValue(handler);
+        }
+        catch (Exception exception)
+        {
+            value = exception;
+        }
+
+        target.Value = CreateValue(name, value);
         target.ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds;
         target.AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes();
         target.EvaluationPolicy = MemberEvaluationPolicy.Evaluated;

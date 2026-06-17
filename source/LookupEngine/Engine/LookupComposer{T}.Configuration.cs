@@ -14,7 +14,6 @@
 
 using System.Reflection;
 using LookupEngine.Abstractions.Configuration;
-using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Abstractions.Enums;
 
 // ReSharper disable once CheckNamespace
@@ -49,9 +48,9 @@ public partial class LookupComposer<TContext> : IMemberConfigurator<TContext>
         AddMemberRegistration(name, predicate, wrapped, evaluationPolicy);
     }
 
-    private void EnqueueContextExtension(string name, MemberAttributes attributes, Func<TContext, object?> handler)
+    private void EnqueueContextExtension(string name, MemberAttributes attributes, Func<TContext, object?> handler, MemberEvaluationPolicy? policy)
     {
         var options = _options;
-        EnqueueExtension(name, attributes, () => handler.Invoke(options.Context));
+        EnqueueExtension(name, attributes, () => handler.Invoke(options.Context), policy);
     }
 }

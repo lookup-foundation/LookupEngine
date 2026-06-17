@@ -1,3 +1,11 @@
+# 2.0.2
+
+- Added deferred evaluation for synthetic extensions: `ExtensionBuilder.Defer(handler)` registers an extension whose value is computed only on force evaluation, mirroring the member builder.
+
+## Breaking changes
+
+- Renamed `ExtensionBuilder.AsDisabled()` to `Disable()` and `ExtensionBuilder.AsNotSupported()` to `NotSupported()`, aligning the extension terminal verbs with the member builder.
+
 # 2.0.1
 
 - Object-returning extension and member handlers no longer allocate a wrapping closure or a variant on each evaluation. The builder constructor callbacks now carry `Func<object?>` instead of `Func<IVariant>`; variant-returning handlers are unchanged.

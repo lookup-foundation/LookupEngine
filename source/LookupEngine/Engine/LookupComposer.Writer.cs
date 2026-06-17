@@ -196,6 +196,25 @@ public partial class LookupComposer
         DecomposedMembers.Add(member);
     }
 
+    private protected void WriteDeferredExtension(string name, MemberAttributes attributes, Func<object?> handler)
+    {
+        var formatTypeName = ReflexionFormater.FormatTypeName(MemberDeclaringType);
+
+        var member = new DecomposedMember
+        {
+            Depth = _depth,
+            Name = name,
+            Value = CreateNullableValue(),
+            DeclaringTypeName = formatTypeName,
+            DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
+            MemberAttributes = attributes,
+            EvaluationPolicy = MemberEvaluationPolicy.Deferred,
+            Evaluator = target => CreateEvaluationComposer().EvaluateDeferredExtension(target, name, handler)
+        };
+
+        DecomposedMembers.Add(member);
+    }
+
     private protected void WriteExtensionResultMember(string name, MemberAttributes attributes, MemberEvaluationPolicy policy)
     {
         var formatTypeName = ReflexionFormater.FormatTypeName(MemberDeclaringType);

@@ -1,5 +1,6 @@
 using LookupEngine.Abstractions.Configuration;
 using LookupEngine.Abstractions.Decomposition;
+using LookupEngine.Abstractions.Enums;
 using LookupEngine.Descriptors;
 using LookupEngine.Options;
 
@@ -124,9 +125,194 @@ public sealed class ExtensionTests
             await Assert.That(comparableContextResult.Members.Count).IsGreaterThan(comparableResult.Members.Count);
         }
     }
+
+    [Test]
+    public async Task Decompose_StaticExtension_HiddenUnlessIncludeStaticMembers()
+    {
+        //Arrange
+        var data = new ExtensibleObject();
+        var hiddenOptions = CreateExtensionOptions(configuration => configuration.Extension("StaticExtension").AsStatic().Register(() => "Value"));
+        var includedOptions = CreateExtensionOptions(configuration => configuration.Extension("StaticExtension").AsStatic().Register(() => "Value"));
+        includedOptions.IncludeStaticMembers = true;
+
+        //Act
+        var hiddenResult = LookupComposer.Decompose(data, hiddenOptions);
+        var includedResult = LookupComposer.Decompose(data, includedOptions);
+
+        //Assert
+        var decomposedMember = includedResult.Members.Single(member => member.Name == "StaticExtension");
+        using (Assert.Multiple())
+        {
+            await Assert.That(hiddenResult.Members.Where(member => member.Name == "StaticExtension")).IsEmpty();
+            await Assert.That(decomposedMember.MemberAttributes).HasFlag(MemberAttributes.Static);
+            await Assert.That(decomposedMember.MemberAttributes).HasFlag(MemberAttributes.Extension);
+            await Assert.That(decomposedMember.Value.RawValue).IsEqualTo("Value");
+        }
+    }
+
+    [Test]
+    public async Task Decompose_DeferredExtension_EvaluatesOnForce()
+    {
+        //Arrange
+        var data = new ExtensibleObject();
+        var options = CreateExtensionOptions(configuration => configuration.Extension("DeferredExtension").Defer(() => "Computed"));
+
+        //Act
+        var result = LookupComposer.Decompose(data, options);
+
+        //Assert
+        var member = result.Members.Single(member => member.Name == "DeferredExtension");
+        using (Assert.Multiple())
+        {
+            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
+            await Assert.That(member.Value.RawValue).IsNull();
+            await Assert.That(member.Evaluator).IsNotNull();
+        }
+
+        member.Evaluate();
+        using (Assert.Multiple())
+        {
+            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
+            await Assert.That(member.Value.RawValue).IsEqualTo("Computed");
+            await Assert.That(member.ComputationTime).IsGreaterThanOrEqualTo(0);
+        }
+    }
+
+    [Test]
+    public async Task Decompose_DisabledExtension_HiddenUnlessIncludeUnsupported()
+    {
+        //Arrange
+        var data = new ExtensibleObject();
+        var hiddenOptions = CreateExtensionOptions(configuration => configuration.Extension("DisabledExtension").Disable());
+        var includedOptions = CreateExtensionOptions(configuration => configuration.Extension("DisabledExtension").Disable());
+        includedOptions.IncludeUnsupported = true;
+
+        //Act
+        var hiddenResult = LookupComposer.Decompose(data, hiddenOptions);
+        var includedResult = LookupComposer.Decompose(data, includedOptions);
+
+        //Assert
+        var decomposedMember = includedResult.Members.Single(member => member.Name == "DisabledExtension");
+        using (Assert.Multiple())
+        {
+            await Assert.That(hiddenResult.Members.Where(member => member.Name == "DisabledExtension")).IsEmpty();
+            await Assert.That(decomposedMember.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Disabled);
+            await Assert.That(decomposedMember.Evaluator).IsNotNull();
+            await Assert.That(decomposedMember.Value.RawValue).IsNull();
+        }
+
+        decomposedMember.Evaluate();
+        await Assert.That(decomposedMember.Value.RawValue).IsTypeOf<InvalidOperationException>();
+    }
+
+    [Test]
+    public async Task Decompose_NotSupportedExtension_HiddenUnlessIncludeUnsupported()
+    {
+        //Arrange
+        var data = new ExtensibleObject();
+        var hiddenOptions = CreateExtensionOptions(configuration => configuration.Extension("UnsupportedExtension").NotSupported());
+        var includedOptions = CreateExtensionOptions(configuration => configuration.Extension("UnsupportedExtension").NotSupported());
+        includedOptions.IncludeUnsupported = true;
+
+        //Act
+        var hiddenResult = LookupComposer.Decompose(data, hiddenOptions);
+        var includedResult = LookupComposer.Decompose(data, includedOptions);
+
+        //Assert
+        var decomposedMember = includedResult.Members.Single(member => member.Name == "UnsupportedExtension");
+        using (Assert.Multiple())
+        {
+            await Assert.That(hiddenResult.Members.Where(member => member.Name == "UnsupportedExtension")).IsEmpty();
+            await Assert.That(decomposedMember.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Unsupported);
+            await Assert.That(decomposedMember.Evaluator).IsNull();
+        }
+    }
+
+    [Test]
+    public async Task Decompose_MappedStaticDeferredExtension_CombinesModifiersAndTerminal()
+    {
+        //Arrange
+        var data = new ExtensibleObject();
+        var options = CreateExtensionOptions(configuration => configuration
+            .Extension("CombinedExtension")
+            .AsStatic()
+            .Map("ApiMember")
+            .Defer(() => Variants.Value("Combined")));
+        options.IncludeStaticMembers = true;
+
+        //Act
+        var result = LookupComposer.Decompose(data, options);
+
+        //Assert
+        var member = result.Members.Single(member => member.Name == "CombinedExtension");
+        using (Assert.Multiple())
+        {
+            await Assert.That(member.MemberAttributes).HasFlag(MemberAttributes.Static);
+            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
+        }
+
+        member.Evaluate();
+        await Assert.That(member.Value.RawValue).IsEqualTo("Combined");
+    }
+
+    [Test]
+    public async Task Decompose_DeferredContextExtension_InvokesHandlerWithContext()
+    {
+        //Arrange
+        var data = new ExtensibleObject();
+        var options = new DecomposeOptions<EngineTestContext>
+        {
+            Context = new EngineTestContext(),
+            EnableExtensions = true,
+            TypeResolver = (obj, _) => obj switch
+            {
+                ExtensibleObject => new DelegatingContextConfigurator(configuration => configuration.Extension("ContextDeferred").Defer(context => context.Version)),
+                _ => new ObjectDescriptor(obj)
+            }
+        };
+
+        //Act
+        var result = LookupComposer.Decompose(data, options);
+
+        //Assert
+        var member = result.Members.Single(member => member.Name == "ContextDeferred");
+        await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
+
+        member.Evaluate();
+        await Assert.That(member.Value.RawValue).IsEqualTo(1);
+    }
+
+    private static DecomposeOptions CreateExtensionOptions(Action<IMemberConfigurator> configure)
+    {
+        return new DecomposeOptions
+        {
+            EnableExtensions = true,
+            TypeResolver = (obj, _) => obj switch
+            {
+                ExtensibleObject => new DelegatingConfigurator(configure),
+                _ => new ObjectDescriptor(obj)
+            }
+        };
+    }
 }
 
 file sealed class ExtensibleObject;
+
+file sealed class DelegatingConfigurator(Action<IMemberConfigurator> configure) : Descriptor, IDescriptorConfigurator
+{
+    public void Configure(IMemberConfigurator configuration)
+    {
+        configure.Invoke(configuration);
+    }
+}
+
+file sealed class DelegatingContextConfigurator(Action<IMemberConfigurator<EngineTestContext>> configure) : Descriptor, IDescriptorConfigurator<EngineTestContext>
+{
+    public void Configure(IMemberConfigurator<EngineTestContext> configuration)
+    {
+        configure.Invoke(configuration);
+    }
+}
 
 file sealed class EquivalenceExtensionDescriptor : Descriptor, IDescriptorConfigurator
 {

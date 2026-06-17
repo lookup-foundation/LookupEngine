@@ -16,7 +16,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using LookupEngine.Abstractions.Configuration;
-using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Abstractions.Enums;
 
 // ReSharper disable once CheckNamespace
@@ -116,11 +115,17 @@ public partial class LookupComposer : IMemberConfigurator
         registrations.Add(new MemberRegistration(predicate, handler, evaluationPolicy));
     }
 
-    private protected void EnqueueExtension(string name, MemberAttributes attributes, Func<object?> handler)
+    private protected void EnqueueExtension(string name, MemberAttributes attributes, Func<object?> handler, MemberEvaluationPolicy? policy)
     {
         _extensionQueue.Add(() =>
         {
             if ((attributes & MemberAttributes.Static) != 0 && !_options.IncludeStaticMembers) return;
+
+            if (policy == MemberEvaluationPolicy.Deferred)
+            {
+                WriteDeferredExtension(name, attributes, handler);
+                return;
+            }
 
             try
             {

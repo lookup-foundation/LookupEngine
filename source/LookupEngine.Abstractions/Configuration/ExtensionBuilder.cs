@@ -24,7 +24,7 @@ namespace LookupEngine.Abstractions.Configuration;
 public struct ExtensionBuilder
 {
     private readonly string _name;
-    private readonly Action<string, MemberAttributes, Func<object?>> _registerCallback;
+    private readonly Action<string, MemberAttributes, Func<object?>, MemberEvaluationPolicy?> _registerCallback;
     private readonly Action<string, MemberAttributes, MemberEvaluationPolicy> _registerResultCallback;
     private MemberAttributes _attributes = MemberAttributes.Extension;
 
@@ -33,7 +33,7 @@ public struct ExtensionBuilder
     /// </summary>
     public ExtensionBuilder(
         string name,
-        Action<string, MemberAttributes, Func<object?>> registerCallback,
+        Action<string, MemberAttributes, Func<object?>, MemberEvaluationPolicy?> registerCallback,
         Action<string, MemberAttributes, MemberEvaluationPolicy> registerResultCallback)
     {
         _name = name;
@@ -63,27 +63,47 @@ public struct ExtensionBuilder
     }
 
     /// <summary>
-    ///     Registers the extension with the evaluation handler that produces its value.
+    ///     Registers the extension with the evaluation handler that produces its value, evaluated eagerly during decomposition.
     /// </summary>
     /// <param name="handler">Returns the resolved value for this extension.</param>
+    /// <remarks>Extensions are not governed by the engine evaluation policy; they evaluate eagerly unless deferred with <see cref="Defer(Func{IVariant})"/>.</remarks>
     public readonly void Register(Func<IVariant> handler)
     {
-        _registerCallback(_name, _attributes, handler);
+        _registerCallback(_name, _attributes, handler, null);
     }
 
     /// <summary>
-    ///     Registers the extension with the evaluation handler that produces its value.
+    ///     Registers the extension with the evaluation handler that produces its value, evaluated eagerly during decomposition.
     /// </summary>
     /// <param name="handler">Returns the resolved value for this extension.</param>
+    /// <remarks>Extensions are not governed by the engine evaluation policy; they evaluate eagerly unless deferred with <see cref="Defer(Func{object})"/>.</remarks>
     public readonly void Register(Func<object?> handler)
     {
-        _registerCallback(_name, _attributes, handler);
+        _registerCallback(_name, _attributes, handler, null);
+    }
+
+    /// <summary>
+    ///     Registers the extension as deferred. The handler is invoked only on force evaluation.
+    /// </summary>
+    /// <param name="handler">Returns the resolved value for this extension.</param>
+    public readonly void Defer(Func<IVariant> handler)
+    {
+        _registerCallback(_name, _attributes, handler, MemberEvaluationPolicy.Deferred);
+    }
+
+    /// <summary>
+    ///     Registers the extension as deferred. The handler is invoked only on force evaluation.
+    /// </summary>
+    /// <param name="handler">Returns the resolved value for this extension.</param>
+    public readonly void Defer(Func<object?> handler)
+    {
+        _registerCallback(_name, _attributes, handler, MemberEvaluationPolicy.Deferred);
     }
 
     /// <summary>
     ///     Registers the extension as unsupported. It appears in results only when <c>DecomposeOptions.IncludeUnsupported</c> is enabled.
     /// </summary>
-    public readonly void AsNotSupported()
+    public readonly void NotSupported()
     {
         _registerResultCallback(_name, _attributes, MemberEvaluationPolicy.Unsupported);
     }
@@ -91,7 +111,7 @@ public struct ExtensionBuilder
     /// <summary>
     ///     Registers the extension as disabled. It appears in results only when <c>DecomposeOptions.IncludeUnsupported</c> is enabled.
     /// </summary>
-    public readonly void AsDisabled()
+    public readonly void Disable()
     {
         _registerResultCallback(_name, _attributes, MemberEvaluationPolicy.Disabled);
     }
