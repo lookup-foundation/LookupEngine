@@ -102,6 +102,19 @@ public struct ExtensionBuilder<TContext>
     }
 
     /// <summary>
+    ///     Registers the extension as deferred. The void action is invoked for its side effect only on force evaluation.
+    /// </summary>
+    /// <param name="handler">Performs the action for this extension given the execution context; the extension resolves to no value.</param>
+    public readonly void Defer(Action<TContext> handler)
+    {
+        _registerCallback(_name, _attributes, context =>
+        {
+            handler.Invoke(context);
+            return null;
+        }, MemberEvaluationPolicy.Deferred);
+    }
+
+    /// <summary>
     ///     Registers the extension as unsupported. It appears in results only when <c>DecomposeOptions.IncludeUnsupported</c> is enabled.
     /// </summary>
     public readonly void NotSupported()

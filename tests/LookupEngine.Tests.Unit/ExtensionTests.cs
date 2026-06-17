@@ -179,6 +179,72 @@ public sealed class ExtensionTests
     }
 
     [Test]
+    public async Task Decompose_DeferredVoidExtension_InvokesActionOnForce()
+    {
+        //Arrange
+        var data = new ExtensibleObject();
+        var invoked = false;
+        var options = CreateExtensionOptions(configuration => configuration.Extension("VoidExtension").Defer(() => { invoked = true; }));
+
+        //Act
+        var result = LookupComposer.Decompose(data, options);
+
+        //Assert
+        var member = result.Members.Single(member => member.Name == "VoidExtension");
+        using (Assert.Multiple())
+        {
+            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
+            await Assert.That(member.Value.RawValue).IsNull();
+            await Assert.That(member.Evaluator).IsNotNull();
+            await Assert.That(invoked).IsFalse();
+        }
+
+        member.Evaluate();
+        using (Assert.Multiple())
+        {
+            await Assert.That(invoked).IsTrue();
+            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
+            await Assert.That(member.Value.RawValue).IsNull();
+        }
+    }
+
+    [Test]
+    public async Task Decompose_DeferredVoidContextExtension_InvokesActionWithContextOnForce()
+    {
+        //Arrange
+        var data = new ExtensibleObject();
+        var observedVersion = 0;
+        var options = new DecomposeOptions<EngineTestContext>
+        {
+            Context = new EngineTestContext(),
+            EnableExtensions = true,
+            TypeResolver = (obj, _) => obj switch
+            {
+                ExtensibleObject => new DelegatingContextConfigurator(configuration => configuration.Extension("VoidContextExtension").Defer(context => { observedVersion = context.Version; })),
+                _ => new ObjectDescriptor(obj)
+            }
+        };
+
+        //Act
+        var result = LookupComposer.Decompose(data, options);
+
+        //Assert
+        var member = result.Members.Single(member => member.Name == "VoidContextExtension");
+        using (Assert.Multiple())
+        {
+            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
+            await Assert.That(observedVersion).IsEqualTo(0);
+        }
+
+        member.Evaluate();
+        using (Assert.Multiple())
+        {
+            await Assert.That(observedVersion).IsEqualTo(1);
+            await Assert.That(member.Value.RawValue).IsNull();
+        }
+    }
+
+    [Test]
     public async Task Decompose_DisabledExtension_HiddenUnlessIncludeUnsupported()
     {
         //Arrange

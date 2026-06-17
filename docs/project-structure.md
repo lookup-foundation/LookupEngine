@@ -15,7 +15,7 @@ The solution is defined in `LookupEngine.slnx`.
 * **`/build`**. The ModularPipelines build system (`Build.csproj`) for compile, test, changelog generation, and GitHub publishing.
 * **Root level**:
     * Configuration: `Directory.Build.props`, `Directory.Packages.props`, `global.json`, `GitVersion.yml`, `renovate.json`, `.editorconfig`.
-    * Documentation: `Readme.md`, `Changelog.md`, `Contributing.md`.
+    * Documentation: `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`.
     * Agent guidelines: `AGENTS.md`, `CLAUDE.md`, `.junie/AGENTS.md`, `docs/`.
     * CI/CD: `.github/workflows`.
 

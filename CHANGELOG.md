@@ -1,3 +1,7 @@
+# 2.0.3
+
+- Added `ExtensionBuilder.Defer(Action)` and `ExtensionBuilder<TContext>.Defer(Action<TContext>)` overloads for deferring void extensions. the extension resolves to no value on force evaluation.
+
 # 2.0.2
 
 - Added deferred evaluation for synthetic extensions: `ExtensionBuilder.Defer(handler)` registers an extension whose value is computed only on force evaluation, mirroring the member builder.

@@ -12,7 +12,7 @@ LookupEngine is a high-performance, reflection-based engine that decomposes any 
 * Treat the public surface as a contract. Mark public types `[PublicAPI]` and read-only methods `[Pure]`, keep nullable warnings as errors, and never break an existing public API. Deprecate instead.
 * Be allocation-conscious on the decomposition hot path. Reach for the most efficient construct that fits (value-type `struct`, `Span`, `[UnsafeAccessor]`, and similar where applicable), pre-size collections, avoid LINQ and boxing where it matters, and dispose every `IEnumerator`.
 * When an implementation has more than one viable approach, benchmark the alternatives and let the numbers decide. Strategy benchmarks hold their own clean candidate code and must not reference LookupEngine's implementation.
-* Update `Readme.md`, `Changelog.md`, and XML docs in the same change as any public-surface change. XML docs state clearly what a member does and never describe the implementation, which is free to change.
+* Update `README.md`, `CHANGELOG.md`, and XML docs in the same change as any public-surface change. XML docs state clearly what a member does and never describe the implementation, which is free to change.
 
 ## Specialized Docs
 
