@@ -86,7 +86,7 @@ A member can resolve to one value or several. The `Variants` factory builds `IVa
 
 ## Method Evaluation Policy
 
-`MethodEvaluationPolicy`, on `DecomposeOptions.EvaluationPolicy`, decides which methods auto-evaluate during decomposition versus defer behind an evaluation handle. It matches the declaring type's namespace against `EvaluatedNamespaces` wildcard patterns, where `*` matches zero or more characters and matching is ordinal and case-sensitive, and skips methods whose return type is in `DeferredReturnTypes`. The `None` and `All` presets cover "defer everything" and "evaluate everything except the deferred return types". The defaults live in the class.
+`MethodEvaluationPolicy`, on `DecomposeOptions.EvaluationPolicy`, decides which methods auto-evaluate during decomposition versus defer behind an evaluation handle. The `EvaluatedFilter` predicate receives the method and the type currently being decomposed, and returns whether to evaluate it eagerly. The `None` and `All` presets cover "defer everything" and "evaluate everything except methods returning `void`". The defaults live in the class.
 
 The policy governs **methods only**. Properties and synthetic extensions are evaluated eagerly by default and are never deferred by the policy. Defer them explicitly with a per-member `Defer` instead.
 
@@ -96,7 +96,7 @@ The policy governs **methods only**. Properties and synthetic extensions are eva
 
 ## Guidelines
 
-* **Immutability.** Descriptors are immutable after construction. Use primary constructors to capture the described value.
+* **Immutability.** Descriptors are immutable after construction. Use a primary constructor when the descriptor holds the value for later, as `EnumerableDescriptor` does. A descriptor that only derives a `Name` needs no captured state, as `ObjectDescriptor` and `StringDescriptor` show.
 * **Context.** Use the `<TContext>` interface variants only when a handler genuinely needs execution context.
 * **No circular redirects.** Avoid redirect chains that loop (A to B to A), because there is no built-in cycle guard.
 * **Speed.** Descriptor code runs for every evaluated member, so keep it allocation-light and fast. See [Performance](./performance.md).

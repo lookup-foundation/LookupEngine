@@ -1,27 +1,34 @@
 # LookupEngine Agent Instructions
 
-LookupEngine is a high-performance, reflection-based engine that decomposes any runtime object into its members and evaluates their values, tracking time and memory for each operation. It ships as a public NuGet package split into two layers. `source/LookupEngine.Abstractions` holds pure, framework-agnostic C# (interfaces, contracts, metadata), and `source/LookupEngine` holds the reflection engine, built-in descriptors, diagnostics, and options. Custom type handling is added through descriptors, never by changing the engine.
+LookupEngine decomposes any runtime object into its members through reflection and evaluates each value. It records the time and memory every operation costs. It ships as a public NuGet package in two layers: `source/LookupEngine.Abstractions` holds pure, framework-agnostic contracts, and `source/LookupEngine` holds the reflection engine, built-in descriptors, and options.
 
 ## Non-Negotiables
 
-* Keep the two layers separated. `LookupEngine.Abstractions` stays pure C# with no engine or implementation dependency. Engine logic and built-in descriptors live in `LookupEngine`.
-* Never crash during decomposition. Reflection failures are caught and surfaced as values (for example, the thrown exception becomes the member value), never propagated out of `Decompose`.
-* Stay thread-safe by design. Each `LookupComposer.Decompose*` call creates an isolated instance. Never introduce shared mutable state between decompositions.
-* This is a synchronous library. Do not add `async` or `await`, because reflection (`GetValue`, `Invoke`) is inherently synchronous.
-* Extend through descriptors implementing the `Configuration` interfaces, not by special-casing types inside the engine. Descriptors are immutable after construction and use primary constructors.
-* Treat the public surface as a contract. Mark public types `[PublicAPI]` and read-only methods `[Pure]`, keep nullable warnings as errors, and never break an existing public API. Deprecate instead.
-* Be allocation-conscious on the decomposition hot path. Reach for the most efficient construct that fits (value-type `struct`, `Span`, `[UnsafeAccessor]`, and similar where applicable), pre-size collections, avoid LINQ and boxing where it matters, and dispose every `IEnumerator`.
-* When an implementation has more than one viable approach, benchmark the alternatives and let the numbers decide. Strategy benchmarks hold their own clean candidate code and must not reference LookupEngine's implementation.
-* Update `README.md`, `CHANGELOG.md`, and XML docs in the same change as any public-surface change. XML docs state clearly what a member does and never describe the implementation, which is free to change.
+* **Two-layer separation.** `LookupEngine.Abstractions` stays pure C# with no engine dependency. The engine and built-in descriptors live in `LookupEngine`.
+* **Never crash during decomposition.** A reflection failure is captured as the member's value, never propagated out of `Decompose`.
+* **Thread-safe by design.** Each `LookupComposer.Decompose*` call runs on an isolated instance. Never add shared mutable state.
+* **Synchronous only.** Do not add `async` or `await`. Reflection is synchronous.
+* **Extend through descriptors.** Add support for a type with a descriptor that implements the `Configuration` interfaces, never with a special case inside the engine.
+* **The public surface is a contract.** Mark public types `[PublicAPI]` and side-effect-free methods `[Pure]`. Never break an existing public API, deprecate it instead.
+* **Performance is a core requirement.** The engine runs on hot paths. Read [Performance](./docs/performance.md) before hot-path or descriptor work.
+* **Tests ship with every change.** Add a benchmark only when more than one viable implementation exists. See [Testing](./docs/testing.md) and [Benchmarks](./docs/benchmarks.md).
+* **Verify unfamiliar APIs.** When unsure of an API's behavior or signature, confirm it before use. Search the web for the official docs. To read a referenced library's source, query GitHub with `gh` (`gh api`, `gh search code`). If `gh` is unavailable, search the web or ask. Never inspect compiled DLLs or XML extracted from NuGet packages.
+* **Keep docs in sync.** A public-surface change updates `README.md`, `CHANGELOG.md`, and the XML docs in the same commit. See [Documentation](./docs/documentation.md).
+
+## Build
+
+The build is a ModularPipelines project. Run `dotnet run -c Release` from the `build` directory to compile.
 
 ## Specialized Docs
 
-Before making related changes, read the matching file.
+Read the matching file before related work.
 
-* [Project Structure](./docs/project-structure.md). Solution layout, the Abstractions and engine split, and where each change belongs.
-* [Architecture](./docs/architecture.md). Design goals, the decomposition pipeline, the entry-point API, and options.
+* [Project Structure](./docs/project-structure.md). Solution layout, the two-layer split, and where each change belongs.
+* [Architecture](./docs/architecture.md). Design goals, the decomposition pipeline, the entry-point API, options, and the error-handling contract.
 * [Descriptor System](./docs/descriptors.md). The extensibility model: descriptors, configurators, redirection, variants, and built-in descriptors.
-* [Code Style](./docs/code-style.md). C# conventions, naming, file and class structure, data objects, and error handling.
-* [Performance](./docs/performance.md). Allocation and reflection guidelines for the hot path.
-* [Testing Strategy](./docs/testing-strategy.md). Unit tests (TUnit) and benchmarks (BenchmarkDotNet).
-* [Package Management](./docs/package-management.md). Centralized NuGet versions and multi-targeting.
+* [Code Style](./docs/code-style.md). C# conventions, naming, attributes, language features, and data objects.
+* [Performance](./docs/performance.md). Allocation and reflection on the hot path.
+* [Testing](./docs/testing.md). Unit tests with TUnit.
+* [Benchmarks](./docs/benchmarks.md). When and how to benchmark with BenchmarkDotNet.
+* [Documentation](./docs/documentation.md). XML docs, README, CHANGELOG, and wiki.
+* [Package Management](./docs/package-management.md). Centralized versions, multi-targeting, and dependencies.

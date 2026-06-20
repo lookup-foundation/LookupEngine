@@ -1,62 +1,60 @@
-# Strict C# Production Style
+# Code Style
 
-All code must meet production-quality standards. "It works" is not enough. Code must be clean, readable, and self-explanatory. The full formatting ruleset is enforced by `.editorconfig`, so match it rather than restating exact values here.
+Production C# only. The full formatting ruleset lives in `.editorconfig`. Match it, do not restate its values here.
 
 ## General Principles
 
-* **SOLID and DRY.** Single responsibility per type. Extract shared logic rather than duplicating it.
-* **Explicit over implicit.** Code should be self-explanatory. Avoid hidden behavior and magic defaults.
-* **Modern C#.** `LangVersion` is `latest`, set in `Directory.Build.props`. Reach for the newest language features when they make code clearer or cheaper, including primary constructors, collection expressions, pattern matching, and the `field` keyword for property backing (as `DecomposeOptions.TypeResolver` does). Do not hand-roll what a current language feature expresses directly.
-* **Nullable safety.** Nullable reference types are enabled solution-wide. Treat nullability warnings as defects.
-* **JetBrains annotations.** `JetBrains.Annotations` is a global using. Mark public types `[PublicAPI]` and read-only methods `[Pure]`.
+* **SOLID and DRY.** One responsibility per type. Extract shared logic rather than duplicate it.
+* **Explicit over implicit.** Code is self-explanatory. Avoid hidden behavior and magic defaults.
+* **Nullable safety.** Nullable reference types are enabled solution-wide. Treat every nullability warning as a defect. Use `null!` only for a field that is always initialized before use.
+
+## Comments
+
+Public types and members carry XML doc comments, see [Documentation](./documentation.md). Inside the code, comments are the exception.
+
+* Names and structure carry the meaning. Default to no comment.
+* Add one only when the reason cannot be read from the code and a reader could break the code without it, such as a non-obvious invariant or why a line that looks removable must stay.
+* A comment explains why, never what. Do not restate the code.
+
+## Modern C#
+
+`LangVersion` is `latest`. Reach for the newest feature that expresses the intent directly, and do not hand-roll what the language already provides.
+
+* Primary constructors when a type captures state.
+* Collection expressions for literals and spans.
+* Pattern matching and switch expressions over branching chains.
+* The `field` keyword for property backing.
+* Range and index operators for slicing.
+* Null-coalescing assignment (`??=`) for lazy initialization.
+* Expression-bodied members for simple accessors.
+* File-scoped namespaces, and `file`-scoped types if needed.
+
+## Attributes
+
+Decorate members with every JetBrains and .NET attribute that carries meaning, so analyzers, the debugger, and callers read the full contract. `JetBrains.Annotations` is a global using. Placement is enforced by `.editorconfig`.
+
+* `[PublicAPI]` on a public type that is part of the shipped surface.
+* `[Pure]` on a method that is free of side effects.
 
 ## Naming
 
-* **Clarity is king.** Names must be descriptive and never abbreviated: `repository` not `repo`, `configuration` not `config`, `context` not `ctx`, `element` not `e`.
-* **No single-letter variables** except in very short loops or lambdas.
-* **`Async` suffix** on any method returning `Task` or `Task<T>`. Note that LookupEngine is synchronous by design (see below), so these should be rare.
-* Interfaces are `IName` and generic type parameters are `TName`, enforced by `.editorconfig`.
+* **Clarity first.** Names are descriptive and never abbreviated: `repository` not `repo`, `configuration` not `config`, `context` not `ctx`, `element` not `e`.
+* No single-letter variables except in a short loop or lambda.
+* `Async` suffix on any method that returns `Task` or `Task<T>`.
+* Interfaces are `IName`, generic type parameters are `TName`, both enforced by `.editorconfig`.
 
-## File & Class Structure
+## File and Class Structure
 
-* **File-scoped namespaces** (`namespace LookupEngine;`). When a file's folder differs from its namespace, keep the namespace flat and add `// ReSharper disable once CheckNamespace` above it, as the engine partials do.
-* **Member order:** private fields, then primary or other constructors, then public properties, then public methods, then private methods.
+* **File-scoped namespaces.** When a file's folder differs from its namespace, keep the namespace flat and add `// ReSharper disable once CheckNamespace` above it, as the engine partials do.
+* **Member order:** private fields, constructors, public properties, public methods, private methods.
 * **Sealed by default** for data models and descriptors unless inheritance is intended.
 
 ## Data Objects
 
 * **Sealed classes** for the metadata models (`DecomposedObject`, `DecomposedMember`, `DecomposedValue`).
-* **`required`** for mandatory initialization, and **`{ get; init; }`** for immutable properties.
-* Use `record` sparingly, only for genuine value-based equality.
+* `required` for mandatory initialization, `{ get; init; }` for immutable properties.
+* `record` only for genuine value-based equality.
 
 ## Synchronous by Design
 
-LookupEngine is a synchronous library. Reflection (`GetValue`, `Invoke`) is inherently synchronous. Do **not** introduce `async` or `await` without a proven, measured benefit.
-
-## Error Handling
-
-* **Graceful degradation.** Decomposition must never crash. In the member-evaluation paths, catch and convert exceptions to values, unwrapping `TargetInvocationException` to its inner exception.
-
-  ```csharp
-  catch (TargetInvocationException exception)
-  {
-      value = exception.InnerException;
-  }
-  catch (Exception exception)
-  {
-      value = exception;
-  }
-  ```
-* **Custom exceptions.** Prefer a dedicated, semantic exception type over throwing a bare `Exception` for a distinct engine error condition. Use `EngineException` for internal engine errors, and add a new exception type when an error category warrants its own catch. Custom exceptions are for internal errors only, never part of the value-capture path above.
-* **Validate at the boundary.** Validate inputs at the public API surface (`LookupComposer.Decompose*`). The engine already tolerates malformed members downstream.
-
-## XML Documentation
-
-* Document every public type, method, and property with a `<summary>` that states clearly and directly what it does. Document parameters with `<param>` and return values with `<returns>`.
-* For a non-trivial member, add a short `<remarks>` with the detail a caller needs (constraints, edge cases, what an empty or null result means). Keep it brief.
-* **Never document the implementation or its internals.** Describe the observable behavior and contract, not how it is achieved. Implementation changes routinely, and docs that describe behavior do not need to change with it. For example, document that a result is computed lazily if a caller must know, but not which collection type or algorithm produces it.
-* If a doc comment references another type or member, link it with `<see cref="..."/>` so renames stay tracked.
-* **No corporate jargon.** Write plain technical English.
-* **No `-ing` verb forms for describing what a member does.** Use the third-person present indicative.
-* **Break lines at sentence boundaries, not at a fixed character limit.** Each sentence goes on its own line. Do not wrap mid-sentence because a line is getting long.
-* **No dashes or semicolons.** Use separate sentences, commas instead.
+LookupEngine is synchronous because reflection (`GetValue`, `Invoke`) is synchronous. The `Async` suffix rule therefore rarely applies. Add `async` or `await` only with a measured benefit.

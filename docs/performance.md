@@ -24,9 +24,6 @@ Reach for the most efficient construct the situation allows. The guidelines belo
 * **Always dispose `IEnumerator`** when it is `IDisposable`, using `try/finally` (see `EnumerableDescriptor.ComputeIsEmpty`). Each `Enumerator` access must return a fresh, non-advanced enumerator.
 * **Consider `[UnsafeAccessor]`** for hot-path access to non-public members instead of classic reflection (`GetValue`/`Invoke`), where the target is known and stable. It avoids the reflection lookup and invocation overhead with no extra allocation. Reserve it for measured hot paths and validate the win with a benchmark.
 
-## Validating Changes
+## Validation
 
-* Any performance-sensitive change gets a benchmark in `tests/LookupEngine.Tests.Performance` (BenchmarkDotNet). See [Testing Strategy](./testing-strategy.md).
-* Compare allocations and time before and after. A change that adds allocations to the per-member path needs justification.
-* **When an implementation has more than one viable approach, always benchmark the alternatives and let the numbers decide.** Do not pick a strategy by intuition. The existing strategy benchmarks (for example, wildcard matching, sorting, type-name formatting) follow this.
-* **Keep strategy benchmarks self-contained.** A benchmark that compares candidate implementations holds its own clean copies of those candidates and must not reference LookupEngine's implementation types. This isolates the comparison to the strategy itself and keeps the benchmark valid after the engine adopts a winner and its internals change. End-to-end benchmarks that measure the public API across versions (such as `DecomposeBenchmark`) are the exception and call the public entry point directly.
+A performance-sensitive change is validated with a benchmark. See [Benchmarks](./benchmarks.md) for when to add one and how to read the results.

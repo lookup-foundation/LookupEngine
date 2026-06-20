@@ -11,7 +11,7 @@ The solution is defined in `LookupEngine.slnx`.
     * `source/LookupEngine`: the reflection-based decomposition engine, built-in descriptors, diagnostics, and options. Depends on `LookupEngine.Abstractions`.
 * **`/tests`**. Verification projects.
     * `tests/LookupEngine.Tests.Unit`: unit tests (TUnit).
-    * `tests/LookupEngine.Tests.Performance`: benchmarks (BenchmarkDotNet, console executable).
+    * `tests/LookupEngine.Tests.Benchmarks`: benchmarks (BenchmarkDotNet).
 * **`/build`**. The ModularPipelines build system (`Build.csproj`) for compile, test, changelog generation, and GitHub publishing.
 * **Root level**:
     * Configuration: `Directory.Build.props`, `Directory.Packages.props`, `global.json`, `GitVersion.yml`, `renovate.json`, `.editorconfig`.
@@ -41,4 +41,4 @@ The solution is defined in `LookupEngine.slnx`.
 * Add support for a new value kind → a descriptor in `LookupEngine/Descriptors`. See [Descriptor System](./descriptors.md).
 * Change how members are discovered or evaluated → the relevant `LookupComposer.*` partial in `Engine/`.
 * Add a configuration knob → `DecomposeOptions`.
-* Add unit coverage → `tests/LookupEngine.Tests.Unit`. Add a performance measurement → `tests/LookupEngine.Tests.Performance`.
+* Add unit coverage → `tests/LookupEngine.Tests.Unit`, see [Testing](./testing.md). Add a benchmark → `tests/LookupEngine.Tests.Benchmarks`, see [Benchmarks](./benchmarks.md).

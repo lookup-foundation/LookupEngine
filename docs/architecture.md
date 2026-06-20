@@ -34,7 +34,7 @@ Each call constructs a fresh `LookupComposer`, the unit of isolation, and walks 
 1. Resolves a `Descriptor` for the declaring value, built-in or custom, via `DecomposeOptions.TypeResolver`.
 2. Applies any descriptor configuration, meaning resolved handlers, evaluation overrides, and synthetic extensions.
 3. Decides whether to evaluate now or defer, per the member's `MemberEvaluationPolicy` and the options' `MethodEvaluationPolicy`.
-4. Evaluates inside guarded reflection. Thrown exceptions, including `TargetInvocationException` unwrapping, are captured as the member's value.
+4. Evaluates inside guarded reflection. A thrown exception is captured as the member's value, per Error Handling below.
 5. Records the time and allocated bytes the evaluation cost.
 
 The output model lives in `Metadata/`. A `DecomposedObject` holds the root descriptor and a list of `DecomposedMember`s. Each member carries its `MemberAttributes`, depth, metrics, evaluation policy, and a lazy evaluator. Each value is a `DecomposedValue`.
@@ -46,6 +46,23 @@ The output model lives in `Metadata/`. A `DecomposedObject` holds the root descr
 ## Design Rules
 
 * The engine never special-cases concrete user types. Per-type behavior comes from descriptors only.
-* Evaluation is guarded, so no reflection failure escapes `Decompose`.
 * Diagnostics are internal (`IEngineDiagnoser`). The cross-framework time source and the per-thread allocation counter are wrapped behind `TimeDiagnoser` and `MemoryDiagnoser`.
-* Internal-only errors use `EngineException`. It is not part of the value-capture path described above.
+
+## Error Handling
+
+The decomposition path never throws. No reflection failure escapes `Decompose`.
+
+* **Capture failures as values.** In a member-evaluation path, catch the exception and store it as the member's value. Unwrap `TargetInvocationException` to its inner exception first.
+
+  ```csharp
+  catch (TargetInvocationException exception)
+  {
+      value = exception.InnerException;
+  }
+  catch (Exception exception)
+  {
+      value = exception;
+  }
+  ```
+* **Custom exceptions are for internal errors only.** Prefer a dedicated, semantic exception type over a bare `Exception` for a distinct engine error. Use `EngineException` for an internal engine error, and add a new type when an error category warrants its own catch. These never appear on the value-capture path above.
+* **Validate at the boundary.** Validate inputs at the public API surface (`LookupComposer.Decompose*`). The engine tolerates malformed members downstream.

@@ -9,13 +9,13 @@ The solution uses centralized NuGet package management. All package versions liv
 * **Keep the shipped library dependency-light.** `LookupEngine.Abstractions` must stay pure and framework-agnostic. Prefer platform APIs and existing dependencies before adding a new one.
 * **Multi-targeting.** The libraries multi-target for broad compatibility, and the framework list is declared in the project files and `Directory.Build.props`. Gate framework-specific code with `#if` directives (for example, `#if NET` for .NET-only APIs) rather than dropping a target.
 
-## Adding a Dependency
+## Add a Dependency
 
 1. Add the package version to `Directory.Packages.props`.
 2. Add a versionless `PackageReference` to the project that uses it.
 3. Keep the scope narrow and prefer the abstractions layer to stay dependency-free.
 
-## Updating Dependencies
+## Update Dependencies
 
 * Renovate (`renovate.json`) manages routine version bumps. Keep updates focused and separate from feature work.
 * Run the build/tests after any dependency change.
