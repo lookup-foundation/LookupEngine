@@ -14,7 +14,7 @@
 
 using BenchmarkDotNet.Attributes;
 
-namespace LookupEngine.Tests.Performance.Benchmarks;
+namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 
 /// <summary>
 ///     Compares strategies for base-type chain traversal, as used in <c>LookupComposer.GetTypeHierarchy</c>.

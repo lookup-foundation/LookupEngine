@@ -14,7 +14,7 @@
 
 using BenchmarkDotNet.Attributes;
 
-namespace LookupEngine.Tests.Performance.Benchmarks;
+namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 
 /// <summary>
 ///     Compares builder shapes for the deferred extension-registration model used by the engine.

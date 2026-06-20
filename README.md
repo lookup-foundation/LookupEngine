@@ -298,26 +298,28 @@ var options = new DecomposeOptions
     EvaluationPolicy = MethodEvaluationPolicy.None
 };
 
-// Evaluate all methods except the excluded return types
+// Evaluate all methods except those returning void
 var options = new DecomposeOptions
 {
     EvaluationPolicy = MethodEvaluationPolicy.All
 };
 
-// Evaluate methods declared in the matching namespaces only
+// Evaluate methods selected by a custom filter
 var options = new DecomposeOptions
 {
     EvaluationPolicy = new MethodEvaluationPolicy
     {
-        EvaluatedNamespaces = ["Autodesk.Revit.*"],
-        DeferredReturnTypes = [typeof(void), typeof(bool)]
-    }
+        EvaluatedFilter = (member, declaringType) =>
+        {
+            if (declaringType.Namespace is null) return false;
+            if (declaringType.Namespace.StartsWith("System", StringComparison.Ordinal)) return true;
+            return false;
+        }
 };
 ```
 
-`EvaluatedNamespaces` - contains wildcard patterns matched against the namespace of the type where the method is declared.
-`DeferredReturnTypes` - defers methods by their return type even when the namespace matches.
-By default, methods without a return value are only executed explicitly.
+`EvaluatedFilter` receives the method and the type currently being decomposed, and returns whether to evaluate the method eagerly.
+The `All` policy evaluates everything except methods returning `void`, so side-effect-only methods are never auto-invoked.
 
 ### Member evaluation policy overrides
 

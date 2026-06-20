@@ -33,7 +33,7 @@ public sealed class EvaluationOverrideTests
     }
 
     [Test]
-    public async Task Decompose_EvaluatedOverride_BeatsDeferredReturnTypes()
+    public async Task Decompose_EvaluatedOverride_BeatsVoidDeferral()
     {
         //Arrange
         var data = new OverridableObject();

@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json;
 using LookupEngine.Abstractions;
 using LookupEngine.Abstractions.Configuration;
@@ -55,16 +56,11 @@ public sealed class MethodEvaluationTests
     }
 
     [Test]
-    [Arguments("LookupEngine.Tests.Unit")]
-    [Arguments("LookupEngine.*")]
-    [Arguments("*Unit")]
-    [Arguments("Lookup*Unit")]
-    [Arguments("*")]
-    public async Task Decompose_MatchingNamespacePattern_MethodsAreEvaluated(string pattern)
+    public async Task Decompose_MatchingFilter_MethodsAreEvaluated()
     {
         //Arrange
         var data = new EvaluableObject();
-        var options = CreateFilteredOptions(pattern);
+        var options = CreateFilteredOptions((_, declaringType) => declaringType.Namespace == "LookupEngine.Tests.Unit");
 
         //Act
         var result = LookupComposer.Decompose(data, options);
@@ -79,15 +75,11 @@ public sealed class MethodEvaluationTests
     }
 
     [Test]
-    [Arguments("System.*")]
-    [Arguments("lookupengine.*")]
-    [Arguments("LookupEngine.Tests.Unit.*")]
-    [Arguments("LookupEngine")]
-    public async Task Decompose_MismatchingNamespacePattern_MethodsAreDeferred(string pattern)
+    public async Task Decompose_MismatchingFilter_MethodsAreDeferred()
     {
         //Arrange
         var data = new EvaluableObject();
-        var options = CreateFilteredOptions(pattern);
+        var options = CreateFilteredOptions((_, declaringType) => declaringType.Namespace == "System");
 
         //Act
         var result = LookupComposer.Decompose(data, options);
@@ -107,7 +99,12 @@ public sealed class MethodEvaluationTests
             IncludeRoot = true,
             EvaluationPolicy = new MethodEvaluationPolicy
             {
-                EvaluatedNamespaces = ["LookupEngine.*"]
+                EvaluatedFilter = (_, declaringType) =>
+                {
+                    if (declaringType.Namespace is null) return false;
+                    if (declaringType.Namespace.StartsWith("LookupEngine", StringComparison.Ordinal)) return true;
+                    return false;
+                }
             }
         };
 
@@ -125,7 +122,7 @@ public sealed class MethodEvaluationTests
     }
 
     [Test]
-    public async Task Decompose_NullNamespaceType_MatchesOnlyUniversalPattern()
+    public async Task Decompose_NullNamespaceType_HandledByFilter()
     {
         //Arrange
         var data = new
@@ -134,8 +131,8 @@ public sealed class MethodEvaluationTests
         };
 
         //Act
-        var universalResult = LookupComposer.Decompose(data, CreateFilteredOptions("*"));
-        var filteredResult = LookupComposer.Decompose(data, CreateFilteredOptions("System.*"));
+        var universalResult = LookupComposer.Decompose(data, CreateFilteredOptions((_, _) => true));
+        var filteredResult = LookupComposer.Decompose(data, CreateFilteredOptions((_, declaringType) => declaringType.Namespace?.StartsWith("System", StringComparison.Ordinal) ?? false));
 
         //Assert
         var universalMember = universalResult.Members.First(member => member.Name == nameof(ToString));
@@ -171,7 +168,7 @@ public sealed class MethodEvaluationTests
     }
 
     [Test]
-    public async Task Decompose_ExcludedReturnType_MethodsAreDeferred()
+    public async Task Decompose_ReturnTypeFilter_MethodsAreDeferred()
     {
         //Arrange
         var data = new ReturnTypesObject();
@@ -179,8 +176,7 @@ public sealed class MethodEvaluationTests
         {
             EvaluationPolicy = new MethodEvaluationPolicy
             {
-                EvaluatedNamespaces = ["*"],
-                DeferredReturnTypes = [typeof(bool)]
+                EvaluatedFilter = (member, _) => member.ReturnType != typeof(bool)
             }
         };
 
@@ -199,7 +195,7 @@ public sealed class MethodEvaluationTests
     }
 
     [Test]
-    public async Task Decompose_EmptyDeferredReturnTypes_VoidMethodsAreEvaluated()
+    public async Task Decompose_EvaluateAllFilter_VoidMethodsAreEvaluated()
     {
         //Arrange
         var data = new VoidMethodObject();
@@ -207,8 +203,7 @@ public sealed class MethodEvaluationTests
         {
             EvaluationPolicy = new MethodEvaluationPolicy
             {
-                EvaluatedNamespaces = ["*"],
-                DeferredReturnTypes = []
+                EvaluatedFilter = (_, _) => true
             }
         };
 
@@ -471,13 +466,13 @@ public sealed class MethodEvaluationTests
         }
     }
 
-    private static DecomposeOptions CreateFilteredOptions(string pattern)
+    private static DecomposeOptions CreateFilteredOptions(Func<MethodInfo, Type, bool> filter)
     {
         return new DecomposeOptions
         {
             EvaluationPolicy = new MethodEvaluationPolicy
             {
-                EvaluatedNamespaces = [pattern]
+                EvaluatedFilter = filter
             }
         };
     }

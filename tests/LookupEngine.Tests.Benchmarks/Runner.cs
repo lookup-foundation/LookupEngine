@@ -3,7 +3,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using LookupEngine.Tests.Performance.Benchmarks;
+using LookupEngine.Tests.Benchmarks.Benchmarks;
 
 var configuration = ManualConfig.Create(DefaultConfig.Instance)
     .AddJob(Job.Default)
@@ -17,5 +17,3 @@ var configuration = ManualConfig.Create(DefaultConfig.Instance)
 // BenchmarkRunner.Run<TypeEqualBenchmark>(configuration);
 // BenchmarkRunner.Run<ExtensionRegistrationBenchmark>(configuration);
 BenchmarkRunner.Run<DecomposeBenchmark>(configuration);
-// BenchmarkRunner.Run<WildcardMatchBenchmark>(configuration);
-// BenchmarkRunner.Run<WildcardMatchArrayBenchmark>(configuration);

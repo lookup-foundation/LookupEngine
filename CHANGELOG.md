@@ -1,6 +1,8 @@
 # 2.0.4
 
-- Renamed `MethodEvaluationPolicy.IncludedNamespaces` to `EvaluatedNamespaces` and `MethodEvaluationPolicy.ExcludedReturnTypes` to `DeferredReturnTypes`.
+## Breaking changes
+
+- Replaced `MethodEvaluationPolicy.IncludedNamespaces` and `ExcludedReturnTypes` with a single `EvaluatedFilter` predicate of type `Func<MethodInfo, Type, bool>` that decides per method whether to evaluate it eagerly.
 
 # 2.0.3
 

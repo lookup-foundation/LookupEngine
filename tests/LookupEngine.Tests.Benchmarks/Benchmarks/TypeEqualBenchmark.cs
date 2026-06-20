@@ -14,7 +14,7 @@
 
 using BenchmarkDotNet.Attributes;
 
-namespace LookupEngine.Tests.Performance.Benchmarks;
+namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 
 /// <summary>
 ///     Compares strategies for descriptor resolution by runtime type in a pattern-match switch, as used in <c>DecomposeOptions.DefaultResolveMap</c>.

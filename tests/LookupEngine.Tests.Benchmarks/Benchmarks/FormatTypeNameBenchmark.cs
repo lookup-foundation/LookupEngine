@@ -14,7 +14,7 @@
 
 using BenchmarkDotNet.Attributes;
 
-namespace LookupEngine.Tests.Performance.Benchmarks;
+namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 
 /// <summary>
 ///     Compares strategies for the <c>Name&lt;Arg1, Arg2&gt;</c> generic type name format, as implemented in <c>ReflexionFormater.FormatTypeName</c>.

@@ -16,7 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Attributes;
 using LookupEngine.Abstractions;
 
-namespace LookupEngine.Tests.Performance.Benchmarks;
+namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 
 /// <summary>
 ///     Tracks the end-to-end cost of <see cref="LookupComposer.Decompose(object, DecomposeOptions)" /> across the available option combinations.

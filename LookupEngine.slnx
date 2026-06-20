@@ -13,7 +13,7 @@
         </Project>
     </Folder>
     <Folder Name="/Tests/">
-        <Project Path="tests\LookupEngine.Tests.Performance\LookupEngine.Tests.Performance.csproj" />
+        <Project Path="tests\LookupEngine.Tests.Benchmarks\LookupEngine.Tests.Benchmarks.csproj" />
         <Project Path="tests\LookupEngine.Tests.Unit\LookupEngine.Tests.Unit.csproj" />
     </Folder>
     <Project Path="source\LookupEngine.Abstractions\LookupEngine.Abstractions.csproj" />

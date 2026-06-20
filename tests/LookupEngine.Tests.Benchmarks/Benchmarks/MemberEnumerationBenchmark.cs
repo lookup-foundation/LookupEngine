@@ -15,7 +15,7 @@
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 
-namespace LookupEngine.Tests.Performance.Benchmarks;
+namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 
 /// <summary>
 ///     Reflection cost of member enumeration during decomposition, as used in <c>LookupComposer.DecomposeProperties/Methods/Fields</c>.
