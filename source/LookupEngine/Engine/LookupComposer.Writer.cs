@@ -82,7 +82,7 @@ public partial class LookupComposer
         var member = new DecomposedMember
         {
             Depth = _depth,
-            Value = CreateValue(nameof(IEnumerable), value),
+            Value = CreateRuntimeValue(nameof(IEnumerable), value),
             Name = $"{ReflexionFormater.FormatTypeName(MemberDeclaringType).Replace("[]", string.Empty)}[{index}]",
             MemberAttributes = MemberAttributes.Property,
             DeclaringTypeName = nameof(IEnumerable),
@@ -100,7 +100,7 @@ public partial class LookupComposer
         {
             Depth = _depth,
             Name = name,
-            Value = CreateValue(name, value),
+            Value = CreateRuntimeValue(name, value),
             DeclaringTypeName = formatTypeName,
             DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
             MemberAttributes = attributes,
@@ -118,7 +118,7 @@ public partial class LookupComposer
         var member = new DecomposedMember
         {
             Depth = _depth,
-            Value = CreateValue(memberInfo.Name, value),
+            Value = CreateRuntimeValue(memberInfo.Name, value),
             Name = memberInfo.Name,
             DeclaringTypeName = formatTypeName,
             DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
@@ -137,7 +137,7 @@ public partial class LookupComposer
         var member = new DecomposedMember
         {
             Depth = _depth,
-            Value = CreateValue(memberInfo.Name, value),
+            Value = CreateMemberValue(memberInfo, value),
             Name = ReflexionFormater.FormatMemberName(memberInfo, parameters),
             DeclaringTypeName = formatTypeName,
             DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
@@ -235,19 +235,18 @@ public partial class LookupComposer
 
         DecomposedMembers.Add(member);
     }
-
-    private DecomposedValue CreateNullableValue()
+    
+    private DecomposedValue CreateMemberValue(MemberInfo memberInfo, object? value)
     {
-        return new DecomposedValue
+        if (value is null && memberInfo is MethodInfo {ReturnType: var returnType} && returnType == typeof(void))
         {
-            RawValue = null,
-            Name = string.Empty,
-            TypeName = nameof(Object),
-            TypeFullName = $"{nameof(System)}.{nameof(Object)}"
-        };
-    }
+            return CreateVoidValue();
+        }
 
-    private DecomposedValue CreateValue(string targetMember, object? value)
+        return CreateRuntimeValue(memberInfo.Name, value);
+    }
+    
+    private DecomposedValue CreateRuntimeValue(string targetMember, object? value)
     {
         if (value is null) return CreateNullableValue();
         if (value is IVariant {Value: null}) return CreateNullableValue();
@@ -268,6 +267,30 @@ public partial class LookupComposer
             TypeName = formatTypeName,
             TypeFullName = ReflexionFormater.FormatTypeFullName(valueType, formatTypeName),
             Descriptor = valueDescriptor
+        };
+    }
+
+    private DecomposedValue CreateNullableValue()
+    {
+        return new DecomposedValue
+        {
+            RawValue = null,
+            Name = string.Empty,
+            TypeName = nameof(Object),
+            TypeFullName = $"{nameof(System)}.{nameof(Object)}"
+        };
+    }
+
+    private static DecomposedValue CreateVoidValue()
+    {
+        var formatTypeName = ReflexionFormater.FormatTypeName(typeof(void));
+
+        return new DecomposedValue
+        {
+            RawValue = null,
+            Name = string.Empty,
+            TypeName = formatTypeName,
+            TypeFullName = ReflexionFormater.FormatTypeFullName(typeof(void), formatTypeName)
         };
     }
 }

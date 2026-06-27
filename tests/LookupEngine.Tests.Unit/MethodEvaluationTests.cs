@@ -216,6 +216,8 @@ public sealed class MethodEvaluationTests
         {
             await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
             await Assert.That(member.Value.RawValue).IsNull();
+            await Assert.That(member.Value.TypeName).IsEqualTo("Void");
+            await Assert.That(member.Value.TypeFullName).IsEqualTo("System.Void");
             await Assert.That(data.InvocationCount).IsEqualTo(1);
         }
     }
@@ -287,6 +289,8 @@ public sealed class MethodEvaluationTests
         {
             await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
             await Assert.That(member.Value.RawValue).IsNull();
+            await Assert.That(member.Value.TypeName).IsEqualTo("Void");
+            await Assert.That(member.Value.TypeFullName).IsEqualTo("System.Void");
             await Assert.That(data.InvocationCount).IsEqualTo(1);
         }
     }

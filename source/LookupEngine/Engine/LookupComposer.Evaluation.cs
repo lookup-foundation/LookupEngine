@@ -48,7 +48,7 @@ public partial class LookupComposer
             value = exception;
         }
 
-        target.Value = CreateValue(member.Name, value);
+        target.Value = CreateMemberValue(member, value);
         target.ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds;
         target.AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes();
         target.EvaluationPolicy = MemberEvaluationPolicy.Evaluated;
@@ -69,7 +69,7 @@ public partial class LookupComposer
             value = exception;
         }
 
-        target.Value = CreateValue(name, value);
+        target.Value = CreateRuntimeValue(name, value);
         target.ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds;
         target.AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes();
         target.EvaluationPolicy = MemberEvaluationPolicy.Evaluated;
@@ -80,7 +80,7 @@ public partial class LookupComposer
     /// </summary>
     internal void EvaluateDisabledMember(DecomposedMember target, string memberName)
     {
-        target.Value = CreateValue(memberName, new InvalidOperationException("Member execution disabled"));
+        target.Value = CreateRuntimeValue(memberName, new InvalidOperationException("Member execution disabled"));
     }
 
     /// <summary>
