@@ -44,6 +44,8 @@ public partial class LookupComposer
             {
                 if (!member.CanRead)
                 {
+                    if (!_options.IncludeUnsupported) continue;
+
                     WriteUnsupportedMember(member, member.PropertyType, parameters);
                     continue;
                 }
