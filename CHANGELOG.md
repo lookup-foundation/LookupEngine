@@ -1,3 +1,10 @@
+# 2.0.5
+
+## Fixes
+
+- Methods returning `void` now report a `void` value type instead of `Object`.
+- Write-only properties now honor `DecomposeOptions.IncludeUnsupported` and are skipped when unsupported members are excluded.
+
 # 2.0.4
 
 ## Breaking changes
