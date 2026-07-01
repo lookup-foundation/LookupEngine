@@ -92,7 +92,7 @@ public partial class LookupComposer
         DecomposedMembers.Add(member);
     }
 
-    private protected void WriteExtensionMember(object? value, string name, MemberAttributes attributes)
+    private protected void WriteExtensionMember(object? value, string name, MemberAttributes attributes, Action<DecomposedMember> evaluator)
     {
         var formatTypeName = ReflexionFormater.FormatTypeName(MemberDeclaringType);
 
@@ -105,13 +105,54 @@ public partial class LookupComposer
             DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
             MemberAttributes = attributes,
             ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds,
-            AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes()
+            AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes(),
+            Evaluator = evaluator
         };
 
         DecomposedMembers.Add(member);
     }
 
-    private void WriteDecompositionMember(object? value, MemberInfo memberInfo)
+    private void WriteDecompositionMember(object? value, MemberInfo memberInfo, Action<DecomposedMember> evaluator)
+    {
+        var formatTypeName = ReflexionFormater.FormatTypeName(MemberDeclaringType);
+
+        var member = new DecomposedMember
+        {
+            Depth = _depth,
+            Value = CreateRuntimeValue(memberInfo.Name, value),
+            Name = memberInfo.Name,
+            DeclaringTypeName = formatTypeName,
+            DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
+            MemberAttributes = ModifiersFormater.FormatAttributes(memberInfo),
+            ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds,
+            AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes(),
+            Evaluator = evaluator
+        };
+
+        DecomposedMembers.Add(member);
+    }
+
+    private void WriteDecompositionMember(object? value, MemberInfo memberInfo, ParameterInfo[] parameters, Action<DecomposedMember> evaluator)
+    {
+        var formatTypeName = ReflexionFormater.FormatTypeName(MemberDeclaringType);
+
+        var member = new DecomposedMember
+        {
+            Depth = _depth,
+            Value = CreateMemberValue(memberInfo, value),
+            Name = ReflexionFormater.FormatMemberName(memberInfo, parameters),
+            DeclaringTypeName = formatTypeName,
+            DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
+            MemberAttributes = ModifiersFormater.FormatAttributes(memberInfo),
+            ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds,
+            AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes(),
+            Evaluator = evaluator
+        };
+
+        DecomposedMembers.Add(member);
+    }
+
+    private void WriteEventMember(object? value, MemberInfo memberInfo)
     {
         var formatTypeName = ReflexionFormater.FormatTypeName(MemberDeclaringType);
 
@@ -130,28 +171,9 @@ public partial class LookupComposer
         DecomposedMembers.Add(member);
     }
 
-    private void WriteDecompositionMember(object? value, MemberInfo memberInfo, ParameterInfo[] parameters)
-    {
-        var formatTypeName = ReflexionFormater.FormatTypeName(MemberDeclaringType);
-
-        var member = new DecomposedMember
-        {
-            Depth = _depth,
-            Value = CreateMemberValue(memberInfo, value),
-            Name = ReflexionFormater.FormatMemberName(memberInfo, parameters),
-            DeclaringTypeName = formatTypeName,
-            DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
-            MemberAttributes = ModifiersFormater.FormatAttributes(memberInfo),
-            ComputationTime = TimeDiagnoser.GetElapsed().TotalMilliseconds,
-            AllocatedBytes = MemoryDiagnoser.GetAllocatedBytes()
-        };
-
-        DecomposedMembers.Add(member);
-    }
-
     private void WriteDeferredMember(MemberInfo memberInfo, Type returnType, ParameterInfo[] parameters, Func<object?>? handler)
     {
-        WriteInactiveMember(memberInfo, returnType, parameters, MemberEvaluationPolicy.Deferred, target =>
+        WriteUnevaluatedMember(memberInfo, returnType, parameters, MemberEvaluationPolicy.Deferred, target =>
         {
             CreateEvaluationComposer().EvaluateDeferredMember(target, memberInfo, handler);
         });
@@ -159,18 +181,15 @@ public partial class LookupComposer
 
     private void WriteDisabledMember(MemberInfo memberInfo, Type returnType, ParameterInfo[] parameters)
     {
-        WriteInactiveMember(memberInfo, returnType, parameters, MemberEvaluationPolicy.Disabled, target =>
-        {
-            CreateEvaluationComposer().EvaluateDisabledMember(target, memberInfo.Name);
-        });
+        WriteUnevaluatedMember(memberInfo, returnType, parameters, MemberEvaluationPolicy.Disabled, null);
     }
 
     private void WriteUnsupportedMember(MemberInfo memberInfo, Type returnType, ParameterInfo[] parameters)
     {
-        WriteInactiveMember(memberInfo, returnType, parameters, MemberEvaluationPolicy.Unsupported, null);
+        WriteUnevaluatedMember(memberInfo, returnType, parameters, MemberEvaluationPolicy.Unsupported, null);
     }
 
-    private void WriteInactiveMember(MemberInfo memberInfo, Type returnType, ParameterInfo[] parameters, MemberEvaluationPolicy policy, Action<DecomposedMember>? evaluator)
+    private void WriteUnevaluatedMember(MemberInfo memberInfo, Type returnType, ParameterInfo[] parameters, MemberEvaluationPolicy policy, Action<DecomposedMember>? evaluator)
     {
         var formatTypeName = ReflexionFormater.FormatTypeName(MemberDeclaringType);
         var returnTypeName = ReflexionFormater.FormatTypeName(returnType);
@@ -227,10 +246,7 @@ public partial class LookupComposer
             DeclaringTypeName = formatTypeName,
             DeclaringTypeFullName = ReflexionFormater.FormatTypeFullName(MemberDeclaringType, formatTypeName),
             MemberAttributes = attributes,
-            EvaluationPolicy = policy,
-            Evaluator = policy == MemberEvaluationPolicy.Disabled
-                ? target => CreateEvaluationComposer().EvaluateDisabledMember(target, name)
-                : null
+            EvaluationPolicy = policy
         };
 
         DecomposedMembers.Add(member);

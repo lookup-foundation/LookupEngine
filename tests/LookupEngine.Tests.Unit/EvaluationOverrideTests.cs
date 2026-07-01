@@ -117,7 +117,7 @@ public sealed class EvaluationOverrideTests
     }
 
     [Test]
-    public async Task Evaluate_DisabledMember_ReportsDisabledResult()
+    public async Task Evaluate_DisabledMember_Throws()
     {
         //Arrange
         var data = new OverridableObject();
@@ -131,18 +131,66 @@ public sealed class EvaluationOverrideTests
         using (Assert.Multiple())
         {
             await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Disabled);
-            await Assert.That(member.Evaluator).IsNotNull();
+            await Assert.That(member.Evaluator).IsNull();
+            await Assert.That(member.Value.RawValue).IsNull();
+            await Assert.That(member.Evaluate).Throws<InvalidOperationException>();
+            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Disabled);
             await Assert.That(member.Value.RawValue).IsNull();
             await Assert.That(data.DeleteCount).IsEqualTo(0);
         }
+    }
 
+    [Test]
+    public async Task Revaluate_EvaluatedMethod_Revaluated()
+    {
+        //Arrange
+        var data = new OverridableObject();
+        var options = CreateOptions(manager => manager.Member(nameof(OverridableObject.Run)).Evaluate(), MethodEvaluationPolicy.All);
+
+        //Act
+        var result = LookupComposer.Decompose(data, options);
+
+        //Assert
+        var member = result.Members.First(member => member.Name == nameof(OverridableObject.Run));
+        using (Assert.Multiple())
+        {
+            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
+            await Assert.That(member.Evaluator).IsNotNull();
+            await Assert.That(data.RunCount).IsEqualTo(1);
+        }
+
+        member.Evaluate();
         member.Evaluate();
         using (Assert.Multiple())
         {
-            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Disabled);
-            await Assert.That(member.Value.RawValue).IsTypeOf<InvalidOperationException>();
-            await Assert.That(data.DeleteCount).IsEqualTo(0);
-            await Assert.That(member.Evaluate).Throws<InvalidOperationException>();
+            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
+            await Assert.That(member.Evaluator).IsNotNull();
+            await Assert.That(data.RunCount).IsEqualTo(3);
+        }
+    }
+
+    [Test]
+    public async Task Revaluate_DeferredMember_Revaluated()
+    {
+        //Arrange
+        var data = new OverridableObject();
+        var options = CreateOptions(manager => manager.Member(nameof(OverridableObject.Delete)).Defer(), MethodEvaluationPolicy.None);
+
+        //Act
+        var result = LookupComposer.Decompose(data, options);
+
+        //Assert
+        var member = result.Members.First(member => member.Name == nameof(OverridableObject.Delete));
+        await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
+
+        member.Evaluate();
+        member.Evaluate();
+        using (Assert.Multiple())
+        {
+            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
+            await Assert.That(member.Evaluator).IsNotNull();
+            await Assert.That(member.Value.RawValue).IsEqualTo("Deleted");
+            await Assert.That(data.DeleteCount).IsEqualTo(2);
         }
     }
 
@@ -260,10 +308,11 @@ public sealed class EvaluationOverrideTests
             await Assert.That(data.SecretReadCount).IsEqualTo(0);
         }
 
-        member.Evaluate();
         using (Assert.Multiple())
         {
-            await Assert.That(member.Value.RawValue).IsTypeOf<InvalidOperationException>();
+            await Assert.That(member.Evaluator).IsNull();
+            await Assert.That(member.Evaluate).Throws<InvalidOperationException>();
+            await Assert.That(member.Value.RawValue).IsNull();
             await Assert.That(data.SecretReadCount).IsEqualTo(0);
         }
     }

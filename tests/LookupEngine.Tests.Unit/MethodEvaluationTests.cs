@@ -50,7 +50,7 @@ public sealed class MethodEvaluationTests
         using (Assert.Multiple())
         {
             await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
-            await Assert.That(member.Evaluator).IsNull();
+            await Assert.That(member.Evaluator).IsNotNull();
             await Assert.That(member.Value.RawValue).IsEqualTo("Text");
         }
     }
@@ -263,7 +263,7 @@ public sealed class MethodEvaluationTests
         using (Assert.Multiple())
         {
             await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
-            await Assert.That(member.Evaluator).IsNull();
+            await Assert.That(member.Evaluator).IsNotNull();
             await Assert.That(member.Value.RawValue).IsEqualTo(42);
             await Assert.That(member.Value.TypeName).IsEqualTo(nameof(Int32));
             await Assert.That(member.ComputationTime).IsGreaterThanOrEqualTo(0);
@@ -415,24 +415,12 @@ public sealed class MethodEvaluationTests
     }
 
     [Test]
-    public async Task Evaluate_EvaluatedMember_Throws()
+    public async Task Revaluate_EvaluatedMember_Evaluated()
     {
         //Arrange
         var data = new EvaluableObject();
         var options = new DecomposeOptions {EvaluationPolicy = MethodEvaluationPolicy.All};
         var result = LookupComposer.Decompose(data, options);
-        var member = result.Members.First(member => member.Name == nameof(EvaluableObject.GetText));
-
-        //Assert
-        await Assert.That(member.Evaluate).Throws<InvalidOperationException>();
-    }
-
-    [Test]
-    public async Task Evaluate_EvaluatedTwice_Throws()
-    {
-        //Arrange
-        var data = new EvaluableObject();
-        var result = LookupComposer.Decompose(data);
         var member = result.Members.First(member => member.Name == nameof(EvaluableObject.GetText));
 
         //Act
@@ -441,9 +429,53 @@ public sealed class MethodEvaluationTests
         //Assert
         using (Assert.Multiple())
         {
+            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
+            await Assert.That(member.Evaluator).IsNotNull();
             await Assert.That(member.Value.RawValue).IsEqualTo("Text");
-            await Assert.That(member.Evaluate).Throws<InvalidOperationException>();
         }
+    }
+
+    [Test]
+    public async Task Revaluate_Twice_Evaluated()
+    {
+        //Arrange
+        var data = new EvaluableObject();
+        var result = LookupComposer.Decompose(data);
+        var member = result.Members.First(member => member.Name == nameof(EvaluableObject.GetText));
+
+        //Act
+        member.Evaluate();
+        member.Evaluate();
+
+        //Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
+            await Assert.That(member.Evaluator).IsNotNull();
+            await Assert.That(member.Value.RawValue).IsEqualTo("Text");
+        }
+    }
+
+    [Test]
+    public async Task Revaluate_Field_Evaluated()
+    {
+        //Arrange
+        var data = new FieldHolder();
+        var options = new DecomposeOptions {IncludeFields = true};
+        var result = LookupComposer.Decompose(data, options);
+        var member = result.Members.First(member => member.Name == nameof(FieldHolder.Counter));
+
+        //Assert
+        using (Assert.Multiple())
+        {
+            await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
+            await Assert.That(member.Evaluator).IsNotNull();
+            await Assert.That(member.Value.RawValue).IsEqualTo(0);
+        }
+
+        data.Counter = 7;
+        member.Evaluate();
+        await Assert.That(member.Value.RawValue).IsEqualTo(7);
     }
 
     [Test]
@@ -493,6 +525,11 @@ file sealed class EvaluableObject
     {
         return 42;
     }
+}
+
+file sealed class FieldHolder
+{
+    public int Counter;
 }
 
 file sealed class VoidMethodObject

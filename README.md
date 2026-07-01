@@ -332,7 +332,7 @@ public sealed class DocumentDescriptor(Document document) : Descriptor, IDescrip
     {
         configuration.Member(nameof(Document.GetTypeOfStorage)).Evaluate(); // evaluate during decomposition, even when the policy defers
         configuration.Member(nameof(Document.EnumerateUserDefinedParameters)).Defer(); // never evaluate automatically, force evaluation runs it
-        configuration.Member(nameof(Document.Close)).Disable(); // never evaluate, force evaluation reports the disabled result
+        configuration.Member(nameof(Document.Close)).Disable(); // never evaluate; force evaluation throws
     }
 }
 ```
@@ -340,7 +340,9 @@ public sealed class DocumentDescriptor(Document document) : Descriptor, IDescrip
 ### Force evaluation
 
 A deferred member is marked with the `EvaluationPolicy` property, and its value contains the method return type instead of the evaluation result.
-To evaluate the member on demand, for example by a user action in the UI, call `Evaluate()`.
+To evaluate a member on demand, for example by a user action in the UI, call `Evaluate()`.
+`Evaluate()` works for deferred and already-evaluated members and may be called repeatedly to refresh the value.
+Disabled and unsupported members carry no `Evaluator` and throw.
 The value and performance metrics are updated in place:
 
 ```C#

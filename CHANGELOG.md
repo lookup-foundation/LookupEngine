@@ -1,3 +1,8 @@
+# 2.0.6
+
+- `DecomposedMember.Evaluate()` is now repeatable: it no longer clears `Evaluator` after invoking, so the value can be refreshed on demand. Evaluated members now carry an `Evaluator`, and `Evaluator != null` means the member is evaluable.
+- `Evaluate()` on a `Disabled` member now throws `InvalidOperationException` instead of reporting a synthetic disabled result; disabled and unsupported members have a `null` `Evaluator`.
+
 # 2.0.5
 
 ## Fixes

@@ -263,12 +263,11 @@ public sealed class ExtensionTests
         {
             await Assert.That(hiddenResult.Members.Where(member => member.Name == "DisabledExtension")).IsEmpty();
             await Assert.That(decomposedMember.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Disabled);
-            await Assert.That(decomposedMember.Evaluator).IsNotNull();
+            await Assert.That(decomposedMember.Evaluator).IsNull();
+            await Assert.That(decomposedMember.Value.RawValue).IsNull();
+            await Assert.That(decomposedMember.Evaluate).Throws<InvalidOperationException>();
             await Assert.That(decomposedMember.Value.RawValue).IsNull();
         }
-
-        decomposedMember.Evaluate();
-        await Assert.That(decomposedMember.Value.RawValue).IsTypeOf<InvalidOperationException>();
     }
 
     [Test]

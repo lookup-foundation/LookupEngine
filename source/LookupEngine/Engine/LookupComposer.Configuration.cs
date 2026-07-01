@@ -130,11 +130,11 @@ public partial class LookupComposer : IMemberConfigurator
             try
             {
                 var result = EvaluateValue(handler);
-                WriteExtensionMember(result, name, attributes);
+                WriteExtensionMember(result, name, attributes, target => CreateEvaluationComposer().EvaluateDeferredExtension(target, name, handler));
             }
             catch (Exception exception)
             {
-                WriteExtensionMember(exception, name, attributes);
+                WriteExtensionMember(exception, name, attributes, target => CreateEvaluationComposer().EvaluateDeferredExtension(target, name, handler));
             }
         });
     }

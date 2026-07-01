@@ -60,24 +60,23 @@ public sealed class DecomposedMember
     public required DecomposedValue Value { get; set; }
 
     /// <summary>
-    ///     Engine-provided handle that triggers evaluation of a deferred member.
-    ///     <see langword="null"/> for already-evaluated members and after deserialization.
+    ///     Engine-provided handle that evaluates this member on demand.
+    ///     Present for deferred and evaluated members; <see langword="null"/> for disabled and unsupported members.
     /// </summary>
     [JsonIgnore]
     public Action<DecomposedMember>? Evaluator { get; set; }
 
     /// <summary>
-    ///     Triggers evaluation of this deferred member through the engine, updating
-    ///     <see cref="Value"/>, <see cref="ComputationTime"/>, and <see cref="AllocatedBytes"/> in place.
+    ///     Triggers evaluation of this member through the engine, updating <see cref="Value"/>, <see cref="ComputationTime"/>, and <see cref="AllocatedBytes"/> in place.
+    ///     May be called to refresh the value.
     /// </summary>
     /// <exception cref="InvalidOperationException">
-    ///     The member is not deferred, or <see cref="Evaluator"/> was cleared after deserialization.
+    ///     The member cannot be evaluated (it is disabled or unsupported).
     /// </exception>
     public void Evaluate()
     {
-        if (Evaluator is null) throw new InvalidOperationException("The member is not deferred or was deserialized");
+        if (Evaluator is null) throw new InvalidOperationException("The member cannot be evaluated");
 
         Evaluator.Invoke(this);
-        Evaluator = null;
     }
 }

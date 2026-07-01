@@ -45,7 +45,7 @@ public partial class LookupComposer
                 value = exception;
             }
 
-            WriteDecompositionMember(value, member);
+            WriteDecompositionMember(value, member, target => CreateEvaluationComposer().EvaluateDeferredMember(target, member, null));
         }
     }
 }

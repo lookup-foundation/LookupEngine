@@ -76,14 +76,6 @@ public partial class LookupComposer
     }
 
     /// <summary>
-    ///     Report the disabled evaluation result for a disabled member
-    /// </summary>
-    internal void EvaluateDisabledMember(DecomposedMember target, string memberName)
-    {
-        target.Value = CreateRuntimeValue(memberName, new InvalidOperationException("Member execution disabled"));
-    }
-
-    /// <summary>
     ///     Evaluate a member value by reflection
     /// </summary>
     private object? EvaluateMember(MemberInfo member)
@@ -92,6 +84,7 @@ public partial class LookupComposer
         {
             MethodInfo method => EvaluateValue(method),
             PropertyInfo property => EvaluateValue(property),
+            FieldInfo field => EvaluateValue(field),
             _ => throw new NotSupportedException($"Unsupported member type: {member.MemberType}")
         };
     }

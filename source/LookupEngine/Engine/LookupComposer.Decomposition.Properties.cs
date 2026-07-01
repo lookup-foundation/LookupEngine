@@ -79,7 +79,7 @@ public partial class LookupComposer
                 value = exception;
             }
 
-            WriteDecompositionMember(value, member, parameters);
+            WriteDecompositionMember(value, member, parameters, target => CreateEvaluationComposer().EvaluateDeferredMember(target, member, handler));
         }
     }
 }
