@@ -37,4 +37,4 @@ The engine runs on hot paths such as interactive object inspectors; it stays fas
 
 * Compile: `dotnet build -c Release`.
 * Test: `dotnet test`.
-* Run the benchmarks: `dotnet run -c Release --project tests/LookupEngine.Tests.Benchmarks`.
+* Run the benchmarks: set a Job.Dry and run `dotnet run -c Release --project tests/LookupEngine.Tests.Benchmarks`.
