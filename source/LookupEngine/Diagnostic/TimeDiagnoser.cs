@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Lookup Foundation and Contributors
-// 
+//
 // Permission to use, copy, modify, and distribute this software in
 // object code form for any purpose and without fee is hereby granted,
 // provided that the above copyright notice appears in all copies and
 // that both that copyright notice and the limited warranty and
 // restricted rights notice below appear in all supporting
 // documentation.
-// 
+//
 // THIS PROGRAM IS PROVIDED "AS IS" AND WITH ALL FAULTS.
 // NO IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE IS PROVIDED.
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
@@ -17,12 +17,12 @@ using System.Diagnostics;
 namespace LookupEngine.Diagnostic;
 
 /// <summary>
-///     Measures the elapsed time between <see cref="StartMonitoring"/> and <see cref="StopMonitoring"/>.
+///     Measures the elapsed time between <see cref="StartMonitoring" /> and <see cref="StopMonitoring" />.
 /// </summary>
 internal sealed class TimeDiagnoser : IEngineDiagnoser
 {
-    private long _startTimeStamp;
     private long _endTimeStamp;
+    private long _startTimeStamp;
 
     public void StartMonitoring()
     {
@@ -39,7 +39,7 @@ internal sealed class TimeDiagnoser : IEngineDiagnoser
 #if NET
         var elapsed = Stopwatch.GetElapsedTime(_startTimeStamp, _endTimeStamp);
 #else
-        var tickFrequency = (double) TimeSpan.TicksPerSecond / Stopwatch.Frequency;
+        var tickFrequency = (double)TimeSpan.TicksPerSecond / Stopwatch.Frequency;
         var elapsed = new TimeSpan((long)((_endTimeStamp - _startTimeStamp) * tickFrequency));
 #endif
         _startTimeStamp = 0;

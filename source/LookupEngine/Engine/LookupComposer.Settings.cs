@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Lookup Foundation and Contributors
-// 
+//
 // Permission to use, copy, modify, and distribute this software in
 // object code form for any purpose and without fee is hereby granted,
 // provided that the above copyright notice appears in all copies and
 // that both that copyright notice and the limited warranty and
 // restricted rights notice below appear in all supporting
 // documentation.
-// 
+//
 // THIS PROGRAM IS PROVIDED "AS IS" AND WITH ALL FAULTS.
 // NO IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE IS PROVIDED.
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
@@ -21,9 +21,9 @@ namespace LookupEngine;
 
 /// <summary>
 ///     Static entry point for decomposing any runtime object into a structured, evaluated representation of its members, values, and diagnostic metrics.
-///     Pass a <see cref="Type"/> to decompose the static surface of a type.
+///     Pass a <see cref="Type" /> to decompose the static surface of a type.
 ///     Pass any other value to decompose an instance.
-///     A <see langword="null"/> value always produces a well-defined result with no members.
+///     A <see langword="null" /> value always produces a well-defined result with no members.
 /// </summary>
 /// <remarks>
 ///     Each decomposition call is fully isolated: it creates a dedicated internal instance so concurrent calls are safe without any external synchronization.
@@ -33,10 +33,10 @@ namespace LookupEngine;
 public partial class LookupComposer
 {
     private readonly DecomposeOptions _options;
-
-    private int _depth;
     private protected object Input;
     private DecomposedObject? _decomposedObject;
+
+    private int _depth;
 
     /// <summary>
     ///     Initialize a new composer instance

@@ -13,6 +13,7 @@
 // UNINTERRUPTED OR ERROR FREE.
 
 using System.Reflection;
+using System.Text;
 using BenchmarkDotNet.Attributes;
 
 namespace LookupEngine.Tests.Benchmarks.Benchmarks;
@@ -36,7 +37,10 @@ public class FormatMemberNameBenchmark
     [Benchmark]
     public string LinqSelectJoin()
     {
-        if (_parameters.Length == 0) return _member.Name;
+        if (_parameters.Length == 0)
+        {
+            return _member.Name;
+        }
 
         var formatedParameters = _parameters.Select(info =>
         {
@@ -53,9 +57,12 @@ public class FormatMemberNameBenchmark
     [Benchmark]
     public string StringBuilderAppend()
     {
-        if (_parameters.Length == 0) return _member.Name;
+        if (_parameters.Length == 0)
+        {
+            return _member.Name;
+        }
 
-        var builder = new System.Text.StringBuilder();
+        var builder = new StringBuilder();
         builder.Append(_member.Name);
         builder.Append(" (");
 
@@ -72,7 +79,10 @@ public class FormatMemberNameBenchmark
                 builder.Append(FormatTypeName(parameterType));
             }
 
-            if (i < _parameters.Length - 1) builder.Append(", ");
+            if (i < _parameters.Length - 1)
+            {
+                builder.Append(", ");
+            }
         }
 
         builder.Append(')');
@@ -82,9 +92,12 @@ public class FormatMemberNameBenchmark
     [Benchmark(Baseline = true)]
     public string StringBuilderSpanTrim()
     {
-        if (_parameters.Length == 0) return _member.Name;
+        if (_parameters.Length == 0)
+        {
+            return _member.Name;
+        }
 
-        var builder = new System.Text.StringBuilder();
+        var builder = new StringBuilder();
         builder.Append(_member.Name);
         builder.Append(" (");
 
@@ -102,7 +115,10 @@ public class FormatMemberNameBenchmark
                 builder.Append(FormatTypeName(parameterType));
             }
 
-            if (i < _parameters.Length - 1) builder.Append(", ");
+            if (i < _parameters.Length - 1)
+            {
+                builder.Append(", ");
+            }
         }
 
         builder.Append(')');
@@ -111,17 +127,27 @@ public class FormatMemberNameBenchmark
 
     private static string FormatTypeName(Type type)
     {
-        if (!type.IsGenericType) return type.Name;
+        if (!type.IsGenericType)
+        {
+            return type.Name;
+        }
 
         var typeName = type.Name;
         var apostropheIndex = typeName.IndexOf('`');
-        if (apostropheIndex > 0) typeName = typeName[..apostropheIndex];
+        if (apostropheIndex > 0)
+        {
+            typeName = typeName[..apostropheIndex];
+        }
+
         typeName += "<";
         var genericArguments = type.GetGenericArguments();
         for (var i = 0; i < genericArguments.Length; i++)
         {
             typeName += FormatTypeName(genericArguments[i]);
-            if (i < genericArguments.Length - 1) typeName += ", ";
+            if (i < genericArguments.Length - 1)
+            {
+                typeName += ", ";
+            }
         }
 
         typeName += ">";

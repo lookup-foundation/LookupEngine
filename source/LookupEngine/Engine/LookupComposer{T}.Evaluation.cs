@@ -13,6 +13,7 @@
 // UNINTERRUPTED OR ERROR FREE.
 
 // ReSharper disable once CheckNamespace
+
 namespace LookupEngine;
 
 public partial class LookupComposer<TContext>

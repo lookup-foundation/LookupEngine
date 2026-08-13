@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Lookup Foundation and Contributors
-// 
+//
 // Permission to use, copy, modify, and distribute this software in
 // object code form for any purpose and without fee is hereby granted,
 // provided that the above copyright notice appears in all copies and
 // that both that copyright notice and the limited warranty and
 // restricted rights notice below appear in all supporting
 // documentation.
-// 
+//
 // THIS PROGRAM IS PROVIDED "AS IS" AND WITH ALL FAULTS.
 // NO IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE IS PROVIDED.
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
@@ -93,8 +93,15 @@ public partial class LookupComposer
             MemberDeclaringDescriptor = _options.TypeResolver.Invoke(Input, MemberDeclaringType);
 
             var flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            if (_options.IncludeStaticMembers) flags |= BindingFlags.Static;
-            if (_options.IncludePrivateMembers) flags |= BindingFlags.NonPublic;
+            if (_options.IncludeStaticMembers)
+            {
+                flags |= BindingFlags.Static;
+            }
+
+            if (_options.IncludePrivateMembers)
+            {
+                flags |= BindingFlags.NonPublic;
+            }
 
             ConfigureMembers();
             DecomposeFields(flags);
@@ -121,7 +128,10 @@ public partial class LookupComposer
         DecomposedMembers = new List<DecomposedMember>(32);
 
         var flags = BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly;
-        if (_options.IncludePrivateMembers) flags |= BindingFlags.NonPublic;
+        if (_options.IncludePrivateMembers)
+        {
+            flags |= BindingFlags.NonPublic;
+        }
 
         var objectTypeHierarchy = GetTypeHierarchy(objectType);
         for (var i = objectTypeHierarchy.Count - 1; i >= 0; i--)
@@ -154,7 +164,10 @@ public partial class LookupComposer
             inputType = inputType.BaseType;
         }
 
-        if (_options.IncludeRoot) types.Add(inputType);
+        if (_options.IncludeRoot)
+        {
+            types.Add(inputType);
+        }
 
         return types;
     }

@@ -6,7 +6,7 @@ using LookupEngine.Options;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for <see cref="IDescriptorRedirector"/> functionality and value redirection behavior.
+///     Tests for <see cref="IDescriptorRedirector" /> functionality and value redirection behavior.
 /// </summary>
 public sealed class RedirectionTests
 {
@@ -120,6 +120,7 @@ public sealed class RedirectionTests
             await Assert.That(comparableContextResult.Members[0].Value.TypeName).IsNotEqualTo(comparableResult.Members[0].Value.TypeName);
         }
     }
+
     [Test]
     public async Task Decompose_CyclicRedirection_Terminates()
     {
@@ -182,20 +183,25 @@ public sealed class RedirectionTests
     }
 }
 
+[PublicAPI]
 file sealed class RedirectContainerObject
 {
     public RedirectableObject PropertyToRedirect => new();
 }
 
+[PublicAPI]
 file sealed class CycleContainerObject
 {
     public CycleFirstObject PropertyToRedirect => new();
 }
 
+[PublicAPI]
 file sealed class CycleFirstObject;
 
+[PublicAPI]
 file sealed class CycleSecondObject;
 
+[PublicAPI]
 file sealed class CycleFirstDescriptor : Descriptor, IDescriptorRedirector
 {
     public bool TryRedirect(string target, out object result)
@@ -205,6 +211,7 @@ file sealed class CycleFirstDescriptor : Descriptor, IDescriptorRedirector
     }
 }
 
+[PublicAPI]
 file sealed class CycleSecondDescriptor : Descriptor, IDescriptorRedirector
 {
     public bool TryRedirect(string target, out object result)
@@ -214,6 +221,7 @@ file sealed class CycleSecondDescriptor : Descriptor, IDescriptorRedirector
     }
 }
 
+[PublicAPI]
 file sealed class CycleContextDescriptor : Descriptor, IDescriptorRedirector<EngineTestContext>
 {
     public bool TryRedirect(string target, EngineTestContext context, out object result)
@@ -223,17 +231,20 @@ file sealed class CycleContextDescriptor : Descriptor, IDescriptorRedirector<Eng
     }
 }
 
+[PublicAPI]
 file sealed class RedirectableObject
 {
     public Random Random { get; set; } = new(69);
 }
 
+[PublicAPI]
 file sealed class EngineTestContext
 {
     public int Version { get; } = 1;
     public string Metadata { get; } = "Test context";
 }
 
+[PublicAPI]
 file sealed class RedirectionDescriptor : Descriptor, IDescriptorRedirector, IDescriptorRedirector<EngineTestContext>
 {
     public RedirectionDescriptor()

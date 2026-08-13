@@ -1,3 +1,4 @@
+using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Descriptors;
 
 namespace LookupEngine.Tests.Unit;
@@ -51,7 +52,7 @@ public sealed class NullHandlingTests
     public async Task Decompose_PropertyWithNullValue_HandlesCorrectly()
     {
         // Arrange
-        var testObject = new NullPropertyObject {Value = null};
+        var testObject = new NullPropertyObject { Value = null };
 
         // Act
         var result = LookupComposer.Decompose(testObject);
@@ -67,8 +68,8 @@ public sealed class NullHandlingTests
     public async Task Decompose_FieldWithNullValue_HandlesCorrectly()
     {
         // Arrange
-        var testObject = new NullFieldObject {Field = null};
-        var options = new DecomposeOptions {IncludeFields = true};
+        var testObject = new NullFieldObject { Field = null };
+        var options = new DecomposeOptions { IncludeFields = true };
 
         // Act
         var result = LookupComposer.Decompose(testObject, options);
@@ -134,7 +135,7 @@ public sealed class NullHandlingTests
     public async Task Decompose_NullInEnumerable_HandlesGracefully()
     {
         // Arrange
-        var list = new List<string?> {"First", null, "Third"};
+        var list = new List<string?> { "First", null, "Third" };
 
         // Act
         var result = LookupComposer.Decompose(list);
@@ -172,7 +173,7 @@ public sealed class NullHandlingTests
     public async Task Decompose_NullNamespace_HandlesGracefully()
     {
         // Arrange - Anonymous types have null namespace
-        var anonymous = new {Value = 42};
+        var anonymous = new { Value = 42 };
 
         // Act
         var result = LookupComposer.Decompose(anonymous);
@@ -186,23 +187,26 @@ public sealed class NullHandlingTests
     }
 }
 
-// Test helper classes
+[PublicAPI]
 file sealed class NullPropertyObject
 {
     public string? Value { get; set; }
 }
 
+[PublicAPI]
 file sealed class NullFieldObject
 {
     public string? Field;
 }
 
+[PublicAPI]
 file sealed class NullableValueTypeObject
 {
     public int? NullableInt { get; set; }
     public int? HasValue { get; set; }
 }
 
+[PublicAPI]
 file sealed class AllNullObject
 {
     public string? Property1 { get; set; }
@@ -210,11 +214,11 @@ file sealed class AllNullObject
     public string? Property3 { get; set; }
 }
 
-file sealed class NullDescriptorNameObject
-{
-}
+[PublicAPI]
+file sealed class NullDescriptorNameObject;
 
-file sealed class NullNameDescriptor : LookupEngine.Abstractions.Decomposition.Descriptor
+[PublicAPI]
+file sealed class NullNameDescriptor : Descriptor
 {
     // Name intentionally not set (will be null)
 }

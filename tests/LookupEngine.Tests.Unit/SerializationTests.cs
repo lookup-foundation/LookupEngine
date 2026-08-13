@@ -12,7 +12,7 @@ public sealed class SerializationTests
     {
         WriteIndented = true
     };
-    
+
     [Test]
     public async Task Decompose_SerializeToJson_ReturnsValidJson()
     {
@@ -28,8 +28,8 @@ public sealed class SerializationTests
         {
             await Assert.That(json).IsNotNull();
             await Assert.That(json).Contains($"""
-                                             "Name": "{nameof(SerializableObject.Name)}"
-                                             """);
+                                              "Name": "{nameof(SerializableObject.Name)}"
+                                              """);
             await Assert.That(json).Contains($"""
                                               "Name": "{nameof(SerializableObject.Value)}"
                                               """);
@@ -57,7 +57,7 @@ public sealed class SerializationTests
             await Assert.That(deserialized.TypeName).IsEqualTo(original.TypeName);
             await Assert.That(deserialized.TypeFullName).IsEqualTo(original.TypeFullName);
             await Assert.That(deserialized.Members).Count().IsEqualTo(original.Members.Count);
-            
+
             for (var i = 0; i < original.Members.Count; i++)
             {
                 await Assert.That(deserialized.Members[i].Name).IsEqualTo(original.Members[i].Name);
@@ -76,6 +76,7 @@ public sealed class SerializationTests
     }
 }
 
+[PublicAPI]
 public class SerializableObject
 {
     public string? Name { get; set; } = "Test";

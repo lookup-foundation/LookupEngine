@@ -4,7 +4,7 @@ using LookupEngine.Abstractions.Enums;
 namespace LookupEngine.Formaters;
 
 /// <summary>
-///     Converts reflection metadata into <see cref="MemberAttributes"/> flags.
+///     Converts reflection metadata into <see cref="MemberAttributes" /> flags.
 /// </summary>
 internal static class ModifiersFormater
 {
@@ -22,15 +22,31 @@ internal static class ModifiersFormater
 
     private static MemberAttributes CombineModifiers(MemberAttributes attributes, MethodAttributes methodAttributes)
     {
-        if ((methodAttributes & MethodAttributes.Static) != 0) attributes |= MemberAttributes.Static;
-        if ((methodAttributes & MethodAttributes.Private) != 0) attributes |= MemberAttributes.Private;
+        if ((methodAttributes & MethodAttributes.Static) != 0)
+        {
+            attributes |= MemberAttributes.Static;
+        }
+
+        if ((methodAttributes & MethodAttributes.Private) != 0)
+        {
+            attributes |= MemberAttributes.Private;
+        }
+
         return attributes;
     }
 
     private static MemberAttributes CombineModifiers(MemberAttributes attributes, FieldAttributes fieldAttributes)
     {
-        if ((fieldAttributes & FieldAttributes.Static) != 0) attributes |= MemberAttributes.Static;
-        if ((fieldAttributes & FieldAttributes.Private) != 0) attributes |= MemberAttributes.Private;
+        if ((fieldAttributes & FieldAttributes.Static) != 0)
+        {
+            attributes |= MemberAttributes.Static;
+        }
+
+        if ((fieldAttributes & FieldAttributes.Private) != 0)
+        {
+            attributes |= MemberAttributes.Private;
+        }
+
         return attributes;
     }
 }

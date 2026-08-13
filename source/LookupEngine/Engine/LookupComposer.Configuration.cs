@@ -25,19 +25,9 @@ namespace LookupEngine;
 public partial class LookupComposer : IMemberConfigurator
 {
     private static readonly ConcurrentDictionary<(Type Descriptor, Type Interface), bool> ImplementationOwnerCache = new();
-
-    private readonly Dictionary<string, List<MemberRegistration>> _memberRegistrations = new();
     private readonly List<Action> _extensionQueue = [];
 
-    /// <summary>
-    ///     A descriptor-declared configuration of a member
-    /// </summary>
-    private readonly struct MemberRegistration(Func<ParameterInfo[], bool>? predicate, Func<object?>? handler, MemberEvaluationPolicy? evaluationPolicy)
-    {
-        public readonly Func<ParameterInfo[], bool>? Predicate = predicate;
-        public readonly Func<object?>? Handler = handler;
-        public readonly MemberEvaluationPolicy? EvaluationPolicy = evaluationPolicy;
-    }
+    private readonly Dictionary<string, List<MemberRegistration>> _memberRegistrations = new();
 
     /// <summary>
     ///     Configures an existing member of the described type by name
@@ -74,7 +64,10 @@ public partial class LookupComposer : IMemberConfigurator
     /// </summary>
     private void FlushExtensions()
     {
-        if (!_options.EnableExtensions) return;
+        if (!_options.EnableExtensions)
+        {
+            return;
+        }
 
         foreach (var registration in _extensionQueue)
         {
@@ -90,11 +83,17 @@ public partial class LookupComposer : IMemberConfigurator
         handler = null;
         evaluationPolicy = null;
 
-        if (!_memberRegistrations.TryGetValue(name, out var registrations)) return false;
+        if (!_memberRegistrations.TryGetValue(name, out var registrations))
+        {
+            return false;
+        }
 
         foreach (var registration in registrations)
         {
-            if (registration.Predicate is not null && !registration.Predicate.Invoke(parameters)) continue;
+            if (registration.Predicate is not null && !registration.Predicate.Invoke(parameters))
+            {
+                continue;
+            }
 
             handler = registration.Handler;
             evaluationPolicy = registration.EvaluationPolicy;
@@ -119,7 +118,10 @@ public partial class LookupComposer : IMemberConfigurator
     {
         _extensionQueue.Add(() =>
         {
-            if ((attributes & MemberAttributes.Static) != 0 && !_options.IncludeStaticMembers) return;
+            if ((attributes & MemberAttributes.Static) != 0 && !_options.IncludeStaticMembers)
+            {
+                return;
+            }
 
             if (policy == MemberEvaluationPolicy.Deferred)
             {
@@ -143,8 +145,15 @@ public partial class LookupComposer : IMemberConfigurator
     {
         _extensionQueue.Add(() =>
         {
-            if (!_options.IncludeUnsupported) return;
-            if ((attributes & MemberAttributes.Static) != 0 && !_options.IncludeStaticMembers) return;
+            if (!_options.IncludeUnsupported)
+            {
+                return;
+            }
+
+            if ((attributes & MemberAttributes.Static) != 0 && !_options.IncludeStaticMembers)
+            {
+                return;
+            }
 
             WriteExtensionResultMember(name, attributes, policy);
         });
@@ -168,5 +177,15 @@ public partial class LookupComposer : IMemberConfigurator
         ImplementationOwnerCache[key] = owns;
 
         return owns;
+    }
+
+    /// <summary>
+    ///     A descriptor-declared configuration of a member
+    /// </summary>
+    private readonly struct MemberRegistration(Func<ParameterInfo[], bool>? predicate, Func<object?>? handler, MemberEvaluationPolicy? evaluationPolicy)
+    {
+        public readonly Func<ParameterInfo[], bool>? Predicate = predicate;
+        public readonly Func<object?>? Handler = handler;
+        public readonly MemberEvaluationPolicy? EvaluationPolicy = evaluationPolicy;
     }
 }

@@ -10,17 +10,27 @@ internal static class ReflexionFormater
 {
     internal static string FormatTypeName(Type type)
     {
-        if (!type.IsGenericType) return type.Name;
+        if (!type.IsGenericType)
+        {
+            return type.Name;
+        }
 
         var typeName = type.Name;
         var apostropheIndex = typeName.IndexOf('`');
-        if (apostropheIndex > 0) typeName = typeName[..apostropheIndex];
+        if (apostropheIndex > 0)
+        {
+            typeName = typeName[..apostropheIndex];
+        }
+
         typeName += "<";
         var genericArguments = type.GetGenericArguments();
         for (var i = 0; i < genericArguments.Length; i++)
         {
             typeName += FormatTypeName(genericArguments[i]);
-            if (i < genericArguments.Length - 1) typeName += ", ";
+            if (i < genericArguments.Length - 1)
+            {
+                typeName += ", ";
+            }
         }
 
         typeName += ">";
@@ -34,7 +44,10 @@ internal static class ReflexionFormater
 
     internal static string FormatMemberName(MemberInfo member, ParameterInfo[] parameters)
     {
-        if (parameters.Length == 0) return member.Name;
+        if (parameters.Length == 0)
+        {
+            return member.Name;
+        }
 
         var builder = new StringBuilder();
         builder.Append(member.Name);
@@ -54,7 +67,10 @@ internal static class ReflexionFormater
                 builder.Append(FormatTypeName(parameterType));
             }
 
-            if (i < parameters.Length - 1) builder.Append(", ");
+            if (i < parameters.Length - 1)
+            {
+                builder.Append(", ");
+            }
         }
 
         builder.Append(')');

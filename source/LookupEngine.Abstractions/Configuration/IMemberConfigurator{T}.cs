@@ -15,7 +15,7 @@
 namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
-///     Context-aware builder passed to <see cref="IDescriptorConfigurator{TContext}.Configure"/> to configure member handlers, evaluation policy overrides, and synthetic extension members for a descriptor.
+///     Context-aware builder passed to <see cref="IDescriptorConfigurator{TContext}.Configure" /> to configure member handlers, evaluation policy overrides, and synthetic extension members for a descriptor.
 /// </summary>
 /// <typeparam name="TContext">The type of execution context available to registered handlers.</typeparam>
 public interface IMemberConfigurator<TContext>
@@ -24,7 +24,7 @@ public interface IMemberConfigurator<TContext>
     ///     Returns a builder for configuring an existing member of the described type.
     /// </summary>
     /// <param name="name">
-    ///     The member name. Affects all overloads unless narrowed with <see cref="MemberResolverBuilder{TContext}.When"/>.
+    ///     The member name. Affects all overloads unless narrowed with <see cref="MemberResolverBuilder{TContext}.When" />.
     /// </param>
     MemberResolverBuilder<TContext> Member(string name);
 

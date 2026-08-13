@@ -1,7 +1,7 @@
 ﻿namespace LookupEngine.Abstractions.Decomposition;
 
 /// <summary>
-///     A typed, mutable accumulator for multiple <see cref="IVariant"/> values produced by a single member.
+///     A typed, mutable accumulator for multiple <see cref="IVariant" /> values produced by a single member.
 /// </summary>
 /// <typeparam name="T">The element type of each added value.</typeparam>
 public interface IVariantsCollection<in T> : IVariantsCollection

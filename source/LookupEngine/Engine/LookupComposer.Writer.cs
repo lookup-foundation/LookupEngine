@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Lookup Foundation and Contributors
-// 
+//
 // Permission to use, copy, modify, and distribute this software in
 // object code form for any purpose and without fee is hereby granted,
 // provided that the above copyright notice appears in all copies and
 // that both that copyright notice and the limited warranty and
 // restricted rights notice below appear in all supporting
 // documentation.
-// 
+//
 // THIS PROGRAM IS PROVIDED "AS IS" AND WITH ALL FAULTS.
 // NO IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE IS PROVIDED.
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
@@ -86,7 +86,7 @@ public partial class LookupComposer
             Name = $"{ReflexionFormater.FormatTypeName(MemberDeclaringType).Replace("[]", string.Empty)}[{index}]",
             MemberAttributes = MemberAttributes.Property,
             DeclaringTypeName = nameof(IEnumerable),
-            DeclaringTypeFullName = $"{nameof(System)}.{nameof(System.Collections)}.{nameof(IEnumerable)}",
+            DeclaringTypeFullName = $"{nameof(System)}.{nameof(System.Collections)}.{nameof(IEnumerable)}"
         };
 
         DecomposedMembers.Add(member);
@@ -251,21 +251,28 @@ public partial class LookupComposer
 
         DecomposedMembers.Add(member);
     }
-    
+
     private DecomposedValue CreateMemberValue(MemberInfo memberInfo, object? value)
     {
-        if (value is null && memberInfo is MethodInfo {ReturnType: var returnType} && returnType == typeof(void))
+        if (value is null && memberInfo is MethodInfo { ReturnType: var returnType } && returnType == typeof(void))
         {
             return CreateVoidValue();
         }
 
         return CreateRuntimeValue(memberInfo.Name, value);
     }
-    
+
     private DecomposedValue CreateRuntimeValue(string targetMember, object? value)
     {
-        if (value is null) return CreateNullableValue();
-        if (value is IVariant {Value: null}) return CreateNullableValue();
+        if (value is null)
+        {
+            return CreateNullableValue();
+        }
+
+        if (value is IVariant { Value: null })
+        {
+            return CreateNullableValue();
+        }
 
         value = RedirectValue(value, targetMember, out var valueDescriptor, out var description);
 

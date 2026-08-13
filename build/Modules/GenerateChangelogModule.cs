@@ -40,7 +40,10 @@ public sealed class GenerateChangelogModule(IOptions<PublishOptions> publishOpti
         {
             if (isChangelogEntryFound)
             {
-                if (line.StartsWith(separator)) break;
+                if (line.StartsWith(separator))
+                {
+                    break;
+                }
 
                 changelog.AppendLine(line);
                 continue;
@@ -61,13 +64,23 @@ public sealed class GenerateChangelogModule(IOptions<PublishOptions> publishOpti
     /// </summary>
     private static void TrimEmptyLines(StringBuilder changelog)
     {
-        if (changelog.Length == 0) return;
+        if (changelog.Length == 0)
+        {
+            return;
+        }
 
         var start = 0;
         var end = changelog.Length - 1;
 
-        while (start < changelog.Length && (changelog[start] == '\r' || changelog[start] == '\n')) start++;
-        while (end >= start && (changelog[end] == '\r' || changelog[end] == '\n')) end--;
+        while (start < changelog.Length && (changelog[start] == '\r' || changelog[start] == '\n'))
+        {
+            start++;
+        }
+
+        while (end >= start && (changelog[end] == '\r' || changelog[end] == '\n'))
+        {
+            end--;
+        }
 
         if (end < changelog.Length - 1)
         {

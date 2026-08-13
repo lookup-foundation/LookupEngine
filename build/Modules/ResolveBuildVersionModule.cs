@@ -77,7 +77,10 @@ public sealed class ResolveBuildVersionModule(IOptions<PublishOptions> publishOp
             });
 
         var previousTag = describeResult.StandardOutput.Trim();
-        if (!string.IsNullOrWhiteSpace(previousTag)) return previousTag;
+        if (!string.IsNullOrWhiteSpace(previousTag))
+        {
+            return previousTag;
+        }
 
         var revisionResult = await context.Git().Commands.RevList(
             new GitRevListOptions
@@ -104,8 +107,8 @@ public sealed record ResolveVersioningResult
     /// </summary>
     /// <remarks>Version format: <c>version-environment.n.date</c>.</remarks>
     /// <example>
-    ///     1.0.0-alpha.1.250101 <br/>
-    ///     1.0.0-beta.2.250101 <br/>
+    ///     1.0.0-alpha.1.250101 <br />
+    ///     1.0.0-beta.2.250101 <br />
     ///     1.0.0
     /// </example>
     public required string Version { get; init; }
@@ -114,8 +117,8 @@ public sealed record ResolveVersioningResult
     ///     The normal part of the release version number.
     /// </summary>
     /// <example>
-    ///     1.0.0 <br/>
-    ///     12.3.6 <br/>
+    ///     1.0.0 <br />
+    ///     12.3.6 <br />
     ///     2026.4.0
     /// </example>
     public required string VersionPrefix { get; init; }
@@ -124,8 +127,8 @@ public sealed record ResolveVersioningResult
     ///     The pre-release label of the release version number.
     /// </summary>
     /// <example>
-    ///     alpha <br/>
-    ///     beta <br/>
+    ///     alpha <br />
+    ///     beta <br />
     ///     rc.1.250101
     /// </example>
     public required string? VersionSuffix { get; init; }
@@ -134,8 +137,8 @@ public sealed record ResolveVersioningResult
     ///     Indicates whether the current version represents a prerelease.
     /// </summary>
     /// <remarks>
-    /// A version is considered a prerelease if it includes a version suffix,
-    /// such as "alpha", "beta", or similar identifiers.
+    ///     A version is considered a prerelease if it includes a version suffix,
+    ///     such as "alpha", "beta", or similar identifiers.
     /// </remarks>
     public required bool IsPrerelease { get; init; }
 

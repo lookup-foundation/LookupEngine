@@ -18,7 +18,10 @@ public sealed class GenerateGitHubChangelogModule : Module<string>
         var changelogResult = await context.GetModule<GenerateChangelogModule>();
         var versioning = versioningResult.ValueOrDefault!;
         var changelog = changelogResult.ValueOrDefault!;
-        if (changelog.Length == 0) return changelog;
+        if (changelog.Length == 0)
+        {
+            return changelog;
+        }
 
         return AppendGitHubCompareUrl(context, changelog, versioning);
     }
@@ -28,7 +31,10 @@ public sealed class GenerateGitHubChangelogModule : Module<string>
     /// </summary>
     private static string AppendGitHubCompareUrl(IPipelineContext context, string changelog, ResolveVersioningResult versioning)
     {
-        if (changelog.Contains("Full changelog", StringComparison.OrdinalIgnoreCase)) return changelog;
+        if (changelog.Contains("Full changelog", StringComparison.OrdinalIgnoreCase))
+        {
+            return changelog;
+        }
 
         var repositoryInfo = context.GitHub().RepositoryInfo;
         var url = $"https://github.com/{repositoryInfo.Identifier}/compare/{versioning.PreviousVersion}...{versioning.Version}";

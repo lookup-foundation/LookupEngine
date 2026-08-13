@@ -67,7 +67,7 @@ public struct ExtensionBuilder<TContext>
     ///     Registers the extension with the context-aware evaluation handler that produces its value, evaluated eagerly during decomposition.
     /// </summary>
     /// <param name="handler">Returns the resolved value for this extension given the execution context.</param>
-    /// <remarks>Extensions are not governed by the engine evaluation policy; they evaluate eagerly unless deferred with <see cref="Defer(Func{TContext, IVariant})"/>.</remarks>
+    /// <remarks>Extensions are not governed by the engine evaluation policy; they evaluate eagerly unless deferred with <see cref="Defer(Func{TContext, IVariant})" />.</remarks>
     public readonly void Register(Func<TContext, IVariant> handler)
     {
         _registerCallback(_name, _attributes, handler, null);
@@ -77,7 +77,7 @@ public struct ExtensionBuilder<TContext>
     ///     Registers the extension with the context-aware evaluation handler that produces its value, evaluated eagerly during decomposition.
     /// </summary>
     /// <param name="handler">Returns the resolved value for this extension given the execution context.</param>
-    /// <remarks>Extensions are not governed by the engine evaluation policy; they evaluate eagerly unless deferred with <see cref="Defer(Func{TContext, object})"/>.</remarks>
+    /// <remarks>Extensions are not governed by the engine evaluation policy; they evaluate eagerly unless deferred with <see cref="Defer(Func{TContext, object})" />.</remarks>
     public readonly void Register(Func<TContext, object?> handler)
     {
         _registerCallback(_name, _attributes, handler, null);

@@ -20,7 +20,7 @@ namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
 ///     Fluent builder for configuring how an existing member is resolved and evaluated using caller-supplied context.
-///     Obtained from <see cref="IMemberConfigurator{TContext}.Member"/>.
+///     Obtained from <see cref="IMemberConfigurator{TContext}.Member" />.
 /// </summary>
 /// <typeparam name="TContext">The type of execution context available to registered handlers.</typeparam>
 [PublicAPI]
@@ -52,7 +52,7 @@ public struct MemberResolverBuilder<TContext>
 
     /// <summary>
     ///     Supplies a context-aware handler whose result replaces the reflected value.
-    ///     The engine's <see cref="MethodEvaluationPolicy"/> still decides whether to evaluate eagerly or defer.
+    ///     The engine's <see cref="MethodEvaluationPolicy" /> still decides whether to evaluate eagerly or defer.
     /// </summary>
     public readonly void Resolve(Func<TContext, IVariant> handler)
     {
@@ -61,7 +61,7 @@ public struct MemberResolverBuilder<TContext>
 
     /// <summary>
     ///     Supplies a context-aware handler whose result replaces the reflected value.
-    ///     The engine's <see cref="MethodEvaluationPolicy"/> still decides whether to evaluate eagerly or defer.
+    ///     The engine's <see cref="MethodEvaluationPolicy" /> still decides whether to evaluate eagerly or defer.
     /// </summary>
     public readonly void Resolve(Func<TContext, object?> handler)
     {

@@ -6,7 +6,7 @@ using LookupEngine.Descriptors;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for <see cref="MemberAttributes"/> flag assignment and combination.
+///     Tests for <see cref="MemberAttributes" /> flag assignment and combination.
 /// </summary>
 public sealed class MemberAttributesTests
 {
@@ -197,17 +197,22 @@ file sealed class ExtensionDescriptor : Descriptor, IDescriptorConfigurator
     }
 }
 
-// Test helper classes
+// [PublicAPI]
 file sealed class FieldsObject
 {
     public string? PublicField;
 }
 
+[PublicAPI]
 file sealed class MethodsObject
 {
-    public string PublicMethod() => "Result";
+    public string PublicMethod()
+    {
+        return "Result";
+    }
 }
 
+[PublicAPI]
 file sealed class StaticMembersObject
 {
     public static string StaticProperty => "Static";

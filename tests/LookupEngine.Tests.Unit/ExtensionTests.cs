@@ -7,7 +7,7 @@ using LookupEngine.Options;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for <see cref="IDescriptorConfigurator"/> extension functionality and context data enrichment.
+///     Tests for <see cref="IDescriptorConfigurator" /> extension functionality and context data enrichment.
 /// </summary>
 public sealed class ExtensionTests
 {
@@ -361,8 +361,10 @@ public sealed class ExtensionTests
     }
 }
 
+[PublicAPI]
 file sealed class ExtensibleObject;
 
+[PublicAPI]
 file sealed class DelegatingConfigurator(Action<IMemberConfigurator> configure) : Descriptor, IDescriptorConfigurator
 {
     public void Configure(IMemberConfigurator configuration)
@@ -371,6 +373,7 @@ file sealed class DelegatingConfigurator(Action<IMemberConfigurator> configure) 
     }
 }
 
+[PublicAPI]
 file sealed class DelegatingContextConfigurator(Action<IMemberConfigurator<EngineTestContext>> configure) : Descriptor, IDescriptorConfigurator<EngineTestContext>
 {
     public void Configure(IMemberConfigurator<EngineTestContext> configuration)
@@ -379,6 +382,7 @@ file sealed class DelegatingContextConfigurator(Action<IMemberConfigurator<Engin
     }
 }
 
+[PublicAPI]
 file sealed class EquivalenceExtensionDescriptor : Descriptor, IDescriptorConfigurator
 {
     public void Configure(IMemberConfigurator configuration)
@@ -388,12 +392,14 @@ file sealed class EquivalenceExtensionDescriptor : Descriptor, IDescriptorConfig
     }
 }
 
+[PublicAPI]
 file sealed class EngineTestContext
 {
     public int Version { get; } = 1;
     public string Metadata { get; } = "Test context";
 }
 
+[PublicAPI]
 file sealed class ExtensionDescriptor : Descriptor, IDescriptorConfigurator, IDescriptorConfigurator<EngineTestContext>
 {
     public void Configure(IMemberConfigurator configuration)

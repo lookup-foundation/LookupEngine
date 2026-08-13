@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Lookup Foundation and Contributors
-// 
+//
 // Permission to use, copy, modify, and distribute this software in
 // object code form for any purpose and without fee is hereby granted,
 // provided that the above copyright notice appears in all copies and
 // that both that copyright notice and the limited warranty and
 // restricted rights notice below appear in all supporting
 // documentation.
-// 
+//
 // THIS PROGRAM IS PROVIDED "AS IS" AND WITH ALL FAULTS.
 // NO IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE IS PROVIDED.
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
@@ -21,10 +21,9 @@ namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 /// </summary>
 public class TypeEqualBenchmark
 {
-    private object Object { get; set; } = new RoundButton();
+    private object Object { get; } = new RoundButton();
 
-    [Params(null, typeof(ButtonBase))]
-    public Type? Type { get; set; }
+    [Params(null, typeof(ButtonBase))] public Type? Type { get; set; }
 
     [Benchmark]
     public string? PatternMatching()

@@ -212,7 +212,7 @@ public sealed class StaticTypeTests
 [PublicAPI]
 file static class StaticTestClass
 {
+    public static string PublicStaticField = "Field";
     public static string PublicStaticProperty => "Public";
     private static string PrivateStaticProperty => "Private";
-    public static string PublicStaticField = "Field";
 }

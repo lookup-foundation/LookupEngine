@@ -61,13 +61,13 @@ public sealed class DecomposedMember
 
     /// <summary>
     ///     Engine-provided handle that evaluates this member on demand.
-    ///     Present for deferred and evaluated members; <see langword="null"/> for disabled and unsupported members.
+    ///     Present for deferred and evaluated members; <see langword="null" /> for disabled and unsupported members.
     /// </summary>
     [JsonIgnore]
     public Action<DecomposedMember>? Evaluator { get; set; }
 
     /// <summary>
-    ///     Triggers evaluation of this member through the engine, updating <see cref="Value"/>, <see cref="ComputationTime"/>, and <see cref="AllocatedBytes"/> in place.
+    ///     Triggers evaluation of this member through the engine, updating <see cref="Value" />, <see cref="ComputationTime" />, and <see cref="AllocatedBytes" /> in place.
     ///     May be called to refresh the value.
     /// </summary>
     /// <exception cref="InvalidOperationException">
@@ -75,7 +75,10 @@ public sealed class DecomposedMember
     /// </exception>
     public void Evaluate()
     {
-        if (Evaluator is null) throw new InvalidOperationException("The member cannot be evaluated");
+        if (Evaluator is null)
+        {
+            throw new InvalidOperationException("The member cannot be evaluated");
+        }
 
         Evaluator.Invoke(this);
     }

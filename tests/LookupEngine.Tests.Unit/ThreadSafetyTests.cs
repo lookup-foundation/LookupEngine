@@ -14,7 +14,7 @@ public sealed class ThreadSafetyTests
     public async Task Decompose_ConcurrentCalls_AllSucceed()
     {
         // Arrange
-        var testObject = new {Name = "Test", Value = 42};
+        var testObject = new { Name = "Test", Value = 42 };
         const int threadCount = 10;
         var tasks = new List<Task<DecomposedObject>>();
 
@@ -45,7 +45,7 @@ public sealed class ThreadSafetyTests
     {
         // Arrange
         var testObjects = Enumerable.Range(0, 100)
-            .Select(i => new {Index = i, Value = i * 2})
+            .Select(i => new { Index = i, Value = i * 2 })
             .ToList();
 
         // Act
@@ -68,7 +68,7 @@ public sealed class ThreadSafetyTests
     public async Task Decompose_WithOptions_ThreadSafe()
     {
         // Arrange
-        var testObject = new {Name = "Test"};
+        var testObject = new { Name = "Test" };
         var options = new DecomposeOptions
         {
             IncludeStaticMembers = true,
@@ -101,8 +101,8 @@ public sealed class ThreadSafetyTests
     public async Task Decompose_DifferentObjectsConcurrently_NoInterference()
     {
         // Arrange
-        var object1 = new {Type = "First", Value = 1};
-        var object2 = new {Type = "Second", Count = 2};
+        var object1 = new { Type = "First", Value = 1 };
+        var object2 = new { Type = "Second", Count = 2 };
         var object3 = new DateTime(2025, 1, 11);
 
         // Act
@@ -133,7 +133,7 @@ public sealed class ThreadSafetyTests
         var tasks = Enumerable.Range(0, 20)
             .Select(i => Task.Run(() =>
             {
-                var obj = new {Index = i};
+                var obj = new { Index = i };
                 return LookupComposer.Decompose(obj, sharedOptions);
             }))
             .ToList();
@@ -156,7 +156,7 @@ public sealed class ThreadSafetyTests
     public async Task DecomposeMembers_Concurrent_AllSucceed()
     {
         // Arrange
-        var testObject = new {A = 1, B = 2, C = 3};
+        var testObject = new { A = 1, B = 2, C = 3 };
         const int threadCount = 10;
 
         // Act
@@ -222,7 +222,7 @@ public sealed class ThreadSafetyTests
         for (var i = 0; i < descriptors.Length; i++)
         {
             var descriptorType = typeof(CacheStressDescriptor<>).MakeGenericType(markerType);
-            descriptors[i] = (Descriptor) Activator.CreateInstance(descriptorType)!;
+            descriptors[i] = (Descriptor)Activator.CreateInstance(descriptorType)!;
             markerType = typeof(List<>).MakeGenericType(markerType);
         }
 
@@ -258,7 +258,7 @@ public sealed class ThreadSafetyTests
     {
         // Arrange
         const int taskCount = 100;
-        var testObject = new {Value = "Test"};
+        var testObject = new { Value = "Test" };
 
         // Act
         var tasks = Enumerable.Range(0, taskCount)
@@ -280,8 +280,10 @@ public sealed class ThreadSafetyTests
     }
 }
 
+[PublicAPI]
 file sealed class ExtensibleObject;
 
+[PublicAPI]
 file sealed class ExtensionDescriptor : Descriptor, IDescriptorConfigurator
 {
     public void Configure(IMemberConfigurator configuration)
@@ -296,7 +298,7 @@ file sealed class ExtensionDescriptor : Descriptor, IDescriptorConfigurator
     }
 }
 
-// ReSharper disable once UnusedTypeParameter
+[PublicAPI]
 file sealed class CacheStressDescriptor<TMarker> : Descriptor, IDescriptorConfigurator
 {
     public void Configure(IMemberConfigurator configuration)

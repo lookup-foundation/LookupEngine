@@ -31,7 +31,7 @@ var decomposition = LookupComposer.Decompose(data);
 Using context to provide additional metadata to the engine:
 
 ```C#
-// Any object can be used as a context. 
+// Any object can be used as a context.
 // It is used by descriptors that require context to resolve members, or add in-context extensions.
 var data = Colors.Red;
 var options = new DecomposeOptions<ExecutionContext>
@@ -154,7 +154,7 @@ Describing an object is implemented with interfaces.
 
 ### IDescriptorConfigurator
 
-A single place to configure how the engine handles a type: resolve member handlers, override the evaluation policy per member, and register synthetic extension members. 
+A single place to configure how the engine handles a type: resolve member handlers, override the evaluation policy per member, and register synthetic extension members.
 `configuration.Member(name)` configures an existing member; `configuration.Extension(name)` adds a member the type does not have.
 
 ```c#

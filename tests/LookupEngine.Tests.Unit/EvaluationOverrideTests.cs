@@ -7,7 +7,7 @@ using LookupEngine.Options;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for per-member evaluation overrides declared through <see cref="IDescriptorConfigurator"/>.
+///     Tests for per-member evaluation overrides declared through <see cref="IDescriptorConfigurator" />.
 /// </summary>
 public sealed class EvaluationOverrideTests
 {
@@ -226,7 +226,7 @@ public sealed class EvaluationOverrideTests
         var member = includedResult.Members.First(member => member.Name.StartsWith(nameof(OverridableObject.WithParameter)));
         using (Assert.Multiple())
         {
-            await Assert.That(hiddenResult.Members.Where(member => member.Name.StartsWith(nameof(OverridableObject.WithParameter)))).IsEmpty();
+            await Assert.That(hiddenResult.Members.Where(decomposedMember => decomposedMember.Name.StartsWith(nameof(OverridableObject.WithParameter)))).IsEmpty();
             await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Unsupported);
             await Assert.That(member.Evaluator).IsNull();
         }
@@ -240,10 +240,10 @@ public sealed class EvaluationOverrideTests
         var options = CreateOverloadOptions(manager =>
         {
             manager.Member(nameof(OverloadedObject.Get))
-                .When(parameters => parameters is [{ParameterType: var type}] && type == typeof(string))
+                .When(parameters => parameters is [{ ParameterType: var type }] && type == typeof(string))
                 .Disable();
             manager.Member(nameof(OverloadedObject.Get))
-                .When(parameters => parameters is [{ParameterType: var type}] && type == typeof(int))
+                .When(parameters => parameters is [{ ParameterType: var type }] && type == typeof(int))
                 .Evaluate(() => "By int");
         });
 
@@ -394,10 +394,11 @@ public sealed class EvaluationOverrideTests
     }
 }
 
+[PublicAPI]
 file sealed class OverridableObject
 {
-    public int RunCount;
     public int DeleteCount;
+    public int RunCount;
 
     public string GetText()
     {
@@ -426,6 +427,7 @@ file sealed class OverridableObject
     }
 }
 
+[PublicAPI]
 file sealed class OverloadedObject
 {
     public string Get(string key)
@@ -439,6 +441,7 @@ file sealed class OverloadedObject
     }
 }
 
+[PublicAPI]
 file sealed class OverridablePropertyObject
 {
     public int SecretReadCount;
@@ -456,11 +459,13 @@ file sealed class OverridablePropertyObject
     }
 }
 
+[PublicAPI]
 file sealed class OverrideTestContext
 {
     public string Metadata { get; } = "Context metadata";
 }
 
+[PublicAPI]
 file sealed class DelegatingConfigurator(Action<IMemberConfigurator> configure) : Descriptor, IDescriptorConfigurator
 {
     public void Configure(IMemberConfigurator configuration)
@@ -469,6 +474,7 @@ file sealed class DelegatingConfigurator(Action<IMemberConfigurator> configure) 
     }
 }
 
+[PublicAPI]
 file sealed class ContextPropertyConfigurator : Descriptor, IDescriptorConfigurator<OverrideTestContext>
 {
     public void Configure(IMemberConfigurator<OverrideTestContext> manager)

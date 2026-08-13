@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Lookup Foundation and Contributors
-// 
+//
 // Permission to use, copy, modify, and distribute this software in
 // object code form for any purpose and without fee is hereby granted,
 // provided that the above copyright notice appears in all copies and
 // that both that copyright notice and the limited warranty and
 // restricted rights notice below appear in all supporting
 // documentation.
-// 
+//
 // THIS PROGRAM IS PROVIDED "AS IS" AND WITH ALL FAULTS.
 // NO IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE IS PROVIDED.
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
@@ -21,8 +21,8 @@ namespace LookupEngine.Abstractions.Decomposition;
 ///     and an optional contextual description shown alongside it in decomposition results.
 /// </summary>
 /// <remarks>
-///     Implement <see cref="IDescriptorConfigurator"/>, <see cref="IDescriptorRedirector"/>,
-///     or <see cref="IDescriptorEnumerator"/> on a derived class to add member configuration,
+///     Implement <see cref="IDescriptorConfigurator" />, <see cref="IDescriptorRedirector" />,
+///     or <see cref="IDescriptorEnumerator" /> on a derived class to add member configuration,
 ///     object redirection, or collection enumeration behavior.
 /// </remarks>
 [PublicAPI]
@@ -31,7 +31,7 @@ public abstract class Descriptor
 {
     /// <summary>
     ///     The display name of the described object shown in decomposition results.
-    ///     When <see langword="null"/>, the engine falls back to the formatted type name.
+    ///     When <see langword="null" />, the engine falls back to the formatted type name.
     /// </summary>
     public string? Name { get; init; }
 

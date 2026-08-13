@@ -23,7 +23,7 @@ public enum MemberEvaluationPolicy
     Evaluated = 0,
 
     /// <summary>
-    ///     The member was not evaluated during decomposition. Call <see cref="DecomposedMember.Evaluate()"/>
+    ///     The member was not evaluated during decomposition. Call <see cref="DecomposedMember.Evaluate()" />
     ///     to trigger evaluation on demand.
     /// </summary>
     Deferred = 1,

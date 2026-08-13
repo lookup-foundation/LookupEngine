@@ -6,12 +6,17 @@ using LookupEngine.Abstractions.Decomposition;
 namespace LookupEngine.Descriptors;
 
 /// <summary>
-///     Descriptor for any <see cref="IEnumerable"/> value. Exposes its elements as indexed members and suppresses the <c>GetEnumerator</c> method from the decomposition result.
+///     Descriptor for any <see cref="IEnumerable" /> value. Exposes its elements as indexed members and suppresses the <c>GetEnumerator</c> method from the decomposition result.
 /// </summary>
 [SuppressMessage("ReSharper", "NotDisposedResourceIsReturnedByProperty")]
 public sealed class EnumerableDescriptor(IEnumerable value) : Descriptor, IDescriptorEnumerator, IDescriptorConfigurator
 {
     private bool? _isEmpty;
+
+    public void Configure(IMemberConfigurator configuration)
+    {
+        configuration.Member(nameof(IEnumerable.GetEnumerator)).Resolve(Variants.Empty<IEnumerator>);
+    }
 
     /// <summary>
     ///     Returns a fresh, non-advanced enumerator over the described collection.
@@ -19,14 +24,17 @@ public sealed class EnumerableDescriptor(IEnumerable value) : Descriptor, IDescr
     public IEnumerator Enumerator => value.GetEnumerator();
 
     /// <summary>
-    ///     <see langword="true"/> when the described collection contains no elements. Evaluated lazily.
+    ///     <see langword="true" /> when the described collection contains no elements. Evaluated lazily.
     /// </summary>
     public bool IsEmpty => _isEmpty ??= ComputeIsEmpty();
 
     private bool ComputeIsEmpty()
     {
         //Checking types to reduce memory allocation when creating an iterator and increase performance
-        if (value is ICollection collection) return collection.Count == 0;
+        if (value is ICollection collection)
+        {
+            return collection.Count == 0;
+        }
 
         var enumerator = value.GetEnumerator();
         try
@@ -40,10 +48,5 @@ public sealed class EnumerableDescriptor(IEnumerable value) : Descriptor, IDescr
                 disposable.Dispose();
             }
         }
-    }
-
-    public void Configure(IMemberConfigurator configuration)
-    {
-        configuration.Member(nameof(IEnumerable.GetEnumerator)).Resolve(Variants.Empty<IEnumerator>);
     }
 }

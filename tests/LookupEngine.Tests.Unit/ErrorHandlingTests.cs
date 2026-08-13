@@ -71,7 +71,7 @@ public sealed class ErrorHandlingTests
         };
 
         // Act
-        var result = LookupComposer.Decompose(testObject, new DecomposeOptions {IncludeFields = true});
+        var result = LookupComposer.Decompose(testObject, new DecomposeOptions { IncludeFields = true });
 
         // Assert
         await Assert.That(result.Members).IsNotEmpty();
@@ -88,8 +88,8 @@ public sealed class ErrorHandlingTests
     public async Task Decompose_NullReferenceInChain_HandlesGracefully()
     {
         // Arrange
-        var testObject = new NullReferenceObject {Value = null};
-        var options = new DecomposeOptions {IncludeFields = true};
+        var testObject = new NullReferenceObject { Value = null };
+        var options = new DecomposeOptions { IncludeFields = true };
 
         // Act
         var result = LookupComposer.Decompose(testObject, options);
@@ -125,27 +125,34 @@ public sealed class ErrorHandlingTests
     }
 }
 
-// Test helper classes
+// [PublicAPI]
 file sealed class ThrowingPropertyObject
 {
     public string ThrowingProperty => throw new InvalidOperationException("Property throws");
 }
 
+[PublicAPI]
 file sealed class ThrowingMethodObject
 {
-    public string ThrowingMethod() => throw new InvalidOperationException("Method throws");
+    public string ThrowingMethod()
+    {
+        throw new InvalidOperationException("Method throws");
+    }
 }
 
+[PublicAPI]
 file sealed class ExceptionFieldObject
 {
     public Exception? ExceptionField;
 }
 
+[PublicAPI]
 file sealed class NullReferenceObject
 {
     public string? Value;
 }
 
+[PublicAPI]
 file sealed class MultipleThrowingObject
 {
     public string ThrowingProperty1 => throw new InvalidOperationException("First exception");

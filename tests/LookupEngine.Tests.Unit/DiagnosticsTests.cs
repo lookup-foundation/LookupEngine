@@ -14,7 +14,7 @@ public sealed class DiagnosticsTests
     public async Task Decompose_Member_TracksComputationTime()
     {
         // Arrange
-        var testObject = new {Name = "Test", Value = 42};
+        var testObject = new { Name = "Test", Value = 42 };
 
         // Act
         var result = LookupComposer.Decompose(testObject);
@@ -118,7 +118,7 @@ public sealed class DiagnosticsTests
     public async Task Decompose_MultipleMembers_IndependentMetrics()
     {
         // Arrange
-        var testObject = new {First = "A", Second = "B", Third = "C"};
+        var testObject = new { First = "A", Second = "B", Third = "C" };
 
         // Act
         var result = LookupComposer.Decompose(testObject);
@@ -137,18 +137,18 @@ public sealed class DiagnosticsTests
     public async Task Decompose_ComplexObject_NonZeroMetrics()
     {
         // Arrange
-        var testObject = new List<string> {"One", "Two", "Three"};
+        var testObject = new List<string> { "One", "Two", "Three" };
 
         // Act
         var result = LookupComposer.Decompose(testObject);
 
         // Assert
         await Assert.That(result.Members).IsNotEmpty();
-        
+
         // At least some members should have measurable metrics
         var membersWithTime = result.Members.Count(member => member.ComputationTime > 0);
         var membersWithAllocation = result.Members.Count(member => member.AllocatedBytes > 0);
-        
+
         using (Assert.Multiple())
         {
             await Assert.That(membersWithTime).IsGreaterThan(0);
@@ -207,12 +207,14 @@ file sealed class ExtensionDescriptor : Descriptor, IDescriptorConfigurator
     }
 }
 
+[PublicAPI]
 file sealed class AllocationObject
 {
     public string AllocationProperty1 { get; set; } = "Test";
     public List<string> AllocationProperty2 { get; set; } = [];
 }
 
+[PublicAPI]
 file sealed class SlowPropertyObject
 {
     public string SlowProperty
@@ -225,6 +227,7 @@ file sealed class SlowPropertyObject
     }
 }
 
+[PublicAPI]
 file sealed class ThrowingPropertyObject
 {
     public string ThrowingProperty => throw new InvalidOperationException("Test exception");

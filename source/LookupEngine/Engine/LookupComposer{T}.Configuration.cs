@@ -12,6 +12,7 @@
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using LookupEngine.Abstractions.Configuration;
 using LookupEngine.Abstractions.Enums;
@@ -19,6 +20,7 @@ using LookupEngine.Abstractions.Enums;
 // ReSharper disable once CheckNamespace
 namespace LookupEngine;
 
+[SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
 public partial class LookupComposer<TContext> : IMemberConfigurator<TContext>
 {
     MemberResolverBuilder<TContext> IMemberConfigurator<TContext>.Member(string name)

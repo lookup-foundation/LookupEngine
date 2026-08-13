@@ -66,7 +66,7 @@ public struct ExtensionBuilder
     ///     Registers the extension with the evaluation handler that produces its value, evaluated eagerly during decomposition.
     /// </summary>
     /// <param name="handler">Returns the resolved value for this extension.</param>
-    /// <remarks>Extensions are not governed by the engine evaluation policy; they evaluate eagerly unless deferred with <see cref="Defer(Func{IVariant})"/>.</remarks>
+    /// <remarks>Extensions are not governed by the engine evaluation policy; they evaluate eagerly unless deferred with <see cref="Defer(Func{IVariant})" />.</remarks>
     public readonly void Register(Func<IVariant> handler)
     {
         _registerCallback(_name, _attributes, handler, null);
@@ -76,7 +76,7 @@ public struct ExtensionBuilder
     ///     Registers the extension with the evaluation handler that produces its value, evaluated eagerly during decomposition.
     /// </summary>
     /// <param name="handler">Returns the resolved value for this extension.</param>
-    /// <remarks>Extensions are not governed by the engine evaluation policy; they evaluate eagerly unless deferred with <see cref="Defer(Func{object})"/>.</remarks>
+    /// <remarks>Extensions are not governed by the engine evaluation policy; they evaluate eagerly unless deferred with <see cref="Defer(Func{object})" />.</remarks>
     public readonly void Register(Func<object?> handler)
     {
         _registerCallback(_name, _attributes, handler, null);

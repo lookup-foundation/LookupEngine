@@ -1,7 +1,7 @@
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for <see cref="DecomposeOptions"/> configuration and its effect on decomposition behavior.
+///     Tests for <see cref="DecomposeOptions" /> configuration and its effect on decomposition behavior.
 /// </summary>
 public sealed class OptionsTests
 {
@@ -9,7 +9,7 @@ public sealed class OptionsTests
     public async Task Decompose_DefaultOptions_HasMembers()
     {
         //Arrange
-        var data = "TestString";
+        const string data = "TestString";
 
         //Act
         var defaultResult = LookupComposer.Decompose(data);
@@ -40,10 +40,10 @@ public sealed class OptionsTests
     public async Task Decompose_IncludingPrivate_HasPrivateMembers()
     {
         //Arrange
-        var data = "TestString";
+        const string data = "TestString";
         var options = new DecomposeOptions
         {
-            IncludePrivateMembers = true,
+            IncludePrivateMembers = true
         };
 
         //Act
@@ -58,7 +58,7 @@ public sealed class OptionsTests
     public async Task Decompose_IncludingUnsupported_HasUnsupported()
     {
         //Arrange
-        var data = "TestString";
+        const string data = "TestString";
         var options = new DecomposeOptions
         {
             IncludeUnsupported = true
@@ -76,7 +76,7 @@ public sealed class OptionsTests
     public async Task Decompose_IncludingRoot_HasRootMembers()
     {
         //Arrange
-        var data = "TestString";
+        const string data = "TestString";
         var options = new DecomposeOptions
         {
             IncludeRoot = true

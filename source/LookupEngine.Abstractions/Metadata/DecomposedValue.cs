@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using LookupEngine.Abstractions.Decomposition;
 using System.Text.Json.Serialization;
+using LookupEngine.Abstractions.Decomposition;
 
 // ReSharper disable once CheckNamespace
 namespace LookupEngine.Abstractions;
@@ -15,10 +15,11 @@ public sealed class DecomposedValue
     /// <summary>
     ///     The raw object produced by member evaluation.
     /// </summary>
-    [JsonIgnore] public object? RawValue { get; init; }
+    [JsonIgnore]
+    public object? RawValue { get; init; }
 
     /// <summary>
-    ///     The display name of this value, derived from its <see cref="Descriptor"/> or type name.
+    ///     The display name of this value, derived from its <see cref="Descriptor" /> or type name.
     ///     Empty string when no value was produced (deferred, disabled, or unsupported members).
     /// </summary>
     public required string Name { get; init; }
@@ -34,12 +35,13 @@ public sealed class DecomposedValue
     public required string TypeFullName { get; init; }
 
     /// <summary>
-    ///     An optional description provided by the descriptor for this value, or <see langword="null"/> when not supplied.
+    ///     An optional description provided by the descriptor for this value, or <see langword="null" /> when not supplied.
     /// </summary>
     public string? Description { get; init; }
 
     /// <summary>
     ///     The descriptor that named and described this value.
     /// </summary>
-    [JsonIgnore] public Descriptor? Descriptor { get; init; }
+    [JsonIgnore]
+    public Descriptor? Descriptor { get; init; }
 }

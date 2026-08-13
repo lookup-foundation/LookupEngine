@@ -6,7 +6,7 @@ using LookupEngine.Options;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for <see cref="IDescriptorConfigurator"/> member resolution and custom type resolution.
+///     Tests for <see cref="IDescriptorConfigurator" /> member resolution and custom type resolution.
 /// </summary>
 public sealed class ResolverTests
 {
@@ -84,6 +84,7 @@ public sealed class ResolverTests
             await Assert.That(comparableContextResult.Members.Count).IsGreaterThan(comparableResult.Members.Count);
         }
     }
+
     [Test]
     public async Task Decompose_SharedValueDescriptor_DescriptionDoesNotLeakBetweenMembers()
     {
@@ -119,6 +120,7 @@ public sealed class ResolverTests
     }
 }
 
+[PublicAPI]
 file sealed class DescribedContainerObject
 {
     public DescribedValueObject DescribedMethod(int parameter)
@@ -132,10 +134,13 @@ file sealed class DescribedContainerObject
     }
 }
 
+[PublicAPI]
 file sealed class DescribedValueObject;
 
+[PublicAPI]
 file sealed class SharedValueDescriptor : Descriptor;
 
+[PublicAPI]
 file sealed class DescribingResolverDescriptor : Descriptor, IDescriptorConfigurator
 {
     public void Configure(IMemberConfigurator configuration)
@@ -145,6 +150,7 @@ file sealed class DescribingResolverDescriptor : Descriptor, IDescriptorConfigur
     }
 }
 
+[PublicAPI]
 file sealed class ResolvableObject
 {
     public string UnsupportedMethod(int parameter)
@@ -163,12 +169,14 @@ file sealed class ResolvableObject
     }
 }
 
+[PublicAPI]
 file sealed class EngineTestContext
 {
     public int Version { get; } = 1;
     public string Metadata { get; } = "Test context";
 }
 
+[PublicAPI]
 file sealed class ResolverDescriptor : Descriptor, IDescriptorConfigurator, IDescriptorConfigurator<EngineTestContext>
 {
     public ResolverDescriptor()

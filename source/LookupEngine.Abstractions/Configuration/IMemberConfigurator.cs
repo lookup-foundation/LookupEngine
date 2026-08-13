@@ -15,7 +15,7 @@
 namespace LookupEngine.Abstractions.Configuration;
 
 /// <summary>
-///     Builder passed to <see cref="IDescriptorConfigurator.Configure"/> to configure member handlers, evaluation policy overrides, and synthetic extension members for a descriptor.
+///     Builder passed to <see cref="IDescriptorConfigurator.Configure" /> to configure member handlers, evaluation policy overrides, and synthetic extension members for a descriptor.
 /// </summary>
 public interface IMemberConfigurator
 {
@@ -23,7 +23,7 @@ public interface IMemberConfigurator
     ///     Returns a builder for configuring an existing member of the described type.
     /// </summary>
     /// <param name="name">
-    ///     The member name. Affects all overloads unless narrowed with <see cref="MemberResolverBuilder.When"/>.
+    ///     The member name. Affects all overloads unless narrowed with <see cref="MemberResolverBuilder.When" />.
     /// </param>
     MemberResolverBuilder Member(string name);
 

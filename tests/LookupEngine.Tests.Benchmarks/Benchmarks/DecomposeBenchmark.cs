@@ -23,18 +23,16 @@ namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 /// </summary>
 public class DecomposeBenchmark
 {
-    private SampleData _target = null!;
-
     private static readonly DecomposeOptions DefaultOptions = new();
-    private static readonly DecomposeOptions IncludeRootOptions = new() {IncludeRoot = true};
-    private static readonly DecomposeOptions IncludeFieldsOptions = new() {IncludeFields = true};
-    private static readonly DecomposeOptions IncludeEventsOptions = new() {IncludeEvents = true};
-    private static readonly DecomposeOptions IncludeUnsupportedOptions = new() {IncludeUnsupported = true};
-    private static readonly DecomposeOptions IncludePrivateOptions = new() {IncludePrivateMembers = true};
-    private static readonly DecomposeOptions IncludeStaticOptions = new() {IncludeStaticMembers = true};
-    private static readonly DecomposeOptions EvaluateMethodsOptions = new() {EvaluationPolicy = MethodEvaluationPolicy.All};
-    private static readonly DecomposeOptions ExtensionsOptions = new() {EnableExtensions = true};
-    private static readonly DecomposeOptions RedirectionOptions = new() {EnableRedirection = true};
+    private static readonly DecomposeOptions IncludeRootOptions = new() { IncludeRoot = true };
+    private static readonly DecomposeOptions IncludeFieldsOptions = new() { IncludeFields = true };
+    private static readonly DecomposeOptions IncludeEventsOptions = new() { IncludeEvents = true };
+    private static readonly DecomposeOptions IncludeUnsupportedOptions = new() { IncludeUnsupported = true };
+    private static readonly DecomposeOptions IncludePrivateOptions = new() { IncludePrivateMembers = true };
+    private static readonly DecomposeOptions IncludeStaticOptions = new() { IncludeStaticMembers = true };
+    private static readonly DecomposeOptions EvaluateMethodsOptions = new() { EvaluationPolicy = MethodEvaluationPolicy.All };
+    private static readonly DecomposeOptions ExtensionsOptions = new() { EnableExtensions = true };
+    private static readonly DecomposeOptions RedirectionOptions = new() { EnableRedirection = true };
 
     private static readonly DecomposeOptions AllEnabledOptions = new()
     {
@@ -48,6 +46,8 @@ public class DecomposeBenchmark
         EnableRedirection = true,
         EvaluationPolicy = MethodEvaluationPolicy.All
     };
+
+    private SampleData _target = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -129,11 +129,10 @@ public class DecomposeBenchmark
 [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
 public sealed class SampleData
 {
-    public static string Category => "Default";
-
     public readonly int Field = 100;
     private readonly string _secret = "hidden";
     private int _counter = 7;
+    public static string Category => "Default";
 
     public int Id { get; set; } = 42;
     public string Name { get; set; } = "Benchmark";

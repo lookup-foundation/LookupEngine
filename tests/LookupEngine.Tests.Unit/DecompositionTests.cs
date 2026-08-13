@@ -27,7 +27,7 @@ public sealed class DecompositionTests
     public async Task Decompose_SimpleObject_ReturnsDecomposedStructure()
     {
         // Arrange
-        var testObject = new {Name = "Test", Value = 42};
+        var testObject = new { Name = "Test", Value = 42 };
 
         // Act
         var result = LookupComposer.Decompose(testObject);
@@ -46,10 +46,10 @@ public sealed class DecompositionTests
     public async Task Decompose_PrimitiveTypes_ReturnsCorrectTypeName()
     {
         // Arrange
-        var intValue = 42;
-        var stringValue = "test";
-        var boolValue = true;
-        var doubleValue = 3.14;
+        const int intValue = 42;
+        const string stringValue = "test";
+        const bool boolValue = true;
+        const double doubleValue = 3.14;
 
         // Act
         var intResult = LookupComposer.Decompose(intValue);
@@ -90,7 +90,7 @@ public sealed class DecompositionTests
     public async Task DecomposeObject_ReturnsObjectWithoutMembers()
     {
         // Arrange
-        var testObject = new {Name = "Test", Value = 42};
+        var testObject = new { Name = "Test", Value = 42 };
 
         // Act
         var result = LookupComposer.DecomposeObject(testObject);
@@ -108,7 +108,7 @@ public sealed class DecompositionTests
     public async Task DecomposeMembers_ReturnsOnlyMembers()
     {
         // Arrange
-        var testObject = new {Name = "Test", Value = 42};
+        var testObject = new { Name = "Test", Value = 42 };
 
         // Act
         var result = LookupComposer.DecomposeMembers(testObject);
@@ -167,7 +167,7 @@ public sealed class DecompositionTests
     public async Task Decompose_GenericType_HandlesCorrectly()
     {
         // Arrange
-        var list = new List<int> {1, 2, 3};
+        var list = new List<int> { 1, 2, 3 };
 
         // Act
         var result = LookupComposer.Decompose(list);
@@ -185,7 +185,7 @@ public sealed class DecompositionTests
     public async Task Decompose_MemberDepth_IsCorrect()
     {
         // Arrange
-        var testObject = new {Name = "Test"};
+        var testObject = new { Name = "Test" };
 
         // Act
         var result = LookupComposer.Decompose(testObject);
@@ -216,7 +216,7 @@ public sealed class DecompositionTests
     public async Task Decompose_NullNamespaceType_TypeFullNameHasNoLeadingDot()
     {
         // Arrange - Anonymous types have null namespace
-        var anonymous = new {Value = 42};
+        var anonymous = new { Value = 42 };
 
         // Act
         var result = LookupComposer.Decompose(anonymous);

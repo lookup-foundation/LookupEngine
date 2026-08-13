@@ -1,3 +1,4 @@
+using System.Collections;
 using LookupEngine.Descriptors;
 
 namespace LookupEngine.Tests.Unit;
@@ -11,7 +12,7 @@ public sealed class EnumerableTests
     public async Task Decompose_List_IncludesItemsAsMembers()
     {
         // Arrange
-        var list = new List<int> {1, 2, 3, 4, 5};
+        var list = new List<int> { 1, 2, 3, 4, 5 };
 
         // Act
         var result = LookupComposer.Decompose(list);
@@ -29,7 +30,7 @@ public sealed class EnumerableTests
     public async Task Decompose_Array_IncludesArrayElements()
     {
         // Arrange
-        var array = new[] {"First", "Second", "Third"};
+        var array = new[] { "First", "Second", "Third" };
 
         // Act
         var result = LookupComposer.Decompose(array);
@@ -37,7 +38,7 @@ public sealed class EnumerableTests
         // Assert
         await Assert.That(result.Members).IsNotEmpty();
         var arrayMembers = result.Members.Where(member => member.Name.Contains(nameof(String))).ToList();
-        
+
         await Assert.That(arrayMembers).Count().IsEqualTo(3);
     }
 
@@ -105,7 +106,7 @@ public sealed class EnumerableTests
     public async Task Decompose_EnumerableWithNullElements_HandlesNulls()
     {
         // Arrange
-        var list = new List<string?> {"First", null, "Third"};
+        var list = new List<string?> { "First", null, "Third" };
 
         // Act
         var result = LookupComposer.Decompose(list);
@@ -125,8 +126,8 @@ public sealed class EnumerableTests
         // Arrange
         var nestedList = new List<List<int>>
         {
-            new() {1, 2},
-            new() {3, 4}
+            new() { 1, 2 },
+            new() { 3, 4 }
         };
 
         // Act
@@ -140,7 +141,7 @@ public sealed class EnumerableTests
     public async Task Decompose_String_TreatedAsEnumerable()
     {
         // Arrange
-        var text = "Test";
+        const string text = "Test";
 
         // Act
         var result = LookupComposer.Decompose(text);
@@ -158,7 +159,7 @@ public sealed class EnumerableTests
     public async Task Decompose_EnumerableIndexing_IsSequential()
     {
         // Arrange
-        var list = new List<string> {"A", "B", "C"};
+        var list = new List<string> { "A", "B", "C" };
 
         // Act
         var result = LookupComposer.Decompose(list);
@@ -211,7 +212,7 @@ public sealed class EnumerableTests
     public async Task Decompose_EnumerableItems_HaveSameDepth()
     {
         // Arrange
-        var list = new List<string> {"A", "B", "C"};
+        var list = new List<string> { "A", "B", "C" };
 
         // Act
         var result = LookupComposer.Decompose(list);
@@ -231,7 +232,7 @@ public sealed class EnumerableTests
     {
         // Arrange
         var emptyCollection = new EnumerableDescriptor(new List<int>());
-        var filledCollection = new EnumerableDescriptor(new List<int> {1});
+        var filledCollection = new EnumerableDescriptor(new List<int> { 1 });
         var emptyIterator = new EnumerableDescriptor(EmptyIterator());
         var filledIterator = new EnumerableDescriptor(FilledIterator());
 
@@ -259,18 +260,24 @@ public sealed class EnumerableTests
     public async Task EnumerableDescriptor_Enumerator_ReturnsFreshEnumerator()
     {
         // Arrange
-        var descriptor = new EnumerableDescriptor(new List<int> {1, 2, 3});
+        var descriptor = new EnumerableDescriptor(new List<int> { 1, 2, 3 });
 
         // Act - IsEmpty must not advance or dispose the exposed enumerator
         var isEmpty = descriptor.IsEmpty;
 
         var firstPass = 0;
         var enumerator = descriptor.Enumerator;
-        while (enumerator.MoveNext()) firstPass++;
+        while (enumerator.MoveNext())
+        {
+            firstPass++;
+        }
 
         var secondPass = 0;
         var freshEnumerator = descriptor.Enumerator;
-        while (freshEnumerator.MoveNext()) secondPass++;
+        while (freshEnumerator.MoveNext())
+        {
+            secondPass++;
+        }
 
         // Assert
         using (Assert.Multiple())
@@ -283,16 +290,14 @@ public sealed class EnumerableTests
 }
 
 // Test helper classes
-file sealed class CountingEnumerable : System.Collections.IEnumerable
+file sealed class CountingEnumerable : IEnumerable
 {
-    private int _enumerationCount;
+    public int EnumerationCount { get; private set; }
 
-    public int EnumerationCount => _enumerationCount;
-
-    public System.Collections.IEnumerator GetEnumerator()
+    public IEnumerator GetEnumerator()
     {
-        _enumerationCount++;
-        return new[] {1, 2}.GetEnumerator();
+        EnumerationCount++;
+        return new[] { 1, 2 }.GetEnumerator();
     }
 }
 
@@ -305,7 +310,10 @@ file sealed class CustomEnumerable : IEnumerable<int>
         yield return 3;
     }
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }
 
 file sealed class DisposableEnumerable : IEnumerable<int>
@@ -317,23 +325,32 @@ file sealed class DisposableEnumerable : IEnumerable<int>
         return new DisposableEnumerator(this);
     }
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
     private sealed class DisposableEnumerator(DisposableEnumerable parent) : IEnumerator<int>
     {
-        private int _current;
+        public int Current { get; private set; }
 
-        public int Current => _current;
-        object System.Collections.IEnumerator.Current => Current;
+        object IEnumerator.Current => Current;
 
         public bool MoveNext()
         {
-            if (_current >= 3) return false;
-            _current++;
+            if (Current >= 3)
+            {
+                return false;
+            }
+
+            Current++;
             return true;
         }
 
-        public void Reset() => _current = 0;
+        public void Reset()
+        {
+            Current = 0;
+        }
 
         public void Dispose()
         {

@@ -50,7 +50,7 @@ public struct MemberResolverBuilder
 
     /// <summary>
     ///     Supplies a custom handler whose result replaces the reflected value.
-    ///     The engine's <see cref="MethodEvaluationPolicy"/> still decides whether to evaluate eagerly or defer.
+    ///     The engine's <see cref="MethodEvaluationPolicy" /> still decides whether to evaluate eagerly or defer.
     /// </summary>
     public readonly void Resolve(Func<IVariant> handler)
     {
@@ -59,7 +59,7 @@ public struct MemberResolverBuilder
 
     /// <summary>
     ///     Supplies a custom handler whose result replaces the reflected value.
-    ///     The engine's <see cref="MethodEvaluationPolicy"/> still decides whether to evaluate eagerly or defer.
+    ///     The engine's <see cref="MethodEvaluationPolicy" /> still decides whether to evaluate eagerly or defer.
     /// </summary>
     public readonly void Resolve(Func<object?> handler)
     {

@@ -51,7 +51,10 @@ public class TypeHierarchyBenchmark
             inputType = inputType.BaseType;
         }
 
-        if (includeRoot) types.Add(inputType);
+        if (includeRoot)
+        {
+            types.Add(inputType);
+        }
 
         return types;
     }
@@ -65,7 +68,10 @@ public class TypeHierarchyBenchmark
             inputType = inputType.BaseType;
         }
 
-        if (includeRoot) stack.Push(inputType);
+        if (includeRoot)
+        {
+            stack.Push(inputType);
+        }
 
         return new List<Type>(stack);
     }
@@ -81,7 +87,10 @@ public class TypeHierarchyBenchmark
             current = current.BaseType;
         }
 
-        if (includeRoot) depth++;
+        if (includeRoot)
+        {
+            depth++;
+        }
 
         // Allocate with exact capacity
         var types = new List<Type>(depth);
@@ -91,7 +100,10 @@ public class TypeHierarchyBenchmark
             inputType = inputType.BaseType;
         }
 
-        if (includeRoot) types.Add(inputType);
+        if (includeRoot)
+        {
+            types.Add(inputType);
+        }
 
         return types;
     }

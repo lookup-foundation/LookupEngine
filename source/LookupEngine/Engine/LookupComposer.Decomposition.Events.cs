@@ -11,7 +11,10 @@ public partial class LookupComposer
     /// </summary>
     private void DecomposeEvents(BindingFlags bindingFlags)
     {
-        if (!_options.IncludeEvents) return;
+        if (!_options.IncludeEvents)
+        {
+            return;
+        }
 
         var members = MemberDeclaringType.GetEvents(bindingFlags);
         foreach (var member in members)

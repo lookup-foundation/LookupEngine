@@ -3,7 +3,7 @@
 namespace LookupEngine.Abstractions.Decomposition;
 
 /// <summary>
-///     Factory for creating <see cref="IVariant"/> instances to return from descriptor handlers.
+///     Factory for creating <see cref="IVariant" /> instances to return from descriptor handlers.
 /// </summary>
 public static class Variants
 {
@@ -30,7 +30,7 @@ public static class Variants
 
     /// <summary>
     ///     Creates a typed, mutable collection for multiple variant values.
-    ///     Populate with <see cref="IVariantsCollection{T}.Add(T?)"/>, then return it from the handler.
+    ///     Populate with <see cref="IVariantsCollection{T}.Add(T?)" />, then return it from the handler.
     /// </summary>
     /// <typeparam name="T">The element type of each value.</typeparam>
     /// <param name="capacity">The expected number of values. Pre-sizing avoids reallocations on the hot path.</param>

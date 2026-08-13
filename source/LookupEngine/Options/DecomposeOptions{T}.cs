@@ -1,7 +1,7 @@
 ﻿namespace LookupEngine.Options;
 
 /// <summary>
-///     Extends <see cref="DecomposeOptions"/> with a required execution context passed through to
+///     Extends <see cref="DecomposeOptions" /> with a required execution context passed through to
 ///     context-aware descriptors and evaluation handlers.
 /// </summary>
 /// <typeparam name="TContext">The type of execution context available to registered handlers.</typeparam>

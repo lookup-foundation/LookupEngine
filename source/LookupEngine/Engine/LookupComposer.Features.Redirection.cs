@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Lookup Foundation and Contributors
-// 
+//
 // Permission to use, copy, modify, and distribute this software in
 // object code form for any purpose and without fee is hereby granted,
 // provided that the above copyright notice appears in all copies and
 // that both that copyright notice and the limited warranty and
 // restricted rights notice below appear in all supporting
 // documentation.
-// 
+//
 // THIS PROGRAM IS PROVIDED "AS IS" AND WITH ALL FAULTS.
 // NO IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE IS PROVIDED.
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
@@ -33,14 +33,25 @@ public partial class LookupComposer
     /// </summary>
     private protected virtual object RedirectValue(object value)
     {
-        if (!_options.EnableRedirection) return value;
+        if (!_options.EnableRedirection)
+        {
+            return value;
+        }
 
         var redirections = 0;
         var valueDescriptor = _options.TypeResolver.Invoke(value, null);
         while (valueDescriptor is IDescriptorRedirector redirector)
         {
-            if (redirections++ == MaxRedirections) break;
-            if (!redirector.TryRedirect(string.Empty, out value)) break;
+            if (redirections++ == MaxRedirections)
+            {
+                break;
+            }
+
+            if (!redirector.TryRedirect(string.Empty, out value))
+            {
+                break;
+            }
+
             valueDescriptor = _options.TypeResolver.Invoke(value, null);
         }
 
@@ -79,8 +90,16 @@ public partial class LookupComposer
             var redirections = 0;
             while (valueDescriptor is IDescriptorRedirector redirector)
             {
-                if (redirections++ == MaxRedirections) break;
-                if (!redirector.TryRedirect(target, out value)) break;
+                if (redirections++ == MaxRedirections)
+                {
+                    break;
+                }
+
+                if (!redirector.TryRedirect(target, out value))
+                {
+                    break;
+                }
+
                 valueDescriptor = _options.TypeResolver.Invoke(value, null);
 
                 if (valueDescriptor.Description is not null)

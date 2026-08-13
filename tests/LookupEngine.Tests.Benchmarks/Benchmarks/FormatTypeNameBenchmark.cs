@@ -12,6 +12,7 @@
 // THERE IS NO GUARANTEE THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 
+using System.Text;
 using BenchmarkDotNet.Attributes;
 
 namespace LookupEngine.Tests.Benchmarks.Benchmarks;
@@ -44,17 +45,27 @@ public class FormatTypeNameBenchmark
 
     private static string FormatTypeName(Type type)
     {
-        if (!type.IsGenericType) return type.Name;
+        if (!type.IsGenericType)
+        {
+            return type.Name;
+        }
 
         var typeName = type.Name;
         var apostropheIndex = typeName.IndexOf('`');
-        if (apostropheIndex > 0) typeName = typeName[..apostropheIndex];
+        if (apostropheIndex > 0)
+        {
+            typeName = typeName[..apostropheIndex];
+        }
+
         typeName += "<";
         var genericArguments = type.GetGenericArguments();
         for (var i = 0; i < genericArguments.Length; i++)
         {
             typeName += FormatTypeName(genericArguments[i]);
-            if (i < genericArguments.Length - 1) typeName += ", ";
+            if (i < genericArguments.Length - 1)
+            {
+                typeName += ", ";
+            }
         }
 
         typeName += ">";
@@ -63,12 +74,12 @@ public class FormatTypeNameBenchmark
 
     private static string FormatTypeNameWithStringBuilder(Type type)
     {
-        var builder = new System.Text.StringBuilder();
+        var builder = new StringBuilder();
         FormatTypeNameRecursive(type, builder);
         return builder.ToString();
     }
 
-    private static void FormatTypeNameRecursive(Type type, System.Text.StringBuilder builder)
+    private static void FormatTypeNameRecursive(Type type, StringBuilder builder)
     {
         if (!type.IsGenericType)
         {
@@ -92,7 +103,10 @@ public class FormatTypeNameBenchmark
         for (var i = 0; i < genericArguments.Length; i++)
         {
             FormatTypeNameRecursive(genericArguments[i], builder);
-            if (i < genericArguments.Length - 1) builder.Append(", ");
+            if (i < genericArguments.Length - 1)
+            {
+                builder.Append(", ");
+            }
         }
 
         builder.Append('>');
@@ -100,13 +114,16 @@ public class FormatTypeNameBenchmark
 
     private static string FormatTypeNameWithSpan(Type type)
     {
-        if (!type.IsGenericType) return type.Name;
+        if (!type.IsGenericType)
+        {
+            return type.Name;
+        }
 
         var typeName = type.Name.AsSpan();
         var apostropheIndex = typeName.IndexOf('`');
         var baseName = apostropheIndex > 0 ? typeName[..apostropheIndex] : typeName;
 
-        var builder = new System.Text.StringBuilder();
+        var builder = new StringBuilder();
         builder.Append(baseName);
         builder.Append('<');
 
@@ -114,7 +131,10 @@ public class FormatTypeNameBenchmark
         for (var i = 0; i < genericArguments.Length; i++)
         {
             builder.Append(FormatTypeNameWithSpan(genericArguments[i]));
-            if (i < genericArguments.Length - 1) builder.Append(", ");
+            if (i < genericArguments.Length - 1)
+            {
+                builder.Append(", ");
+            }
         }
 
         builder.Append('>');

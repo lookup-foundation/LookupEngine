@@ -10,7 +10,7 @@ using LookupEngine.Options;
 namespace LookupEngine.Tests.Unit;
 
 /// <summary>
-///     Tests for <see cref="MethodEvaluationPolicy"/> and deferred member force evaluation.
+///     Tests for <see cref="MethodEvaluationPolicy" /> and deferred member force evaluation.
 /// </summary>
 public sealed class MethodEvaluationTests
 {
@@ -40,7 +40,7 @@ public sealed class MethodEvaluationTests
     {
         //Arrange
         var data = new EvaluableObject();
-        var options = new DecomposeOptions {EvaluationPolicy = MethodEvaluationPolicy.All};
+        var options = new DecomposeOptions { EvaluationPolicy = MethodEvaluationPolicy.All };
 
         //Act
         var result = LookupComposer.Decompose(data, options);
@@ -101,8 +101,16 @@ public sealed class MethodEvaluationTests
             {
                 EvaluatedFilter = (_, declaringType) =>
                 {
-                    if (declaringType.Namespace is null) return false;
-                    if (declaringType.Namespace.StartsWith("LookupEngine", StringComparison.Ordinal)) return true;
+                    if (declaringType.Namespace is null)
+                    {
+                        return false;
+                    }
+
+                    if (declaringType.Namespace.StartsWith("LookupEngine", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+
                     return false;
                 }
             }
@@ -419,7 +427,7 @@ public sealed class MethodEvaluationTests
     {
         //Arrange
         var data = new EvaluableObject();
-        var options = new DecomposeOptions {EvaluationPolicy = MethodEvaluationPolicy.All};
+        var options = new DecomposeOptions { EvaluationPolicy = MethodEvaluationPolicy.All };
         var result = LookupComposer.Decompose(data, options);
         var member = result.Members.First(member => member.Name == nameof(EvaluableObject.GetText));
 
@@ -461,7 +469,7 @@ public sealed class MethodEvaluationTests
     {
         //Arrange
         var data = new FieldHolder();
-        var options = new DecomposeOptions {IncludeFields = true};
+        var options = new DecomposeOptions { IncludeFields = true };
         var result = LookupComposer.Decompose(data, options);
         var member = result.Members.First(member => member.Name == nameof(FieldHolder.Counter));
 
@@ -483,7 +491,7 @@ public sealed class MethodEvaluationTests
     {
         //Arrange
         var data = new EvaluableObject();
-        var serializerOptions = new JsonSerializerOptions {WriteIndented = true};
+        var serializerOptions = new JsonSerializerOptions { WriteIndented = true };
 
         //Act
         var result = LookupComposer.Decompose(data);
@@ -514,6 +522,7 @@ public sealed class MethodEvaluationTests
     }
 }
 
+[PublicAPI]
 file sealed class EvaluableObject
 {
     public string GetText()
@@ -527,11 +536,13 @@ file sealed class EvaluableObject
     }
 }
 
+[PublicAPI]
 file sealed class FieldHolder
 {
     public int Counter;
 }
 
+[PublicAPI]
 file sealed class VoidMethodObject
 {
     public int InvocationCount;
@@ -542,6 +553,7 @@ file sealed class VoidMethodObject
     }
 }
 
+[PublicAPI]
 file sealed class ReturnTypesObject
 {
     public bool IsValid()
@@ -555,6 +567,7 @@ file sealed class ReturnTypesObject
     }
 }
 
+[PublicAPI]
 file sealed class ParametricObject
 {
     public string WithParameter(int parameter)
@@ -563,6 +576,7 @@ file sealed class ParametricObject
     }
 }
 
+[PublicAPI]
 file sealed class ThrowingMethodObject
 {
     public string ThrowingMethod()
@@ -571,6 +585,7 @@ file sealed class ThrowingMethodObject
     }
 }
 
+[PublicAPI]
 file sealed class RedirectReturningObject
 {
     public RedirectSourceObject GetValue()
@@ -579,8 +594,10 @@ file sealed class RedirectReturningObject
     }
 }
 
+[PublicAPI]
 file sealed class RedirectSourceObject;
 
+[PublicAPI]
 file sealed class SourceRedirectionDescriptor : Descriptor, IDescriptorRedirector
 {
     public bool TryRedirect(string target, out object result)
@@ -590,6 +607,7 @@ file sealed class SourceRedirectionDescriptor : Descriptor, IDescriptorRedirecto
     }
 }
 
+[PublicAPI]
 file sealed class ResolvableObject
 {
     public string ResolvableMethod(int parameter)
@@ -603,11 +621,13 @@ file sealed class ResolvableObject
     }
 }
 
+[PublicAPI]
 file sealed class EvaluationTestContext
 {
     public string Metadata { get; } = "Test context";
 }
 
+[PublicAPI]
 file sealed class ResolverDescriptor : Descriptor, IDescriptorConfigurator, IDescriptorConfigurator<EvaluationTestContext>
 {
     public void Configure(IMemberConfigurator configuration)

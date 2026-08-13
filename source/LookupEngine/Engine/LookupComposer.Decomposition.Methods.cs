@@ -28,8 +28,15 @@ public partial class LookupComposer
         var members = MemberDeclaringType.GetMethods(bindingFlags);
         foreach (var member in members)
         {
-            if (member.IsSpecialName) continue;
-            if (member is {IsFamily: true, IsSecurityCritical: true}) continue; //Object-critical methods cause CLR exception
+            if (member.IsSpecialName)
+            {
+                continue;
+            }
+
+            if (member is { IsFamily: true, IsSecurityCritical: true })
+            {
+                continue; //Object-critical methods cause CLR exception
+            }
 
             var parameters = member.GetParameters();
             TryLookupMember(member.Name, parameters, out var handler, out var evaluationOverride);
@@ -42,7 +49,10 @@ public partial class LookupComposer
 
             if (handler is null && parameters.Length > 0)
             {
-                if (!_options.IncludeUnsupported) continue;
+                if (!_options.IncludeUnsupported)
+                {
+                    continue;
+                }
 
                 WriteUnsupportedMember(member, member.ReturnType, parameters);
                 continue;

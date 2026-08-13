@@ -76,7 +76,10 @@ public class MemberEnumerationBenchmark
         var count = 0;
         foreach (var member in members)
         {
-            if (!member.IsSpecialName) count++;
+            if (!member.IsSpecialName)
+            {
+                count++;
+            }
         }
 
         return count;
@@ -89,7 +92,10 @@ public class MemberEnumerationBenchmark
         var count = 0;
         foreach (var member in members)
         {
-            if (!member.IsSpecialName) count++;
+            if (!member.IsSpecialName)
+            {
+                count++;
+            }
         }
 
         return count;
@@ -102,7 +108,10 @@ public class MemberEnumerationBenchmark
         var properties = _type.GetProperties(PublicInstanceFlags);
         foreach (var prop in properties)
         {
-            if (!prop.IsSpecialName) list.Add(prop);
+            if (!prop.IsSpecialName)
+            {
+                list.Add(prop);
+            }
         }
 
         return list.Count;
@@ -115,7 +124,10 @@ public class MemberEnumerationBenchmark
         var properties = _type.GetProperties(PublicInstanceFlags);
         foreach (var prop in properties)
         {
-            if (!prop.IsSpecialName) list.Add(prop);
+            if (!prop.IsSpecialName)
+            {
+                list.Add(prop);
+            }
         }
 
         return list.Count;
