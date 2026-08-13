@@ -20,6 +20,7 @@ namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 /// <summary>
 ///     Reflection cost of member enumeration during decomposition, as used in <c>LookupComposer.DecomposeProperties/Methods/Fields</c>.
 /// </summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class MemberEnumerationBenchmark
 {
     private const BindingFlags PublicInstanceFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;

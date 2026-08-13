@@ -19,6 +19,7 @@ namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 /// <summary>
 ///     Compares builder shapes for the deferred extension-registration model used by the engine.
 /// </summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class ExtensionRegistrationBenchmark
 {
     private readonly ClassManager _classManager = new();
@@ -180,6 +181,7 @@ public class ExtensionRegistrationBenchmark
 ///     The member attributes threaded through the builder into the queued registration.
 /// </summary>
 [Flags]
+[PublicAPI]
 public enum MemberAttributes
 {
     Static = 0b10,
@@ -189,6 +191,7 @@ public enum MemberAttributes
 /// <summary>
 ///     The evaluation policy recorded for a non-evaluated extension.
 /// </summary>
+[PublicAPI]
 public enum MemberEvaluationPolicy
 {
     Evaluated = 0,
@@ -199,6 +202,7 @@ public enum MemberEvaluationPolicy
 /// <summary>
 ///     Immutable result container used by all benchmark managers.
 /// </summary>
+[PublicAPI]
 public sealed class Variant(object? value)
 {
     public object? Value { get; } = value;
@@ -208,12 +212,13 @@ public sealed class Variant(object? value)
 ///     Direct registration without a builder: callers pass the attributes explicitly and the manager enqueues a closure that is evaluated on flush.
 ///     Establishes the cost floor of the deferred model.
 /// </summary>
+[PublicAPI]
 public sealed class ComposerManager
 {
-    private readonly List<Action> _extensionQueue = new(64);
+    private readonly List<Action> _extensionQueue = [with(64)];
     private readonly bool _includeStatic = true;
     private readonly bool _includeUnsupported = true;
-    private readonly List<object> _members = new(64);
+    private readonly List<object> _members = [with(64)];
 
     public int MemberCount => _members.Count;
 
@@ -275,12 +280,13 @@ public sealed class ComposerManager
 ///     Struct builder approach: <c>Define(name)</c> returns a stack-allocated struct that holds a direct manager reference (zero builder allocation).
 ///     Each registration enqueues a closure.
 /// </summary>
+[PublicAPI]
 public sealed class StructManager
 {
-    private readonly List<Action> _extensionQueue = new(64);
+    private readonly List<Action> _extensionQueue = [with(64)];
     private readonly bool _includeStatic = true;
     private readonly bool _includeUnsupported = true;
-    private readonly List<object> _members = new(64);
+    private readonly List<object> _members = [with(64)];
 
     public int MemberCount => _members.Count;
 
@@ -346,6 +352,7 @@ public sealed class StructManager
 /// <summary>
 ///     Struct builder returned by <see cref="StructManager" />, with attributes mutated by fluent calls.
 /// </summary>
+[PublicAPI]
 public struct StructBuilder(StructManager manager, string name)
 {
     private MemberAttributes _attributes = MemberAttributes.Extension;
@@ -380,11 +387,12 @@ public struct StructBuilder(StructManager manager, string name)
 /// <summary>
 ///     Class builder approach: <c>Define(name)</c> returns a heap-allocated class builder (one allocation per <c>Define</c> call).
 /// </summary>
+[PublicAPI]
 public sealed class ClassManager
 {
-    private readonly List<Action> _extensionQueue = new(64);
-    private readonly bool _includeStatic = true;
-    private readonly List<object> _members = new(64);
+    private readonly List<Action> _extensionQueue = [with(64)];
+    private readonly bool __includeStatic = true;
+    private readonly List<object> _members = [with(64)];
 
     public int MemberCount => _members.Count;
 
@@ -403,7 +411,7 @@ public sealed class ClassManager
     {
         _extensionQueue.Add(() =>
         {
-            if ((attributes & MemberAttributes.Static) != 0 && !_includeStatic)
+            if ((attributes & MemberAttributes.Static) != 0 && !__includeStatic)
             {
                 return;
             }
@@ -432,6 +440,7 @@ public sealed class ClassManager
 /// <summary>
 ///     Class builder returned by <see cref="ClassManager" />.
 /// </summary>
+[PublicAPI]
 public sealed class ClassBuilder(ClassManager manager, string name)
 {
     private MemberAttributes _attributes = MemberAttributes.Extension;
@@ -456,12 +465,13 @@ public sealed class ClassBuilder(ClassManager manager, string name)
 /// <summary>
 ///     Struct builder with two cached delegates instead of a direct manager reference (the shape used by the engine): the register and result callbacks are allocated once per manager lifetime, not per <c>Define</c> call.
 /// </summary>
+[PublicAPI]
 public sealed class StructCachedDelegateManager
 {
-    private readonly List<Action> _extensionQueue = new(64);
-    private readonly bool _includeStatic = true;
+    private readonly List<Action> _extensionQueue = [with(64)];
+    private readonly bool __includeStatic = true;
     private readonly bool _includeUnsupported = true;
-    private readonly List<object> _members = new(64);
+    private readonly List<object> _members = [with(64)];
     private readonly Action<string, MemberAttributes, Func<Variant>> _registerCallback;
     private readonly Action<string, MemberAttributes, MemberEvaluationPolicy> _registerResultCallback;
 
@@ -496,7 +506,7 @@ public sealed class StructCachedDelegateManager
     {
         _extensionQueue.Add(() =>
         {
-            if ((attributes & MemberAttributes.Static) != 0 && !_includeStatic)
+            if ((attributes & MemberAttributes.Static) != 0 && !__includeStatic)
             {
                 return;
             }
@@ -522,7 +532,7 @@ public sealed class StructCachedDelegateManager
                 return;
             }
 
-            if ((attributes & MemberAttributes.Static) != 0 && !_includeStatic)
+            if ((attributes & MemberAttributes.Static) != 0 && !__includeStatic)
             {
                 return;
             }
@@ -535,6 +545,7 @@ public sealed class StructCachedDelegateManager
 /// <summary>
 ///     Struct builder returned by <see cref="StructCachedDelegateManager" />.
 /// </summary>
+[PublicAPI]
 public struct CachedDelegateBuilder(
     string name,
     Action<string, MemberAttributes, Func<Variant>> registerCallback,
@@ -572,11 +583,12 @@ public struct CachedDelegateBuilder(
 /// <summary>
 ///     Extension manager where <c>Define(name)</c> returns an <see cref="IExtensionBuilder" />, which boxes the struct (one allocation per <c>Define</c> call).
 /// </summary>
+[PublicAPI]
 public sealed class StructInterfaceManager
 {
-    private readonly List<Action> _extensionQueue = new(64);
-    private readonly bool _includeStatic = true;
-    private readonly List<object> _members = new(64);
+    private readonly List<Action> _extensionQueue = [with(64)];
+    private readonly bool __includeStatic = true;
+    private readonly List<object> _members = [with(64)];
 
     public int MemberCount => _members.Count;
 
@@ -595,7 +607,7 @@ public sealed class StructInterfaceManager
     {
         _extensionQueue.Add(() =>
         {
-            if ((attributes & MemberAttributes.Static) != 0 && !_includeStatic)
+            if ((attributes & MemberAttributes.Static) != 0 && !__includeStatic)
             {
                 return;
             }
@@ -624,6 +636,7 @@ public sealed class StructInterfaceManager
 /// <summary>
 ///     Builder interface for the struct-box benchmark scenario.
 /// </summary>
+[PublicAPI]
 public interface IExtensionBuilder
 {
     IExtensionBuilder Map(string apiName);
@@ -634,6 +647,7 @@ public interface IExtensionBuilder
 /// <summary>
 ///     Struct builder that implements <see cref="IExtensionBuilder" /> — boxed when returned from <see cref="StructInterfaceManager.Define" />.
 /// </summary>
+[PublicAPI]
 file struct InterfaceStructBuilder(StructInterfaceManager manager, string name) : IExtensionBuilder
 {
     private MemberAttributes _attributes = MemberAttributes.Extension;

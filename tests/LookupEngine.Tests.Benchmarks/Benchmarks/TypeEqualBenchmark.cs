@@ -19,6 +19,7 @@ namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 /// <summary>
 ///     Compares strategies for descriptor resolution by runtime type in a pattern-match switch, as used in <c>DecomposeOptions.DefaultResolveMap</c>.
 /// </summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class TypeEqualBenchmark
 {
     private object Object { get; } = new RoundButton();
@@ -77,8 +78,11 @@ public class TypeEqualBenchmark
     }
 }
 
+[PublicAPI]
 public class ButtonBase;
 
+[PublicAPI]
 public class Button : ButtonBase;
 
+[PublicAPI]
 public sealed class RoundButton : Button;

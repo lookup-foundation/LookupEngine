@@ -21,6 +21,7 @@ namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 /// <summary>
 ///     Tracks the end-to-end cost of <see cref="LookupComposer.Decompose(object, DecomposeOptions)" /> across the available option combinations.
 /// </summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class DecomposeBenchmark
 {
     private static readonly DecomposeOptions DefaultOptions = new();

@@ -19,6 +19,7 @@ namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 /// <summary>
 ///     Compares strategies for base-type chain traversal, as used in <c>LookupComposer.GetTypeHierarchy</c>.
 /// </summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class TypeHierarchyBenchmark
 {
     [Params(typeof(string), typeof(ArgumentException), typeof(List<int>))]

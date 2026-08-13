@@ -20,6 +20,7 @@ namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 /// <summary>
 ///     Compares strategies for the <c>Name&lt;Arg1, Arg2&gt;</c> generic type name format, as implemented in <c>ReflexionFormater.FormatTypeName</c>.
 /// </summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class FormatTypeNameBenchmark
 {
     [Params(typeof(string), typeof(List<int>), typeof(Dictionary<string, List<int>>))]

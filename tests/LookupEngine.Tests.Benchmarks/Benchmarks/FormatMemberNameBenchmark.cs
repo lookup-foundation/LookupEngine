@@ -21,6 +21,7 @@ namespace LookupEngine.Tests.Benchmarks.Benchmarks;
 /// <summary>
 ///     Compares strategies for the <c>Name (Type1, ref Type2, ...)</c> member name format, as implemented in <c>ReflexionFormater.FormatMemberName</c>.
 /// </summary>
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class FormatMemberNameBenchmark
 {
     private MemberInfo _member = null!;
