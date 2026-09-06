@@ -18,7 +18,7 @@ public sealed class TestProjectModule : Module<CommandResult>
     {
         return await context.DotNet().Test(new DotNetTestOptions
         {
-            Project = Projects.LookupEngine_Tests_Unit.FullName,
+            Project = Projects.LookupEngine_Tests.FullName,
             Configuration = "Release"
         }, cancellationToken: cancellationToken);
     }
