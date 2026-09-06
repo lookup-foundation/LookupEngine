@@ -7,7 +7,7 @@
     <File Path="Directory.Build.props"/>
     <File Path="build\appsettings.json"/>
   </Folder>
-  <Folder Name="/Automation/">
+  <Folder Name="/Build/">
     <Project Path="build\Build.csproj">
       <Build Project="false"/>
     </Project>
