@@ -13,7 +13,7 @@ public sealed class ResolverTests
     [Test]
     public async Task Decompose_IncludingUnresolvedData_ResolvedData()
     {
-        //Arrange
+        // Arrange
         var data = new ResolvableObject();
         var options = new DecomposeOptions
         {
@@ -27,11 +27,11 @@ public sealed class ResolverTests
             }
         };
 
-        //Act
+        // Act
         var defaultResult = LookupComposer.Decompose(data);
         var comparableResult = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(defaultResult.Members).IsEmpty();
@@ -42,7 +42,7 @@ public sealed class ResolverTests
     [Test]
     public async Task Decompose_IncludingUnresolvedContextData_ResolvedData()
     {
-        //Arrange
+        // Arrange
         var data = new ResolvableObject();
         var context = new EngineTestContext();
         var options = new DecomposeOptions
@@ -70,12 +70,12 @@ public sealed class ResolverTests
             }
         };
 
-        //Act
+        // Act
         var defaultResult = LookupComposer.Decompose(data);
         var comparableResult = LookupComposer.Decompose(data, options);
         var comparableContextResult = LookupComposer.Decompose(data, contextOptions);
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(defaultResult.Members).IsEmpty();
@@ -88,7 +88,7 @@ public sealed class ResolverTests
     [Test]
     public async Task Decompose_SharedValueDescriptor_DescriptionDoesNotLeakBetweenMembers()
     {
-        //Arrange
+        // Arrange
         var data = new DescribedContainerObject();
         var sharedDescriptor = new SharedValueDescriptor();
         var options = new DecomposeOptions
@@ -105,10 +105,10 @@ public sealed class ResolverTests
             }
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var describedMember = result.Members.First(member => member.Name.StartsWith(nameof(DescribedContainerObject.DescribedMethod)));
         var plainMember = result.Members.First(member => member.Name.StartsWith(nameof(DescribedContainerObject.PlainMethod)));
         using (Assert.Multiple())

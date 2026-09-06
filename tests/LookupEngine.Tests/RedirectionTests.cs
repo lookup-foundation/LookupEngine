@@ -13,7 +13,7 @@ public sealed class RedirectionTests
     [Test]
     public async Task Decompose_ExcludingRedirection_ValueStaysOriginalType()
     {
-        //Arrange
+        // Arrange
         var data = new RedirectContainerObject();
         var options = new DecomposeOptions
         {
@@ -28,11 +28,11 @@ public sealed class RedirectionTests
             }
         };
 
-        //Act
+        // Act
         var defaultResult = LookupComposer.Decompose(data);
         var comparableResult = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(defaultResult.Members).IsNotEmpty();
@@ -44,7 +44,7 @@ public sealed class RedirectionTests
     [Test]
     public async Task Decompose_IncludingRedirection_RedirectedToAnotherValue()
     {
-        //Arrange
+        // Arrange
         var data = new RedirectContainerObject();
         var options = new DecomposeOptions
         {
@@ -59,11 +59,11 @@ public sealed class RedirectionTests
             }
         };
 
-        //Act
+        // Act
         var defaultResult = LookupComposer.Decompose(data);
         var comparableResult = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(defaultResult.Members).IsNotEmpty();
@@ -75,7 +75,7 @@ public sealed class RedirectionTests
     [Test]
     public async Task Decompose_IncludingContextRedirection_RedirectedToAnotherValue()
     {
-        //Arrange
+        // Arrange
         var context = new EngineTestContext();
         var data = new RedirectContainerObject();
         var options = new DecomposeOptions
@@ -105,12 +105,12 @@ public sealed class RedirectionTests
             }
         };
 
-        //Act
+        // Act
         var defaultResult = LookupComposer.Decompose(data);
         var comparableResult = LookupComposer.Decompose(data, options);
         var comparableContextResult = LookupComposer.Decompose(data, contextOptions);
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(defaultResult.Members).IsNotEmpty();
@@ -124,7 +124,7 @@ public sealed class RedirectionTests
     [Test]
     public async Task Decompose_CyclicRedirection_Terminates()
     {
-        //Arrange
+        // Arrange
         var data = new CycleContainerObject();
         var options = new DecomposeOptions
         {
@@ -140,10 +140,10 @@ public sealed class RedirectionTests
             }
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(result).IsNotNull();
@@ -154,7 +154,7 @@ public sealed class RedirectionTests
     [Test]
     public async Task Decompose_CyclicContextRedirection_Terminates()
     {
-        //Arrange
+        // Arrange
         var data = new CycleContainerObject();
         var contextOptions = new DecomposeOptions<EngineTestContext>
         {
@@ -171,10 +171,10 @@ public sealed class RedirectionTests
             }
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, contextOptions);
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(result).IsNotNull();

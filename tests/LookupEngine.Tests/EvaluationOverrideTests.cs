@@ -14,14 +14,14 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Decompose_EvaluatedOverride_BeatsDeferringPolicy()
     {
-        //Arrange
+        // Arrange
         var data = new OverridableObject();
         var options = CreateOptions(manager => manager.Member(nameof(OverridableObject.GetText)).Evaluate());
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var overriddenMember = result.Members.First(member => member.Name == nameof(OverridableObject.GetText));
         var policyMember = result.Members.First(member => member.Name == nameof(OverridableObject.GetHeavy));
         using (Assert.Multiple())
@@ -35,14 +35,14 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Decompose_EvaluatedOverride_BeatsVoidDeferral()
     {
-        //Arrange
+        // Arrange
         var data = new OverridableObject();
         var options = CreateOptions(manager => manager.Member(nameof(OverridableObject.Run)).Evaluate(), MethodEvaluationPolicy.All);
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(OverridableObject.Run));
         using (Assert.Multiple())
         {
@@ -54,14 +54,14 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Decompose_DeferredOverride_BeatsEvaluatingPolicy()
     {
-        //Arrange
+        // Arrange
         var data = new OverridableObject();
         var options = CreateOptions(manager => manager.Member(nameof(OverridableObject.GetHeavy)).Defer(), MethodEvaluationPolicy.All);
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var deferredMember = result.Members.First(member => member.Name == nameof(OverridableObject.GetHeavy));
         var policyMember = result.Members.First(member => member.Name == nameof(OverridableObject.GetText));
         await Assert.That(deferredMember.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
@@ -78,14 +78,14 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Evaluate_DeferredHandler_InvokesHandler()
     {
-        //Arrange
+        // Arrange
         var data = new OverridableObject();
         var options = CreateOptions(manager => manager.Member(nameof(OverridableObject.WithParameter)).Defer(() => Variants.Value("Resolved")));
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name.StartsWith(nameof(OverridableObject.WithParameter)));
         await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
 
@@ -100,14 +100,14 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Resolve_PlainValueHandler_AutoWrapsVariant()
     {
-        //Arrange
+        // Arrange
         var data = new OverridableObject();
         var options = CreateOptions(manager => manager.Member(nameof(OverridableObject.GetHeavy)).Evaluate(() => "Plain"));
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(OverridableObject.GetHeavy));
         using (Assert.Multiple())
         {
@@ -119,14 +119,14 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Evaluate_DisabledMember_Throws()
     {
-        //Arrange
+        // Arrange
         var data = new OverridableObject();
         var options = CreateOptions(manager => manager.Member(nameof(OverridableObject.Delete)).Disable(), MethodEvaluationPolicy.All);
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(OverridableObject.Delete));
         using (Assert.Multiple())
         {
@@ -143,14 +143,14 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Revaluate_EvaluatedMethod_Revaluated()
     {
-        //Arrange
+        // Arrange
         var data = new OverridableObject();
         var options = CreateOptions(manager => manager.Member(nameof(OverridableObject.Run)).Evaluate(), MethodEvaluationPolicy.All);
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(OverridableObject.Run));
         using (Assert.Multiple())
         {
@@ -172,14 +172,14 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Revaluate_DeferredMember_Revaluated()
     {
-        //Arrange
+        // Arrange
         var data = new OverridableObject();
         var options = CreateOptions(manager => manager.Member(nameof(OverridableObject.Delete)).Defer(), MethodEvaluationPolicy.None);
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(OverridableObject.Delete));
         await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
 
@@ -197,14 +197,14 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Decompose_DisabledParametricMethod_AlwaysIncluded()
     {
-        //Arrange
+        // Arrange
         var data = new OverridableObject();
         var options = CreateOptions(manager => manager.Member(nameof(OverridableObject.WithParameter)).Disable());
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name.StartsWith(nameof(OverridableObject.WithParameter)));
         await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Disabled);
     }
@@ -212,17 +212,17 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Decompose_DeferredParametricMethodWithoutHandler_RemainsUnsupported()
     {
-        //Arrange
+        // Arrange
         var data = new OverridableObject();
         var hiddenOptions = CreateOptions(manager => manager.Member(nameof(OverridableObject.WithParameter)).Defer());
         var includedOptions = CreateOptions(manager => manager.Member(nameof(OverridableObject.WithParameter)).Defer());
         includedOptions.IncludeUnsupported = true;
 
-        //Act
+        // Act
         var hiddenResult = LookupComposer.Decompose(data, hiddenOptions);
         var includedResult = LookupComposer.Decompose(data, includedOptions);
 
-        //Assert
+        // Assert
         var member = includedResult.Members.First(member => member.Name.StartsWith(nameof(OverridableObject.WithParameter)));
         using (Assert.Multiple())
         {
@@ -235,7 +235,7 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Decompose_PerOverloadOverride_DisablesMatchingOverloadOnly()
     {
-        //Arrange
+        // Arrange
         var data = new OverloadedObject();
         var options = CreateOverloadOptions(manager =>
         {
@@ -247,10 +247,10 @@ public sealed class EvaluationOverrideTests
                 .Evaluate(() => "By int");
         });
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var members = result.Members.Where(item => item.Name.StartsWith(nameof(OverloadedObject.Get))).ToList();
         var disabledMember = members.First(item => item.Name.Contains(nameof(String)));
         var evaluatedMember = members.First(item => item.Name.Contains(nameof(Int32)));
@@ -265,14 +265,14 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Decompose_DeferredProperty_EvaluatesByReflection()
     {
-        //Arrange
+        // Arrange
         var data = new OverridablePropertyObject();
         var options = CreatePropertyOptions(manager => manager.Member(nameof(OverridablePropertyObject.Text)).Defer());
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(OverridablePropertyObject.Text));
         using (Assert.Multiple())
         {
@@ -292,14 +292,14 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Decompose_DisabledProperty_NeverEvaluated()
     {
-        //Arrange
+        // Arrange
         var data = new OverridablePropertyObject();
         var options = CreatePropertyOptions(manager => manager.Member(nameof(OverridablePropertyObject.Secret)).Disable());
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(OverridablePropertyObject.Secret));
         using (Assert.Multiple())
         {
@@ -320,7 +320,7 @@ public sealed class EvaluationOverrideTests
     [Test]
     public async Task Evaluate_DeferredContextProperty_InvokesHandlerWithContext()
     {
-        //Arrange
+        // Arrange
         var data = new OverridablePropertyObject();
         var options = new DecomposeOptions<OverrideTestContext>
         {
@@ -335,10 +335,10 @@ public sealed class EvaluationOverrideTests
             }
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(OverridablePropertyObject.ContextResolvable));
         await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
 

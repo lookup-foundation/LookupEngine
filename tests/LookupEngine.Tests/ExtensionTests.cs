@@ -14,7 +14,7 @@ public sealed class ExtensionTests
     [Test]
     public async Task Decompose_IncludingExtensions_ExtensionHandled()
     {
-        //Arrange
+        // Arrange
         var data = new ExtensibleObject();
         var options = new DecomposeOptions
         {
@@ -29,11 +29,11 @@ public sealed class ExtensionTests
             }
         };
 
-        //Act
+        // Act
         var defaultResult = LookupComposer.Decompose(data);
         var comparableResult = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(defaultResult.Members).IsEmpty();
@@ -46,7 +46,7 @@ public sealed class ExtensionTests
     [Test]
     public async Task Decompose_PlainObjectExtension_EquivalentToVariantExtension()
     {
-        //Arrange
+        // Arrange
         var data = new ExtensibleObject();
         var options = new DecomposeOptions
         {
@@ -61,12 +61,12 @@ public sealed class ExtensionTests
             }
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
         var plainMember = result.Members.Single(member => member.Name == "PlainExtension");
         var variantMember = result.Members.Single(member => member.Name == "VariantExtension");
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(plainMember.Value.RawValue).IsEqualTo(variantMember.Value.RawValue);
@@ -79,7 +79,7 @@ public sealed class ExtensionTests
     [Test]
     public async Task Decompose_IncludingContextExtensions_ExtensionHandled()
     {
-        //Arrange
+        // Arrange
         var data = new ExtensibleObject();
         var context = new EngineTestContext();
         var options = new DecomposeOptions
@@ -109,12 +109,12 @@ public sealed class ExtensionTests
             }
         };
 
-        //Act
+        // Act
         var defaultResult = LookupComposer.Decompose(data);
         var comparableResult = LookupComposer.Decompose(data, options);
         var comparableContextResult = LookupComposer.Decompose(data, contextOptions);
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(defaultResult.Members).IsEmpty();
@@ -129,17 +129,17 @@ public sealed class ExtensionTests
     [Test]
     public async Task Decompose_StaticExtension_HiddenUnlessIncludeStaticMembers()
     {
-        //Arrange
+        // Arrange
         var data = new ExtensibleObject();
         var hiddenOptions = CreateExtensionOptions(configuration => configuration.Extension("StaticExtension").AsStatic().Register(() => "Value"));
         var includedOptions = CreateExtensionOptions(configuration => configuration.Extension("StaticExtension").AsStatic().Register(() => "Value"));
         includedOptions.IncludeStaticMembers = true;
 
-        //Act
+        // Act
         var hiddenResult = LookupComposer.Decompose(data, hiddenOptions);
         var includedResult = LookupComposer.Decompose(data, includedOptions);
 
-        //Assert
+        // Assert
         var decomposedMember = includedResult.Members.Single(member => member.Name == "StaticExtension");
         using (Assert.Multiple())
         {
@@ -153,14 +153,14 @@ public sealed class ExtensionTests
     [Test]
     public async Task Decompose_DeferredExtension_EvaluatesOnForce()
     {
-        //Arrange
+        // Arrange
         var data = new ExtensibleObject();
         var options = CreateExtensionOptions(configuration => configuration.Extension("DeferredExtension").Defer(() => "Computed"));
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.Single(member => member.Name == "DeferredExtension");
         using (Assert.Multiple())
         {
@@ -181,15 +181,15 @@ public sealed class ExtensionTests
     [Test]
     public async Task Decompose_DeferredVoidExtension_InvokesActionOnForce()
     {
-        //Arrange
+        // Arrange
         var data = new ExtensibleObject();
         var invoked = false;
         var options = CreateExtensionOptions(configuration => configuration.Extension("VoidExtension").Defer(() => { invoked = true; }));
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.Single(member => member.Name == "VoidExtension");
         using (Assert.Multiple())
         {
@@ -211,7 +211,7 @@ public sealed class ExtensionTests
     [Test]
     public async Task Decompose_DeferredVoidContextExtension_InvokesActionWithContextOnForce()
     {
-        //Arrange
+        // Arrange
         var data = new ExtensibleObject();
         var observedVersion = 0;
         var options = new DecomposeOptions<EngineTestContext>
@@ -225,10 +225,10 @@ public sealed class ExtensionTests
             }
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.Single(member => member.Name == "VoidContextExtension");
         using (Assert.Multiple())
         {
@@ -247,17 +247,17 @@ public sealed class ExtensionTests
     [Test]
     public async Task Decompose_DisabledExtension_HiddenUnlessIncludeUnsupported()
     {
-        //Arrange
+        // Arrange
         var data = new ExtensibleObject();
         var hiddenOptions = CreateExtensionOptions(configuration => configuration.Extension("DisabledExtension").Disable());
         var includedOptions = CreateExtensionOptions(configuration => configuration.Extension("DisabledExtension").Disable());
         includedOptions.IncludeUnsupported = true;
 
-        //Act
+        // Act
         var hiddenResult = LookupComposer.Decompose(data, hiddenOptions);
         var includedResult = LookupComposer.Decompose(data, includedOptions);
 
-        //Assert
+        // Assert
         var decomposedMember = includedResult.Members.Single(member => member.Name == "DisabledExtension");
         using (Assert.Multiple())
         {
@@ -273,17 +273,17 @@ public sealed class ExtensionTests
     [Test]
     public async Task Decompose_NotSupportedExtension_HiddenUnlessIncludeUnsupported()
     {
-        //Arrange
+        // Arrange
         var data = new ExtensibleObject();
         var hiddenOptions = CreateExtensionOptions(configuration => configuration.Extension("UnsupportedExtension").NotSupported());
         var includedOptions = CreateExtensionOptions(configuration => configuration.Extension("UnsupportedExtension").NotSupported());
         includedOptions.IncludeUnsupported = true;
 
-        //Act
+        // Act
         var hiddenResult = LookupComposer.Decompose(data, hiddenOptions);
         var includedResult = LookupComposer.Decompose(data, includedOptions);
 
-        //Assert
+        // Assert
         var decomposedMember = includedResult.Members.Single(member => member.Name == "UnsupportedExtension");
         using (Assert.Multiple())
         {
@@ -296,7 +296,7 @@ public sealed class ExtensionTests
     [Test]
     public async Task Decompose_MappedStaticDeferredExtension_CombinesModifiersAndTerminal()
     {
-        //Arrange
+        // Arrange
         var data = new ExtensibleObject();
         var options = CreateExtensionOptions(configuration => configuration
             .Extension("CombinedExtension")
@@ -305,10 +305,10 @@ public sealed class ExtensionTests
             .Defer(() => Variants.Value("Combined")));
         options.IncludeStaticMembers = true;
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.Single(member => member.Name == "CombinedExtension");
         using (Assert.Multiple())
         {
@@ -323,7 +323,7 @@ public sealed class ExtensionTests
     [Test]
     public async Task Decompose_DeferredContextExtension_InvokesHandlerWithContext()
     {
-        //Arrange
+        // Arrange
         var data = new ExtensibleObject();
         var options = new DecomposeOptions<EngineTestContext>
         {
@@ -336,10 +336,10 @@ public sealed class ExtensionTests
             }
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.Single(member => member.Name == "ContextDeferred");
         await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
 

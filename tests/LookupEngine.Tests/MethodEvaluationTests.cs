@@ -17,13 +17,13 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Decompose_DefaultPolicy_MethodsAreDeferred()
     {
-        //Arrange
+        // Arrange
         var data = new EvaluableObject();
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(EvaluableObject.GetText));
         using (Assert.Multiple())
         {
@@ -38,14 +38,14 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Decompose_AllPolicy_MethodsAreEvaluated()
     {
-        //Arrange
+        // Arrange
         var data = new EvaluableObject();
         var options = new DecomposeOptions { EvaluationPolicy = MethodEvaluationPolicy.All };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(EvaluableObject.GetText));
         using (Assert.Multiple())
         {
@@ -58,14 +58,14 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Decompose_MatchingFilter_MethodsAreEvaluated()
     {
-        //Arrange
+        // Arrange
         var data = new EvaluableObject();
         var options = CreateFilteredOptions((_, declaringType) => declaringType.Namespace == "LookupEngine.Tests");
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(EvaluableObject.GetText));
         using (Assert.Multiple())
         {
@@ -77,14 +77,14 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Decompose_MismatchingFilter_MethodsAreDeferred()
     {
-        //Arrange
+        // Arrange
         var data = new EvaluableObject();
         var options = CreateFilteredOptions((_, declaringType) => declaringType.Namespace == "System");
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(EvaluableObject.GetText));
         await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
     }
@@ -92,7 +92,7 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Decompose_FilteredHierarchy_BaseMethodsAreDeferred()
     {
-        //Arrange
+        // Arrange
         var data = new EvaluableObject();
         var options = new DecomposeOptions
         {
@@ -116,10 +116,10 @@ public sealed class MethodEvaluationTests
             }
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var ownMember = result.Members.First(member => member.Name == nameof(EvaluableObject.GetText));
         var baseMember = result.Members.First(member => member.Name == nameof(ToString));
         using (Assert.Multiple())
@@ -132,17 +132,17 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Decompose_NullNamespaceType_HandledByFilter()
     {
-        //Arrange
+        // Arrange
         var data = new
         {
             Name = "Test"
         };
 
-        //Act
+        // Act
         var universalResult = LookupComposer.Decompose(data, CreateFilteredOptions((_, _) => true));
         var filteredResult = LookupComposer.Decompose(data, CreateFilteredOptions((_, declaringType) => declaringType.Namespace?.StartsWith("System", StringComparison.Ordinal) ?? false));
 
-        //Assert
+        // Assert
         var universalMember = universalResult.Members.First(member => member.Name == nameof(ToString));
         var filteredMember = filteredResult.Members.First(member => member.Name == nameof(ToString));
         using (Assert.Multiple())
@@ -155,17 +155,17 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Decompose_AllPolicy_VoidMethodsAreDeferred()
     {
-        //Arrange
+        // Arrange
         var data = new VoidMethodObject();
         var options = new DecomposeOptions
         {
             EvaluationPolicy = MethodEvaluationPolicy.All
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(VoidMethodObject.Run));
         using (Assert.Multiple())
         {
@@ -178,7 +178,7 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Decompose_ReturnTypeFilter_MethodsAreDeferred()
     {
-        //Arrange
+        // Arrange
         var data = new ReturnTypesObject();
         var options = new DecomposeOptions
         {
@@ -188,10 +188,10 @@ public sealed class MethodEvaluationTests
             }
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var excludedMember = result.Members.First(member => member.Name == nameof(ReturnTypesObject.IsValid));
         var evaluatedMember = result.Members.First(member => member.Name == nameof(ReturnTypesObject.GetNumber));
         using (Assert.Multiple())
@@ -205,7 +205,7 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Decompose_EvaluateAllFilter_VoidMethodsAreEvaluated()
     {
-        //Arrange
+        // Arrange
         var data = new VoidMethodObject();
         var options = new DecomposeOptions
         {
@@ -215,10 +215,10 @@ public sealed class MethodEvaluationTests
             }
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(VoidMethodObject.Run));
         using (Assert.Multiple())
         {
@@ -233,18 +233,18 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Decompose_ParametricMethodWithoutResolver_RemainsUnsupported()
     {
-        //Arrange
+        // Arrange
         var data = new ParametricObject();
         var options = new DecomposeOptions
         {
             IncludeUnsupported = true
         };
 
-        //Act
+        // Act
         var defaultResult = LookupComposer.Decompose(data);
         var comparableResult = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = comparableResult.Members.First(member => member.Name.StartsWith(nameof(ParametricObject.WithParameter)));
         using (Assert.Multiple())
         {
@@ -258,16 +258,16 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Evaluate_DeferredMethod_UpdatesMemberInPlace()
     {
-        //Arrange
+        // Arrange
         var data = new EvaluableObject();
         var result = LookupComposer.Decompose(data);
         var member = result.Members.First(member => member.Name == nameof(EvaluableObject.GetNumber));
         var originalDepth = member.Depth;
 
-        //Act
+        // Act
         member.Evaluate();
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
@@ -284,15 +284,15 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Evaluate_DeferredVoidMethod_InvokesMethod()
     {
-        //Arrange
+        // Arrange
         var data = new VoidMethodObject();
         var result = LookupComposer.Decompose(data);
         var member = result.Members.First(member => member.Name == nameof(VoidMethodObject.Run));
 
-        //Act
+        // Act
         member.Evaluate();
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
@@ -306,7 +306,7 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Evaluate_DeferredResolvedMethod_InvokesResolverHandler()
     {
-        //Arrange
+        // Arrange
         var data = new ResolvableObject();
         var options = new DecomposeOptions
         {
@@ -320,10 +320,10 @@ public sealed class MethodEvaluationTests
             }
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name.StartsWith(nameof(ResolvableObject.ResolvableMethod)));
         await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
 
@@ -339,7 +339,7 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Evaluate_DeferredContextMethod_InvokesHandlerWithContext()
     {
-        //Arrange
+        // Arrange
         var data = new ResolvableObject();
         var contextOptions = new DecomposeOptions<EvaluationTestContext>
         {
@@ -354,10 +354,10 @@ public sealed class MethodEvaluationTests
             }
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, contextOptions);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name.StartsWith(nameof(ResolvableObject.ContextMethod)));
         await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
 
@@ -372,15 +372,15 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Evaluate_ThrowingMethod_ExceptionBecomesValue()
     {
-        //Arrange
+        // Arrange
         var data = new ThrowingMethodObject();
         var result = LookupComposer.Decompose(data);
         var member = result.Members.First(member => member.Name == nameof(ThrowingMethodObject.ThrowingMethod));
 
-        //Act
+        // Act
         member.Evaluate();
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
@@ -392,7 +392,7 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Evaluate_RedirectedMethod_ValueIsRedirected()
     {
-        //Arrange
+        // Arrange
         var data = new RedirectReturningObject();
         var options = new DecomposeOptions
         {
@@ -407,10 +407,10 @@ public sealed class MethodEvaluationTests
             }
         };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data, options);
 
-        //Assert
+        // Assert
         var member = result.Members.First(member => member.Name == nameof(RedirectReturningObject.GetValue));
         await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Deferred);
 
@@ -425,16 +425,16 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Revaluate_EvaluatedMember_Evaluated()
     {
-        //Arrange
+        // Arrange
         var data = new EvaluableObject();
         var options = new DecomposeOptions { EvaluationPolicy = MethodEvaluationPolicy.All };
         var result = LookupComposer.Decompose(data, options);
         var member = result.Members.First(member => member.Name == nameof(EvaluableObject.GetText));
 
-        //Act
+        // Act
         member.Evaluate();
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
@@ -446,16 +446,16 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Revaluate_Twice_Evaluated()
     {
-        //Arrange
+        // Arrange
         var data = new EvaluableObject();
         var result = LookupComposer.Decompose(data);
         var member = result.Members.First(member => member.Name == nameof(EvaluableObject.GetText));
 
-        //Act
+        // Act
         member.Evaluate();
         member.Evaluate();
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
@@ -467,13 +467,13 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Revaluate_Field_Evaluated()
     {
-        //Arrange
+        // Arrange
         var data = new FieldHolder();
         var options = new DecomposeOptions { IncludeFields = true };
         var result = LookupComposer.Decompose(data, options);
         var member = result.Members.First(member => member.Name == nameof(FieldHolder.Counter));
 
-        //Assert
+        // Assert
         using (Assert.Multiple())
         {
             await Assert.That(member.EvaluationPolicy).IsEqualTo(MemberEvaluationPolicy.Evaluated);
@@ -489,16 +489,16 @@ public sealed class MethodEvaluationTests
     [Test]
     public async Task Decompose_DeferredMembers_SerializationRoundTrip()
     {
-        //Arrange
+        // Arrange
         var data = new EvaluableObject();
         var serializerOptions = new JsonSerializerOptions { WriteIndented = true };
 
-        //Act
+        // Act
         var result = LookupComposer.Decompose(data);
         var json = JsonSerializer.Serialize(result, serializerOptions);
         var deserialized = JsonSerializer.Deserialize<DecomposedObject>(json);
 
-        //Assert
+        // Assert
         var member = deserialized!.Members.First(member => member.Name == nameof(EvaluableObject.GetText));
         using (Assert.Multiple())
         {
