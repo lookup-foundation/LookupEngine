@@ -1,4 +1,4 @@
-﻿using LookupEngine.Abstractions.Decomposition;
+using LookupEngine.Abstractions.Decomposition;
 
 namespace LookupEngine.Descriptors;
 

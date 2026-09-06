@@ -1,4 +1,4 @@
-﻿namespace LookupEngine.Diagnostic;
+namespace LookupEngine.Diagnostic;
 
 /// <summary>
 ///     Measures a single diagnostic dimension around a member evaluation.

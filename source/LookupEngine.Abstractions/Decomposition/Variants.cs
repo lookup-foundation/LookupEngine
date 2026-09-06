@@ -1,4 +1,4 @@
-﻿using LookupEngine.Abstractions.Decomposition.Containers;
+using LookupEngine.Abstractions.Decomposition.Containers;
 
 namespace LookupEngine.Abstractions.Decomposition;
 

@@ -1,4 +1,4 @@
-﻿namespace LookupEngine.Abstractions.Decomposition;
+namespace LookupEngine.Abstractions.Decomposition;
 
 /// <summary>
 ///     A mutable accumulator for multiple <see cref="IVariant" /> values produced by a single member.

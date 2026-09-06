@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using LookupEngine.Formaters;
 
 // ReSharper disable once CheckNamespace

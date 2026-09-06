@@ -1,4 +1,4 @@
-﻿namespace LookupEngine.Options;
+namespace LookupEngine.Options;
 
 /// <summary>
 ///     Extends <see cref="DecomposeOptions" /> with a required execution context passed through to
