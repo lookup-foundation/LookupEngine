@@ -14,7 +14,27 @@
 
 using BenchmarkDotNet.Attributes;
 
-namespace LookupEngine.Tests.Benchmarks.Benchmarks;
+namespace LookupEngine.Benchmarks.Benchmarks;
+
+// ```
+//
+// BenchmarkDotNet v0.15.8, Windows 11 (10.0.28000.2704/26H1/2026Update)
+// AMD Ryzen 9 9950X3D 4.30GHz, 1 CPU, 32 logical and 16 physical cores
+// .NET SDK 10.0.111
+//   [Host]     : .NET 10.0.11 (10.0.11, 10.0.1126.37416), X64 RyuJIT x86-64-v4
+//   DefaultJob : .NET 10.0.11 (10.0.11, 10.0.1126.37416), X64 RyuJIT x86-64-v4
+//
+// ```
+//
+// | Method                              | Type       | Mean     | Error     | StdDev    | Ratio | RatioSD | Allocated | Alloc Ratio |
+// |------------------------------------ |----------- |---------:|----------:|----------:|------:|--------:|----------:|------------:|
+// | **PatternMatching**                     | **?**          | **1.352 ns** | **0.0236 ns** | **0.0210 ns** |  **0.96** |    **0.02** |         **-** |          **NA** |
+// | PatternMatchingWithTypeEquality     | ?          | 1.413 ns | 0.0139 ns | 0.0116 ns |  1.00 |    0.01 |         - |          NA |
+// | PatternMatchingWithFullNameEquality | ?          | 1.868 ns | 0.0202 ns | 0.0179 ns |  1.32 |    0.02 |         - |          NA |
+// |                                     |            |          |           |           |       |         |           |             |
+// | **PatternMatching**                     | **ButtonBase** | **1.364 ns** | **0.0262 ns** | **0.0245 ns** |  **0.68** |    **0.01** |         **-** |          **NA** |
+// | PatternMatchingWithTypeEquality     | ButtonBase | 2.002 ns | 0.0263 ns | 0.0246 ns |  1.00 |    0.02 |         - |          NA |
+// | PatternMatchingWithFullNameEquality | ButtonBase | 4.209 ns | 0.0513 ns | 0.0480 ns |  2.10 |    0.03 |         - |          NA |
 
 /// <summary>
 ///     Compares strategies for descriptor resolution by runtime type in a pattern-match switch, as used in <c>DecomposeOptions.DefaultResolveMap</c>.

@@ -16,7 +16,23 @@ using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Attributes;
 using LookupEngine.Abstractions;
 
-namespace LookupEngine.Tests.Benchmarks.Benchmarks;
+namespace LookupEngine.Benchmarks.Benchmarks;
+
+// ```
+//
+// BenchmarkDotNet v0.15.8, Windows 11 (10.0.28000.2704/26H1/2026Update)
+// AMD Ryzen 9 9950X3D 4.30GHz, 1 CPU, 32 logical and 16 physical cores
+// .NET SDK 10.0.111
+//   [Host] : .NET 10.0.11 (10.0.11, 10.0.1126.37416), X64 RyuJIT x86-64-v4
+//
+// ```
+//
+// | Method  | Mean | Error | Ratio | RatioSD | Alloc Ratio |
+// |-------- |-----:|------:|------:|--------:|------------:|
+// | Default |   NA |    NA |     ? |       ? |           ? |
+//
+// Benchmarks with issues:
+//   DecomposeBenchmark.Default: DefaultJob
 
 /// <summary>
 ///     Tracks the end-to-end cost of <see cref="LookupComposer.Decompose(object, DecomposeOptions)" /> across the available option combinations.

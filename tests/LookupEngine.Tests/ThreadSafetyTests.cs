@@ -3,7 +3,7 @@ using LookupEngine.Abstractions.Configuration;
 using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Descriptors;
 
-namespace LookupEngine.Tests.Unit;
+namespace LookupEngine.Tests;
 
 /// <summary>
 ///     Tests for thread safety in concurrent decomposition.

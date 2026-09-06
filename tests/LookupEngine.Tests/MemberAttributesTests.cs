@@ -3,7 +3,7 @@ using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Abstractions.Enums;
 using LookupEngine.Descriptors;
 
-namespace LookupEngine.Tests.Unit;
+namespace LookupEngine.Tests;
 
 /// <summary>
 ///     Tests for <see cref="MemberAttributes" /> flag assignment and combination.

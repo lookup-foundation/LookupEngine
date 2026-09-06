@@ -7,8 +7,9 @@
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     </PropertyGroup>
 
+    <!-- Core dependencies -->
     <ItemGroup>
-        <!-- Build Automation -->
+        <!-- Build automation -->
         <PackageVersion Include="Sourcy.DotNet" Version="1.1.1"/>
         <PackageVersion Include="ModularPipelines" Version="3.2.8"/>
         <PackageVersion Include="ModularPipelines.Git" Version="3.2.8"/>
@@ -20,11 +21,11 @@
         <PackageVersion Include="Shouldly" Version="4.3.0"/>
         <PackageVersion Include="BenchmarkDotNet" Version="0.15.8"/>
 
-        <!-- System Dependencies -->
+        <!-- System dependencies -->
         <PackageVersion Include="System.Text.Json" Version="10.0.11"/>
     </ItemGroup>
 
-    <!-- Development Dependencies -->
+    <!-- Development dependencies -->
     <ItemGroup>
         <GlobalPackageReference Include="Polyfill" Version="11.2.0"/>
         <GlobalPackageReference Include="JetBrains.Annotations.Sources" Version="2026.2.0"/>

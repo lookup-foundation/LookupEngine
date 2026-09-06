@@ -28,8 +28,8 @@ The engine runs on hot paths such as interactive object inspectors; it stays fas
 
 * `source/LookupEngine.Abstractions/` — the pure contract layer. `Configuration/` holds the descriptor and member-configurator interfaces and the fluent builders, `Decomposition/` holds the Descriptor abstraction and the `Variants` factory, `Metadata/` holds the result model, and `Enums/` holds the member flags and evaluation policy.
 * `source/LookupEngine/` — the engine. `Engine/` holds `LookupComposer` and the generic `LookupComposer<TContext>`, split into partials by responsibility; `Descriptors/` holds the built-in descriptors; `Options/` holds LookupComposer's `DecomposeOptions` and `MethodEvaluationPolicy`; `Diagnostic/` holds the time and memory diagnosers; `Formaters/` holds the display formatters; `Exceptions/` holds engine exceptions.
-* `tests/LookupEngine.Tests.Unit/` — the TUnit suite.
-* `tests/LookupEngine.Tests.Benchmarks/` — the BenchmarkDotNet console executable.
+* `tests/LookupEngine.Tests/` — the TUnit suite.
+* `tests/LookupEngine.Benchmarks/` — the BenchmarkDotNet console executable.
 * `build/` — the ModularPipelines build.
 * Root — `Directory.Build.props`, `Directory.Packages.props`, `global.json`, the `LookupEngine.slnx` solution, `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, CI workflows.
 
@@ -37,4 +37,4 @@ The engine runs on hot paths such as interactive object inspectors; it stays fas
 
 * Compile: `dotnet build -c Release`.
 * Test: `dotnet test`.
-* Run the benchmarks: set a Job.Dry and run `dotnet run -c Release --project tests/LookupEngine.Tests.Benchmarks`.
+* Run the benchmarks: set a Job.Dry and run `dotnet run -c Release --project tests/LookupEngine.Benchmarks`.

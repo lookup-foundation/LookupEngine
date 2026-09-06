@@ -1,4 +1,4 @@
-namespace LookupEngine.Tests.Unit;
+namespace LookupEngine.Tests;
 
 /// <summary>
 ///     Tests for exception capture and error behavior.

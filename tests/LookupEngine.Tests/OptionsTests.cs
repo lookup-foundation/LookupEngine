@@ -1,4 +1,4 @@
-namespace LookupEngine.Tests.Unit;
+namespace LookupEngine.Tests;
 
 /// <summary>
 ///     Tests for <see cref="DecomposeOptions" /> configuration and its effect on decomposition behavior.

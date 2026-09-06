@@ -4,7 +4,7 @@ using LookupEngine.Abstractions.Enums;
 using LookupEngine.Descriptors;
 using LookupEngine.Options;
 
-namespace LookupEngine.Tests.Unit;
+namespace LookupEngine.Tests;
 
 /// <summary>
 ///     Tests for per-member evaluation overrides declared through <see cref="IDescriptorConfigurator" />.

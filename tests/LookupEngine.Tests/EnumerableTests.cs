@@ -1,7 +1,7 @@
 using System.Collections;
 using LookupEngine.Descriptors;
 
-namespace LookupEngine.Tests.Unit;
+namespace LookupEngine.Tests;
 
 /// <summary>
 ///     Tests for <c>IEnumerable</c> decomposition.

@@ -1,0 +1,19 @@
+﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Running;
+using LookupEngine.Benchmarks.Benchmarks;
+
+var configuration = ManualConfig.Create(DefaultConfig.Instance)
+    .AddJob(Job.Default)
+    .AddDiagnoser(MemoryDiagnoser.Default)
+    .AddExporter(MarkdownExporter.GitHub);
+
+BenchmarkRunner.Run<FormatTypeNameBenchmark>(configuration);
+BenchmarkRunner.Run<FormatMemberNameBenchmark>(configuration);
+BenchmarkRunner.Run<TypeHierarchyBenchmark>(configuration);
+BenchmarkRunner.Run<MemberEnumerationBenchmark>(configuration);
+BenchmarkRunner.Run<TypeEqualBenchmark>(configuration);
+BenchmarkRunner.Run<ExtensionRegistrationBenchmark>(configuration);
+BenchmarkRunner.Run<DecomposeBenchmark>(configuration);

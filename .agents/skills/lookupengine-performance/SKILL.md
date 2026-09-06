@@ -91,7 +91,7 @@ Reserve `[UnsafeAccessor]` for hot paths proven by a benchmark, and gate it with
 
 ### Step 6: Benchmark only a real choice, then verify
 
-Add a benchmark to `tests/LookupEngine.Tests.Benchmarks` only when an implementation has more than one viable approach; compare the candidates and let the numbers decide.
+Add a benchmark to `tests/LookupEngine.Benchmarks` only when an implementation has more than one viable approach; compare the candidates and let the numbers decide.
 Mark the candidate that mirrors the shipped code `[Benchmark(Baseline = true)]`; every `Ratio` and `Alloc Ratio` then reads against what the project ships today.
 A strategy benchmark holds its own clean copies of the candidates and must not reference the engine's implementation types; it stays valid after the engine adopts a winner. `TypeHierarchyBenchmark` and
 `ExtensionRegistrationBenchmark` follow this.
@@ -108,7 +108,7 @@ public List<Type> ListWithDynamicGrowth()
 Run the benchmark console project in Release and read the allocation and time columns.
 
 ```shell
-dotnet run -c Release --project tests/LookupEngine.Tests.Benchmarks
+dotnet run -c Release --project tests/LookupEngine.Benchmarks
 ```
 
 ## Validation

@@ -8,6 +8,11 @@
         <PlatformTarget>AnyCPU</PlatformTarget>
     </PropertyGroup>
 
+    <!-- Polyfill configuration -->
+    <PropertyGroup>
+        <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
+    </PropertyGroup>
+
     <!-- Global usings -->
     <ItemGroup>
         <Using Include="JetBrains.Annotations"/>

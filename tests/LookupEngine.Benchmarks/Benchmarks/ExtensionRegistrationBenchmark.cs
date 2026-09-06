@@ -14,7 +14,55 @@
 
 using BenchmarkDotNet.Attributes;
 
-namespace LookupEngine.Tests.Benchmarks.Benchmarks;
+namespace LookupEngine.Benchmarks.Benchmarks;
+
+// ```
+//
+// BenchmarkDotNet v0.15.8, Windows 11 (10.0.28000.2704/26H1/2026Update)
+// AMD Ryzen 9 9950X3D 4.30GHz, 1 CPU, 32 logical and 16 physical cores
+// .NET SDK 10.0.111
+//   [Host]     : .NET 10.0.11 (10.0.11, 10.0.1126.37416), X64 RyuJIT x86-64-v4
+//   DefaultJob : .NET 10.0.11 (10.0.11, 10.0.1126.37416), X64 RyuJIT x86-64-v4
+//
+// ```
+//
+// | Method                              | Count | Mean         | Error      | StdDev     | Ratio | RatioSD | Gen0   | Gen1   | Allocated | Alloc Ratio |
+// |------------------------------------ |------ |-------------:|-----------:|-----------:|------:|--------:|-------:|-------:|----------:|------------:|
+// | **Composer_DirectRegister**             | **1**     |     **17.46 ns** |   **0.120 ns** |   **0.106 ns** |  **0.98** |    **0.01** | **0.0030** |      **-** |     **152 B** |        **1.00** |
+// | Struct_DefineRegister               | 1     |     18.15 ns |   0.329 ns |   0.292 ns |  1.02 |    0.02 | 0.0030 |      - |     152 B |        1.00 |
+// | Class_DefineRegister                | 1     |     19.64 ns |   0.204 ns |   0.180 ns |  1.10 |    0.01 | 0.0038 |      - |     192 B |        1.26 |
+// | StructCachedDelegate_DefineRegister | 1     |     17.81 ns |   0.162 ns |   0.136 ns |  1.00 |    0.01 | 0.0030 |      - |     152 B |        1.00 |
+// | StructInterface_DefineRegister      | 1     |     19.78 ns |   0.289 ns |   0.270 ns |  1.11 |    0.02 | 0.0038 |      - |     192 B |        1.26 |
+// | Composer_NotSupported               | 1     |     14.61 ns |   0.084 ns |   0.070 ns |  0.82 |    0.01 | 0.0024 |      - |     120 B |        0.79 |
+// | Struct_NotSupported                 | 1     |     14.85 ns |   0.286 ns |   0.268 ns |  0.83 |    0.02 | 0.0024 |      - |     120 B |        0.79 |
+// | Composer_MixedScenario              | 1     |     28.93 ns |   0.593 ns |   0.582 ns |  1.62 |    0.03 | 0.0054 |      - |     272 B |        1.79 |
+// | Struct_MixedScenario                | 1     |     31.23 ns |   0.631 ns |   0.726 ns |  1.75 |    0.04 | 0.0054 |      - |     272 B |        1.79 |
+// | Struct_WithMap                      | 1     |     17.68 ns |   0.300 ns |   0.280 ns |  0.99 |    0.02 | 0.0030 |      - |     152 B |        1.00 |
+// | Struct_AsStatic                     | 1     |     18.18 ns |   0.231 ns |   0.216 ns |  1.02 |    0.01 | 0.0030 |      - |     152 B |        1.00 |
+// |                                     |       |              |            |            |       |         |        |        |           |             |
+// | **Composer_DirectRegister**             | **100**   |  **1,509.44 ns** |  **21.692 ns** |  **19.229 ns** |  **1.01** |    **0.02** | **0.3014** | **0.0076** |   **15200 B** |        **1.00** |
+// | Struct_DefineRegister               | 100   |  1,513.46 ns |  20.294 ns |  18.983 ns |  1.01 |    0.02 | 0.3014 | 0.0076 |   15200 B |        1.00 |
+// | Class_DefineRegister                | 100   |  1,787.65 ns |  23.136 ns |  21.642 ns |  1.20 |    0.02 | 0.3815 | 0.0095 |   19200 B |        1.26 |
+// | StructCachedDelegate_DefineRegister | 100   |  1,495.07 ns |  22.076 ns |  20.650 ns |  1.00 |    0.02 | 0.3014 | 0.0076 |   15200 B |        1.00 |
+// | StructInterface_DefineRegister      | 100   |  1,764.42 ns |  23.181 ns |  21.684 ns |  1.18 |    0.02 | 0.3815 | 0.0095 |   19200 B |        1.26 |
+// | Composer_NotSupported               | 100   |  1,058.00 ns |  11.008 ns |   9.758 ns |  0.71 |    0.01 | 0.2384 | 0.0038 |   12000 B |        0.79 |
+// | Struct_NotSupported                 | 100   |  1,088.09 ns |  14.486 ns |  13.550 ns |  0.73 |    0.01 | 0.2384 | 0.0038 |   12000 B |        0.79 |
+// | Composer_MixedScenario              | 100   |  2,666.65 ns |  50.634 ns |  47.363 ns |  1.78 |    0.04 | 0.5417 | 0.0267 |   27200 B |        1.79 |
+// | Struct_MixedScenario                | 100   |  2,710.76 ns |  33.607 ns |  28.063 ns |  1.81 |    0.03 | 0.5417 | 0.0267 |   27200 B |        1.79 |
+// | Struct_WithMap                      | 100   |  1,497.80 ns |  20.341 ns |  18.031 ns |  1.00 |    0.02 | 0.3014 | 0.0076 |   15200 B |        1.00 |
+// | Struct_AsStatic                     | 100   |  1,517.65 ns |  15.112 ns |  13.396 ns |  1.02 |    0.02 | 0.3014 | 0.0076 |   15200 B |        1.00 |
+// |                                     |       |              |            |            |       |         |        |        |           |             |
+// | **Composer_DirectRegister**             | **500**   |  **7,351.18 ns** |  **67.551 ns** |  **63.187 ns** |  **0.97** |    **0.02** | **1.5106** | **0.1907** |   **76000 B** |        **1.00** |
+// | Struct_DefineRegister               | 500   |  7,464.42 ns |  79.623 ns |  70.584 ns |  0.99 |    0.02 | 1.5106 | 0.1907 |   76000 B |        1.00 |
+// | Class_DefineRegister                | 500   |  8,606.03 ns |  76.942 ns |  64.250 ns |  1.14 |    0.02 | 1.9073 | 0.2289 |   96000 B |        1.26 |
+// | StructCachedDelegate_DefineRegister | 500   |  7,564.18 ns | 130.932 ns | 122.474 ns |  1.00 |    0.02 | 1.5106 | 0.1831 |   76000 B |        1.00 |
+// | StructInterface_DefineRegister      | 500   |  8,694.30 ns |  89.949 ns |  79.738 ns |  1.15 |    0.02 | 1.9073 | 0.2289 |   96000 B |        1.26 |
+// | Composer_NotSupported               | 500   |  5,641.15 ns |  64.040 ns |  59.903 ns |  0.75 |    0.01 | 1.1902 | 0.1221 |   60000 B |        0.79 |
+// | Struct_NotSupported                 | 500   |  5,679.29 ns | 112.389 ns | 115.415 ns |  0.75 |    0.02 | 1.1902 | 0.1221 |   60000 B |        0.79 |
+// | Composer_MixedScenario              | 500   | 12,979.20 ns | 117.813 ns |  98.379 ns |  1.72 |    0.03 | 2.7008 | 0.5646 |  136000 B |        1.79 |
+// | Struct_MixedScenario                | 500   | 13,605.26 ns | 268.109 ns | 275.329 ns |  1.80 |    0.05 | 2.7008 | 0.5188 |  136000 B |        1.79 |
+// | Struct_WithMap                      | 500   |  7,561.85 ns |  90.655 ns |  84.799 ns |  1.00 |    0.02 | 1.5106 | 0.1907 |   76000 B |        1.00 |
+// | Struct_AsStatic                     | 500   |  7,656.64 ns | 101.809 ns |  95.232 ns |  1.01 |    0.02 | 1.5106 | 0.1907 |   76000 B |        1.00 |
 
 /// <summary>
 ///     Compares builder shapes for the deferred extension-registration model used by the engine.
@@ -215,10 +263,10 @@ public sealed class Variant(object? value)
 [PublicAPI]
 public sealed class ComposerManager
 {
-    private readonly List<Action> _extensionQueue = [with(64)];
+    private readonly List<Action> _extensionQueue = new(64);
     private readonly bool _includeStatic = true;
     private readonly bool _includeUnsupported = true;
-    private readonly List<object> _members = [with(64)];
+    private readonly List<object> _members = new(64);
 
     public int MemberCount => _members.Count;
 
@@ -283,10 +331,10 @@ public sealed class ComposerManager
 [PublicAPI]
 public sealed class StructManager
 {
-    private readonly List<Action> _extensionQueue = [with(64)];
+    private readonly List<Action> _extensionQueue = new(64);
     private readonly bool _includeStatic = true;
     private readonly bool _includeUnsupported = true;
-    private readonly List<object> _members = [with(64)];
+    private readonly List<object> _members = new(64);
 
     public int MemberCount => _members.Count;
 
@@ -390,9 +438,9 @@ public struct StructBuilder(StructManager manager, string name)
 [PublicAPI]
 public sealed class ClassManager
 {
-    private readonly List<Action> _extensionQueue = [with(64)];
+    private readonly List<Action> _extensionQueue = new(64);
     private readonly bool __includeStatic = true;
-    private readonly List<object> _members = [with(64)];
+    private readonly List<object> _members = new(64);
 
     public int MemberCount => _members.Count;
 
@@ -468,10 +516,10 @@ public sealed class ClassBuilder(ClassManager manager, string name)
 [PublicAPI]
 public sealed class StructCachedDelegateManager
 {
-    private readonly List<Action> _extensionQueue = [with(64)];
+    private readonly List<Action> _extensionQueue = new(64);
     private readonly bool __includeStatic = true;
     private readonly bool _includeUnsupported = true;
-    private readonly List<object> _members = [with(64)];
+    private readonly List<object> _members = new(64);
     private readonly Action<string, MemberAttributes, Func<Variant>> _registerCallback;
     private readonly Action<string, MemberAttributes, MemberEvaluationPolicy> _registerResultCallback;
 
@@ -586,9 +634,9 @@ public struct CachedDelegateBuilder(
 [PublicAPI]
 public sealed class StructInterfaceManager
 {
-    private readonly List<Action> _extensionQueue = [with(64)];
+    private readonly List<Action> _extensionQueue = new(64);
     private readonly bool __includeStatic = true;
-    private readonly List<object> _members = [with(64)];
+    private readonly List<object> _members = new(64);
 
     public int MemberCount => _members.Count;
 

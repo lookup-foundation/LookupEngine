@@ -1,7 +1,7 @@
 using System.Text.Json;
 using LookupEngine.Abstractions;
 
-namespace LookupEngine.Tests.Unit;
+namespace LookupEngine.Tests;
 
 /// <summary>
 ///     Tests for JSON serialization of decomposed objects and members.

@@ -1,6 +1,6 @@
 using LookupEngine.Abstractions.Decomposition;
 
-namespace LookupEngine.Tests.Unit;
+namespace LookupEngine.Tests;
 
 /// <summary>
 ///     Tests for <see cref="IVariant" /> factory methods and variant behavior.

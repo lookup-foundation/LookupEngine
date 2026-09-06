@@ -1,7 +1,7 @@
 using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Descriptors;
 
-namespace LookupEngine.Tests.Unit;
+namespace LookupEngine.Tests;
 
 /// <summary>
 ///     Tests for null value behavior throughout decomposition.

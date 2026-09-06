@@ -7,7 +7,7 @@ using LookupEngine.Abstractions.Enums;
 using LookupEngine.Descriptors;
 using LookupEngine.Options;
 
-namespace LookupEngine.Tests.Unit;
+namespace LookupEngine.Tests;
 
 /// <summary>
 ///     Tests for <see cref="MethodEvaluationPolicy" /> and deferred member force evaluation.
@@ -60,7 +60,7 @@ public sealed class MethodEvaluationTests
     {
         //Arrange
         var data = new EvaluableObject();
-        var options = CreateFilteredOptions((_, declaringType) => declaringType.Namespace == "LookupEngine.Tests.Unit");
+        var options = CreateFilteredOptions((_, declaringType) => declaringType.Namespace == "LookupEngine.Tests");
 
         //Act
         var result = LookupComposer.Decompose(data, options);

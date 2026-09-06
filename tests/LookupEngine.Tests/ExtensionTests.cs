@@ -4,7 +4,7 @@ using LookupEngine.Abstractions.Enums;
 using LookupEngine.Descriptors;
 using LookupEngine.Options;
 
-namespace LookupEngine.Tests.Unit;
+namespace LookupEngine.Tests;
 
 /// <summary>
 ///     Tests for <see cref="IDescriptorConfigurator" /> extension functionality and context data enrichment.

@@ -1,4 +1,4 @@
-namespace LookupEngine.Tests.Unit;
+namespace LookupEngine.Tests;
 
 /// <summary>
 ///     Tests for static type decomposition via <c>typeof(T)</c>.

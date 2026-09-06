@@ -3,7 +3,7 @@ using LookupEngine.Abstractions.Decomposition;
 using LookupEngine.Descriptors;
 using LookupEngine.Options;
 
-namespace LookupEngine.Tests.Unit;
+namespace LookupEngine.Tests;
 
 /// <summary>
 ///     Tests for <see cref="IDescriptorConfigurator" /> member resolution and custom type resolution.

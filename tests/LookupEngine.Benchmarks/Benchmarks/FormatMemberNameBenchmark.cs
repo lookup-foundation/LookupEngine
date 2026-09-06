@@ -16,7 +16,23 @@ using System.Reflection;
 using System.Text;
 using BenchmarkDotNet.Attributes;
 
-namespace LookupEngine.Tests.Benchmarks.Benchmarks;
+namespace LookupEngine.Benchmarks.Benchmarks;
+
+// ```
+//
+// BenchmarkDotNet v0.15.8, Windows 11 (10.0.28000.2704/26H1/2026Update)
+// AMD Ryzen 9 9950X3D 4.30GHz, 1 CPU, 32 logical and 16 physical cores
+// .NET SDK 10.0.111
+//   [Host]     : .NET 10.0.11 (10.0.11, 10.0.1126.37416), X64 RyuJIT x86-64-v4
+//   DefaultJob : .NET 10.0.11 (10.0.11, 10.0.1126.37416), X64 RyuJIT x86-64-v4
+//
+// ```
+//
+// | Method                | Mean     | Error   | StdDev  | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
+// |---------------------- |---------:|--------:|--------:|------:|--------:|-------:|----------:|------------:|
+// | LinqSelectJoin        | 132.6 ns | 1.88 ns | 1.76 ns |  1.25 |    0.02 | 0.0110 |     552 B |        0.84 |
+// | StringBuilderAppend   | 123.9 ns | 1.44 ns | 1.34 ns |  1.17 |    0.01 | 0.0138 |     696 B |        1.06 |
+// | StringBuilderSpanTrim | 106.3 ns | 0.56 ns | 0.47 ns |  1.00 |    0.01 | 0.0130 |     656 B |        1.00 |
 
 /// <summary>
 ///     Compares strategies for the <c>Name (Type1, ref Type2, ...)</c> member name format, as implemented in <c>ReflexionFormater.FormatMemberName</c>.
